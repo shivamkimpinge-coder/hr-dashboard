@@ -10,9 +10,9 @@ function Header({ eyebrow = 'Employee management system', title = 'HR Dashboard'
       <div className="header-actions">
         {currentUser ? <span className="header-user">Hi, {currentUser.name}</span> : null}
         <Button to="/dashboard/add-employee">+ Add Employee</Button>
-        <Button variant="secondary" onClick={onLogout}>
+        {/* <Button variant="secondary" onClick={onLogout}>
           Logout
-        </Button>
+        </Button> */}
       </div>
     </header>
   )

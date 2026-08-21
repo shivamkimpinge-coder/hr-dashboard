@@ -1,58 +1,77 @@
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import CommonForm from '../../../utils/Form/commonform'
+import useApi from '../../../hooks/useApi'
+
+const EMAIL_PATTERN = /\S+@\S+\.\S+/
 
 function ForgetPass({ onBack }) {
-  const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
-  const [error, setError] = useState('')
+  const [submittedEmail, setSubmittedEmail] = useState('')
+  const { forgotPassword, loading } = useApi()
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    mode: 'onTouched',
+    defaultValues: { email: '' },
+  })
 
-    if (!email.trim()) {
-      setError('Please enter your email address.')
-      return
+  const onSubmit = async ({ email }) => {
+    try {
+      await forgotPassword({ email })
+      toast.success('Reset link sent to your email.')
+      setSubmittedEmail(email)
+      setSubmitted(true)
+    } catch (err) {
+      toast.error(err.message || 'Failed to send reset link.')
     }
-
-    if (!email.includes('@')) {
-      setError('Please enter a valid email address.')
-      return
-    }
-
-    setError('')
-    setSubmitted(true)
   }
 
   return (
-    <div className="auth-page auth-page--light">
+    <div className="auth-page auth-page--dark">
       <div className="auth-card">
         <h1>Forgot Password?</h1>
         <p>Enter your email and we’ll send you a reset link.</p>
 
         {submitted ? (
           <div className="auth-success-box">
-            <p>Reset link sent to {email}</p>
+            <p>Reset link sent to {submittedEmail}</p>
             <button type="button" className="auth-secondary-btn" onClick={onBack}>
               Back to Sign In
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="auth-form">
-            <label>Email</label>
-            <input
-              className="auth-input"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-            />
-
-            {error ? <p className="auth-error">{error}</p> : null}
-
-            <button type="submit" className="auth-submit-btn">Send Reset Link</button>
+          <CommonForm
+            formClassName="auth-form"
+            fieldClassName="auth-field"
+            register={register}
+            errors={errors}
+            fields={[
+              {
+                name: 'email',
+                label: 'Email',
+                type: 'email',
+                placeholder: 'Enter your email',
+                className: 'auth-input',
+                rules: {
+                  required: 'Email is required',
+                  pattern: { value: EMAIL_PATTERN, message: 'Please enter a valid email address' },
+                },
+              },
+            ]}
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <button type="submit" className="auth-submit-btn" disabled={loading}>
+              {loading ? 'Sending...' : 'Send Reset Link'}
+            </button>
             <button type="button" className="auth-text-btn" onClick={onBack}>
               Back to Sign In
             </button>
-          </form>
+          </CommonForm>
         )}
       </div>
     </div>

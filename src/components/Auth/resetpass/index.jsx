@@ -1,31 +1,40 @@
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { useSearchParams } from 'react-router-dom'
+import toast from 'react-hot-toast'
+import CommonForm from '../../../utils/Form/commonform'
+import useApi from '../../../hooks/useApi'
 
 function ResetPass({ onBack }) {
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const [searchParams] = useSearchParams()
+  const token = searchParams.get('token')
+
   const [submitted, setSubmitted] = useState(false)
-  const [error, setError] = useState('')
+  const { resetPassword, loading } = useApi()
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({
+    mode: 'onTouched',
+    defaultValues: { password: '', confirmPassword: '' },
+  })
 
-    if (!password || !confirmPassword) {
-      setError('Please fill all fields.')
+  const onSubmit = async ({ password }) => {
+    if (!token) {
+      toast.error('Reset link is invalid or missing a token.')
       return
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.')
-      return
+    try {
+      await resetPassword(token, { password })
+      toast.success('Password reset successfully!')
+      setSubmitted(true)
+    } catch (err) {
+      toast.error(err.message || 'Failed to reset password.')
     }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.')
-      return
-    }
-
-    setError('')
-    setSubmitted(true)
   }
 
   return (
@@ -44,33 +53,45 @@ function ResetPass({ onBack }) {
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="auth-form">
-            <label>New Password</label>
-            <input
-              className="auth-input"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter new password"
-            />
-
-            <label>Confirm Password</label>
-            <input
-              className="auth-input"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm new password"
-            />
-
-            {error ? <p className="auth-error">{error}</p> : null}
-
-            <button type="submit" className="auth-submit-btn">Reset Password</button>
+          <CommonForm
+            formClassName="auth-form"
+            fieldClassName="auth-field"
+            register={register}
+            errors={errors}
+            fields={[
+              {
+                name: 'password',
+                label: 'New Password',
+                type: 'password',
+                placeholder: 'Enter new password',
+                className: 'auth-input',
+                rules: {
+                  required: 'Password is required',
+                  minLength: { value: 6, message: 'Password must be at least 6 characters.' },
+                },
+              },
+              {
+                name: 'confirmPassword',
+                label: 'Confirm Password',
+                type: 'password',
+                placeholder: 'Confirm new password',
+                className: 'auth-input',
+                rules: {
+                  required: 'Please confirm your password',
+                  validate: (value) => value === watch('password') || 'Passwords do not match.',
+                },
+              },
+            ]}
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <button type="submit" className="auth-submit-btn" disabled={loading}>
+              {loading ? 'Resetting...' : 'Reset Password'}
+            </button>
 
             <button type="button" className="auth-text-btn" onClick={onBack}>
               Back to Sign In
             </button>
-          </form>
+          </CommonForm>
         )}
       </div>
     </div>

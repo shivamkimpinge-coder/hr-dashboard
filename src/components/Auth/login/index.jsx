@@ -1,22 +1,39 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { Link, useLocation } from 'react-router-dom'
+import toast from 'react-hot-toast'
+import CommonForm from '../../../utils/Form/commonform'
+import useApi from '../../../hooks/useApi'
 
-function Login({ onLogin, error, onForgotPassword }) {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+const EMAIL_PATTERN = /\S+@\S+\.\S+/
+
+function Login({ onLoginSuccess, onForgotPassword }) {
+  const location = useLocation()
+  const { login, loading } = useApi()
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    mode: 'onTouched',
+    defaultValues: { email: '', password: '' },
   })
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }))
-  }
+  useEffect(() => {
+    if (location.state?.signupSuccess) {
+      toast.success('Account created! Please sign in.', { id: 'signup-success' })
+    }
+  }, [location.state])
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    onLogin?.(formData.email, formData.password)
+  const onSubmit = async ({ email, password }) => {
+    try {
+      const data = await login({ email, password })
+      toast.success('Welcome back!')
+      onLoginSuccess?.(data.user, data.token)
+    } catch (err) {
+      toast.error(err.message || 'Invalid email or password.')
+    }
   }
 
   return (
@@ -25,35 +42,34 @@ function Login({ onLogin, error, onForgotPassword }) {
         <h1>Welcome Back</h1>
         <p>Sign in to continue</p>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="auth-field">
-            <label>Email</label>
-            <input
-              className="auth-input"
-              type="email"
-              name="email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="auth-field">
-            <label>Password</label>
-            <input
-              className="auth-input"
-              type="password"
-              name="password"
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          {error ? <p className="auth-error">{error}</p> : null}
-
+        <CommonForm
+          formClassName="auth-form"
+          fieldClassName="auth-field"
+          register={register}
+          errors={errors}
+          fields={[
+            {
+              name: 'email',
+              label: 'Email',
+              type: 'email',
+              placeholder: 'Enter your email',
+              className: 'auth-input',
+              rules: {
+                required: 'Email is required',
+                pattern: { value: EMAIL_PATTERN, message: 'Please enter a valid email address' },
+              },
+            },
+            {
+              name: 'password',
+              label: 'Password',
+              type: 'password',
+              placeholder: 'Enter your password',
+              className: 'auth-input',
+              rules: { required: 'Password is required' },
+            },
+          ]}
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <div className="auth-options">
             <label>
               <input type="checkbox" /> Remember me
@@ -64,8 +80,10 @@ function Login({ onLogin, error, onForgotPassword }) {
             </button>
           </div>
 
-          <button type="submit" className="auth-submit-btn">Sign In</button>
-        </form>
+          <button type="submit" className="auth-submit-btn" disabled={loading}>
+            {loading ? 'Signing In...' : 'Sign In'}
+          </button>
+        </CommonForm>
 
         <div className="auth-footer">
           Don&apos;t have an account? <Link to="/signup">Create Account</Link>

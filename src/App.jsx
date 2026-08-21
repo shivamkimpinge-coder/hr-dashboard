@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react'
+
+import { useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
-import Dashboard from './components/dashboard'
+import toast, { Toaster } from 'react-hot-toast'
+import Dashboard from './components/Dashboard/dashboard'
 import ForgetPass from './components/Auth/forgotpass'
 import Login from './components/Auth/login'
 import Signup from './components/Auth/signup'
 import ResetPass from './components/Auth/resetpass'
+import { clearToken, getToken, setToken } from './utils/api'
 
-const AUTH_STORAGE_KEY = 'hrAuthSession'
 const CURRENT_USER_KEY = 'hrCurrentUser'
-const API_BASE_URL = 'http://localhost:4000/api'
 
 function AppRoutes() {
-  const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(localStorage.getItem(AUTH_STORAGE_KEY)))
+  const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(getToken()))
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem(CURRENT_USER_KEY) || 'null')
@@ -19,95 +20,54 @@ function AppRoutes() {
       return null
     }
   })
-  const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      localStorage.setItem(AUTH_STORAGE_KEY, 'true')
-    } else {
-      localStorage.removeItem(AUTH_STORAGE_KEY)
-    }
-  }, [isLoggedIn])
-
-  const handleLogin = async (email, password) => {
-    if (!email || !password) {
-      setError('Please enter both email and password.')
-      return
-    }
-
-    if (!email.includes('@')) {
-      setError('Please enter a valid email address.')
-      return
-    }
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.message || 'Invalid email or password.')
-        return
-      }
-
-      setCurrentUser(data.user)
-      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(data.user))
-      setError('')
-      setIsLoggedIn(true)
-      navigate('/dashboard')
-    } catch {
-      setError('Unable to reach the server. Please try again.')
-    }
+  const handleAuthSuccess = (user, token) => {
+    setToken(token)
+    setCurrentUser(user)
+    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user))
+    setIsLoggedIn(true)
+    navigate('/dashboard')
   }
 
-  const handleSignup = async (name, email, password) => {
-    if (!name || !email || !password) {
-      setError('Please complete all signup fields.')
-      return false
-    }
+  const handleProfileUpdate = (updatedUser) => {
+    setCurrentUser((prev) => {
+      const merged = { ...prev, ...updatedUser, id: updatedUser._id || updatedUser.id || prev?.id }
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(merged))
+      return merged
+    })
+  }
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
-      })
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.message || 'Registration failed.')
-        return false
-      }
-
-      setCurrentUser(data.user)
-      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(data.user))
-      setError('')
-      setIsLoggedIn(true)
-      navigate('/dashboard')
-      return true
-    } catch {
-      setError('Unable to reach the server. Please try again.')
-      return false
-    }
+  const handleSignupSuccess = () => {
+    navigate('/', { replace: true, state: { signupSuccess: true } })
   }
 
   const handleLogout = () => {
+    clearToken()
+    localStorage.removeItem(CURRENT_USER_KEY)
+    setCurrentUser(null)
     setIsLoggedIn(false)
     navigate('/')
+    toast.success('Signed out successfully.')
   }
 
   return (
     <Routes>
-      <Route path="/" element={<Login onLogin={handleLogin} error={error} onForgotPassword={() => navigate('/forgot-password')} />} />
-      <Route path="/dashboard/*" element={isLoggedIn ? <Dashboard currentUser={currentUser} onLogout={handleLogout} /> : <Navigate to="/" replace />} />
+      <Route path="/" element={<Login onLoginSuccess={handleAuthSuccess} onForgotPassword={() => navigate('/forgot-password')} />} />
+      <Route
+        path="/dashboard/*"
+        element={
+          isLoggedIn ? (
+            <Dashboard currentUser={currentUser} onLogout={handleLogout} onProfileUpdate={handleProfileUpdate} />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
       <Route path="/forgot-password" element={<ForgetPass onBack={() => navigate('/')} />} />
       <Route path="/reset-password" element={<ResetPass onBack={() => navigate('/')} />} />
 
-      <Route path="/signup" element={<Signup onSignup={handleSignup} error={error} />} />
+      <Route path="/signup" element={<Signup onSignupSuccess={handleSignupSuccess} />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
@@ -116,6 +76,22 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
+      <Toaster
+        position="top-right"
+        gutter={10}
+        toastOptions={{
+          duration: 5000,
+          className: 'app-toast',
+          success: {
+            className: 'app-toast app-toast-success',
+            iconTheme: { primary: '#4ade80', secondary: '#0a1221' },
+          },
+          error: {
+            className: 'app-toast app-toast-error',
+            iconTheme: { primary: '#f87171', secondary: '#0a1221' },
+          },
+        }}
+      />
       <AppRoutes />
     </BrowserRouter>
   )

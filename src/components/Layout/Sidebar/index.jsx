@@ -6,7 +6,7 @@ function Sidebar({ onLogout }) {
     <aside className="sidebar-card">
       <div>
         <p className="eyebrow">HR office</p>
-        <h2>People Center</h2>
+        {/* <h2>People Center</h2> */}
       </div>
       <nav className="sidebar-links">
         <NavLink to="/dashboard" end className={({ isActive }) => (isActive ? 'active-link' : '')}>
