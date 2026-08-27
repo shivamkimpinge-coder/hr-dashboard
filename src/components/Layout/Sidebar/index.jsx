@@ -1,7 +1,9 @@
 import { NavLink } from 'react-router-dom'
 import Button from '../../../utils/Button/button'
 
-function Sidebar({ onLogout }) {
+function Sidebar({ onLogout, currentUser }) {
+  const isAdmin = currentUser?.role === 'Admin'
+
   return (
     <aside className="sidebar-card">
       <div>
@@ -12,11 +14,24 @@ function Sidebar({ onLogout }) {
         <NavLink to="/dashboard" end className={({ isActive }) => (isActive ? 'active-link' : '')}>
           Dashboard
         </NavLink>
-        <NavLink to="/dashboard/employees" className={({ isActive }) => (isActive ? 'active-link' : '')}>
-          Employees
+        {isAdmin ? (
+          <>
+            <NavLink to="/dashboard/employees" className={({ isActive }) => (isActive ? 'active-link' : '')}>
+              Employees
+            </NavLink>
+            <NavLink to="/dashboard/add-employee" className={({ isActive }) => (isActive ? 'active-link' : '')}>
+              Add Employee
+            </NavLink>
+          </>
+        ) : null}
+        <NavLink to="/dashboard/attendance" className={({ isActive }) => (isActive ? 'active-link' : '')}>
+          Attendance
         </NavLink>
-        <NavLink to="/dashboard/add-employee" className={({ isActive }) => (isActive ? 'active-link' : '')}>
-          Add Employee
+        <NavLink to="/dashboard/payroll" className={({ isActive }) => (isActive ? 'active-link' : '')}>
+          Payroll
+        </NavLink>
+        <NavLink to="/dashboard/leave" className={({ isActive }) => (isActive ? 'active-link' : '')}>
+          Leave
         </NavLink>
         <NavLink to="/dashboard/profile" className={({ isActive }) => (isActive ? 'active-link' : '')}>
           Profile

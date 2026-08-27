@@ -98,9 +98,51 @@ export const profileApi = {
     return requestWithFile('/profile/image', formData)
   },
 }
+export const payrollApi = {
+  list: (params = {}) => {
+    const query = new URLSearchParams(params).toString()
+    return request(`/payroll${query ? `?${query}` : ''}`)
+  },
+  my: () => request('/payroll/my'),
+  getStructure: (employeeId) => request(`/payroll/structure/${employeeId}`),
+  saveStructure: (employeeId, payload) =>
+    request(`/payroll/structure/${employeeId}`, { method: 'PUT', body: payload }),
+  generate: (payload) => request('/payroll/generate', { method: 'POST', body: payload }),
+  getPayslip: (id) => request(`/payroll/${id}`),
+}
+
+export const leaveApi = {
+  apply: (payload) => request('/leaves', { method: 'POST', body: payload }),
+  list: (params = {}) => {
+    const query = new URLSearchParams(params).toString()
+    return request(`/leaves${query ? `?${query}` : ''}`)
+  },
+  my: () => request('/leaves/my'),
+  get: (id) => request(`/leaves/${id}`),
+  approve: (id) => request(`/leaves/${id}/approve`, { method: 'PATCH' }),
+  reject: (id) => request(`/leaves/${id}/reject`, { method: 'PATCH' }),
+  cancel: (id) => request(`/leaves/${id}/cancel`, { method: 'PATCH' }),
+}
+
+export const attendanceApi = {
+  checkIn: () => request('/attendance/check-in', { method: 'POST' }),
+  checkOut: () => request('/attendance/check-out', { method: 'POST' }),
+  my: (params = {}) => {
+    const query = new URLSearchParams(params).toString()
+    return request(`/attendance/my${query ? `?${query}` : ''}`)
+  },
+  list: (params = {}) => {
+    const query = new URLSearchParams(params).toString()
+    return request(`/attendance${query ? `?${query}` : ''}`)
+  },
+  mark: (payload) => request('/attendance/mark', { method: 'POST', body: payload }),
+}
 
 export const api = {
   auth: authApi,
   employees: employeeApi,
   profile: profileApi,
+  payroll: payrollApi,
+  leaves: leaveApi,
+  attendance: attendanceApi,
 }

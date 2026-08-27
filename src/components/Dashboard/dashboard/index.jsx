@@ -1,12 +1,83 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useSearchParams } from 'react-router-dom'
 import Button from '../../../utils/Button/button'
 import Header from '../../Layout/Header'
 import Sidebar from '../../Layout/Sidebar'
 import Profile from '../profile'
 import CreateEmployee from '../../Empolyee/createEmployee'
 import EmployeeList from '../../Empolyee/employeeList'
+import SalaryHistory from '../../Payroll/salaryHistory'
+import SalaryStructure from '../../Payroll/salaryStructure'
+import GenerateSalary from '../../Payroll/generateSalary'
+import LeaveList from '../../Leave/leaveList'
+import ApplyLeave from '../../Leave/applyLeave'
+import CheckInOut from '../../Attendance/checkInOut'
+import MarkAttendance from '../../Attendance/markAttendance'
+import AttendanceReports from '../../Attendance/attendanceReports'
 import useApi from '../../../hooks/useApi'
+
+// Backend already rejects non-Admin requests with 403 — this just avoids
+// flashing an Admin-only page/API-error before the redirect happens.
+function RequireAdmin({ currentUser, children }) {
+  if (currentUser?.role !== 'Admin') {
+    return <Navigate to="/dashboard" replace />
+  }
+  return children
+}
+
+function EmployeeOverview({ currentUser }) {
+  return (
+    <section className="row g-3">
+      <div className="col-lg-12">
+        <div className="panel">
+          <div className="panel-heading">
+            <div>
+              <p className="eyebrow">Welcome</p>
+              <h3>Hi, {currentUser?.name || 'there'}</h3>
+            </div>
+          </div>
+          <div className="row g-3">
+            <div className="col-lg-4">
+              <div className="overview-card">
+                <h4>Attendance</h4>
+                <p>Check in, check out, and track your working hours.</p>
+                <div className="action-row">
+                  <Button to="/dashboard/attendance">Mark Attendance</Button>
+                  <Button variant="secondary" to="/dashboard/attendance/reports">
+                    My Reports
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-4">
+              <div className="overview-card">
+                <h4>Leave</h4>
+                <p>Apply for leave or check the status of your requests.</p>
+                <div className="action-row">
+                  <Button to="/dashboard/leave/apply">Apply Leave</Button>
+                  <Button variant="secondary" to="/dashboard/leave">
+                    My Leave Requests
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-4">
+              <div className="overview-card">
+                <h4>Payroll</h4>
+                <p>View your salary slips.</p>
+                <div className="action-row">
+                  <Button variant="secondary" to="/dashboard/payroll">
+                    My Salary Slips
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
 
 function OverviewContent({ employees, stats, loading }) {
   return (
@@ -86,10 +157,6 @@ function OverviewContent({ employees, stats, loading }) {
                 <p>Review paperwork for the newest hires.</p>
               </div>
               <div className="overview-card">
-                <h4>Payroll</h4>
-                <p>Verify salary updates before Friday close.</p>
-              </div>
-              <div className="overview-card">
                 <h4>Retention</h4>
                 <p>Schedule check-ins for inactive employees.</p>
               </div>
@@ -102,6 +169,10 @@ function OverviewContent({ employees, stats, loading }) {
 }
 
 function Dashboard({ onLogout, currentUser, onProfileUpdate }) {
+  const isAdmin = currentUser?.role === 'Admin'
+  const [searchParams] = useSearchParams()
+  const employeeSearch = searchParams.get('search')?.trim() || ''
+
   const [employees, setEmployees] = useState([])
   const [statsData, setStatsData] = useState({ total: 0, active: 0, inactive: 0, newEmployees: 0 })
   const [loading, setLoading] = useState(true)
@@ -114,7 +185,10 @@ function Dashboard({ onLogout, currentUser, onProfileUpdate }) {
       if (!silent) setLoading(true)
       setListError('')
       try {
-        const data = await listEmployees({ limit: 200 })
+        const params = { limit: 200 }
+        if (employeeSearch) params.search = employeeSearch
+
+        const data = await listEmployees(params)
         setEmployees(data.employees || [])
       } catch (error) {
         if (error.status === 401) {
@@ -126,7 +200,7 @@ function Dashboard({ onLogout, currentUser, onProfileUpdate }) {
         if (!silent) setLoading(false)
       }
     },
-    [listEmployees, onLogout]
+    [employeeSearch, listEmployees, onLogout]
   )
 
   const fetchStats = useCallback(async () => {
@@ -139,9 +213,13 @@ function Dashboard({ onLogout, currentUser, onProfileUpdate }) {
   }, [getEmployeeStats, onLogout])
 
   useEffect(() => {
+    if (!isAdmin) {
+      setLoading(false)
+      return
+    }
     fetchEmployees()
     fetchStats()
-  }, [fetchEmployees, fetchStats])
+  }, [isAdmin, fetchEmployees, fetchStats])
 
   const stats = [
     { label: 'Total Employees', value: statsData.total, trend: 'All team members' },
@@ -154,28 +232,73 @@ function Dashboard({ onLogout, currentUser, onProfileUpdate }) {
 
   return (
     <div className="dashboard-page">
-      <Sidebar onLogout={onLogout} />
+      <Sidebar onLogout={onLogout} currentUser={currentUser} />
 
       <main className="dashboard-main">
-        <Header currentUser={currentUser} onLogout={onLogout} />
+        <Header currentUser={currentUser} />
 
         <Routes>
           <Route
             path="/"
-            element={<OverviewContent employees={employees} stats={stats} loading={loading} />}
+            element={
+              isAdmin ? (
+                <OverviewContent employees={employees} stats={stats} loading={loading} />
+              ) : (
+                <EmployeeOverview currentUser={currentUser} />
+              )
+            }
           />
           <Route
             path="/employees"
             element={
-              <EmployeeList
-                employees={employees}
-                loading={loading}
-                error={listError}
-                onChanged={refreshEmployeeData}
-              />
+              <RequireAdmin currentUser={currentUser}>
+                <EmployeeList
+                  employees={employees}
+                  loading={loading}
+                  error={listError}
+                  searchTerm={employeeSearch}
+                  onChanged={refreshEmployeeData}
+                />
+              </RequireAdmin>
             }
           />
-          <Route path="/add-employee" element={<CreateEmployee onCreated={refreshEmployeeData} />} />
+          <Route
+            path="/add-employee"
+            element={
+              <RequireAdmin currentUser={currentUser}>
+                <CreateEmployee onCreated={refreshEmployeeData} />
+              </RequireAdmin>
+            }
+          />
+          <Route path="/payroll" element={<SalaryHistory currentUser={currentUser} />} />
+          <Route
+            path="/payroll/structure"
+            element={
+              <RequireAdmin currentUser={currentUser}>
+                <SalaryStructure />
+              </RequireAdmin>
+            }
+          />
+          <Route
+            path="/payroll/generate"
+            element={
+              <RequireAdmin currentUser={currentUser}>
+                <GenerateSalary />
+              </RequireAdmin>
+            }
+          />
+          <Route path="/leave" element={<LeaveList currentUser={currentUser} />} />
+          <Route path="/leave/apply" element={<ApplyLeave />} />
+          <Route path="/attendance" element={<CheckInOut currentUser={currentUser} />} />
+          <Route
+            path="/attendance/mark"
+            element={
+              <RequireAdmin currentUser={currentUser}>
+                <MarkAttendance />
+              </RequireAdmin>
+            }
+          />
+          <Route path="/attendance/reports" element={<AttendanceReports currentUser={currentUser} />} />
           <Route
             path="/profile"
             element={<Profile currentUser={currentUser} onProfileUpdate={onProfileUpdate} onLogout={onLogout} />}

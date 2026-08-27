@@ -41,6 +41,30 @@ export default function useApi() {
   const uploadProfileImage = useCallback((file) => run(() => api.profile.uploadImage(file)), [run])
   const changePassword = useCallback((payload) => run(() => api.profile.changePassword(payload)), [run])
 
+  const listPayroll = useCallback((params) => run(() => api.payroll.list(params)), [run])
+  const getMyPayroll = useCallback(() => run(() => api.payroll.my()), [run])
+  const getSalaryStructure = useCallback((employeeId) => run(() => api.payroll.getStructure(employeeId)), [run])
+  const saveSalaryStructure = useCallback(
+    (employeeId, payload) => run(() => api.payroll.saveStructure(employeeId, payload)),
+    [run]
+  )
+  const generateSalary = useCallback((payload) => run(() => api.payroll.generate(payload)), [run])
+  const getPayslip = useCallback((id) => run(() => api.payroll.getPayslip(id)), [run])
+
+  const applyLeave = useCallback((payload) => run(() => api.leaves.apply(payload)), [run])
+  const listLeaves = useCallback((params) => run(() => api.leaves.list(params)), [run])
+  const getMyLeaves = useCallback(() => run(() => api.leaves.my()), [run])
+  const getLeaveById = useCallback((id) => run(() => api.leaves.get(id)), [run])
+  const approveLeave = useCallback((id) => run(() => api.leaves.approve(id)), [run])
+  const rejectLeave = useCallback((id) => run(() => api.leaves.reject(id)), [run])
+  const cancelLeave = useCallback((id) => run(() => api.leaves.cancel(id)), [run])
+
+  const checkInAttendance = useCallback(() => run(() => api.attendance.checkIn()), [run])
+  const checkOutAttendance = useCallback(() => run(() => api.attendance.checkOut()), [run])
+  const getMyAttendance = useCallback((params) => run(() => api.attendance.my(params)), [run])
+  const listAttendance = useCallback((params) => run(() => api.attendance.list(params)), [run])
+  const markAttendance = useCallback((payload) => run(() => api.attendance.mark(payload)), [run])
+
   return {
     loading,
     error,
@@ -66,5 +90,29 @@ export default function useApi() {
     updateProfile,
     uploadProfileImage,
     changePassword,
+
+    // Payroll
+    listPayroll,
+    getMyPayroll,
+    getSalaryStructure,
+    saveSalaryStructure,
+    generateSalary,
+    getPayslip,
+
+    // Leave
+    applyLeave,
+    listLeaves,
+    getMyLeaves,
+    getLeaveById,
+    approveLeave,
+    rejectLeave,
+    cancelLeave,
+
+    // Attendance
+    checkInAttendance,
+    checkOutAttendance,
+    getMyAttendance,
+    listAttendance,
+    markAttendance,
   }
 }

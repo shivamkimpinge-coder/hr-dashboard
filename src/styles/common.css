@@ -19,7 +19,7 @@
 body {
   margin: 0;
     background: #ffffff;
-
+    font-family: Arial, sans-serif;
   min-width: 320px;
   min-height: 100vh;
 }
@@ -355,7 +355,7 @@ h1, h2, h3, h4, p {
 
   letter-spacing: 0.24em;
 
-  color: #8b6ff7;
+  color: #111827;
 }
 
 
@@ -659,6 +659,19 @@ h1, h2, h3, h4, p {
 }
 
 
+/* Warn (e.g. Cancel) */
+
+.action-btn-warn {
+  background: #fffbeb;
+
+  color: #b45309;
+}
+
+.action-btn-warn:hover {
+  background: #fef3c7;
+}
+
+
 /* ==========================================================================
    Status Pills
    ========================================================================== */
@@ -676,7 +689,7 @@ h1, h2, h3, h4, p {
 }
 
 
-/* Active */
+/* Active / Approved */
 
 .pill-success {
   background: #ecfdf3;
@@ -685,12 +698,30 @@ h1, h2, h3, h4, p {
 }
 
 
-/* Inactive */
+/* Inactive / Cancelled */
 
 .pill-muted {
   background: #eff6ff;
 
   color: #2563eb;
+}
+
+
+/* Pending */
+
+.pill-warning {
+  background: #fffbeb;
+
+  color: #b45309;
+}
+
+
+/* Rejected */
+
+.pill-danger {
+  background: #fef2f2;
+
+  color: #dc2626;
 }
 
 
@@ -779,6 +810,11 @@ h1, h2, h3, h4, p {
   font-size: 0.8rem;
 
   margin-top: 4px;
+}
+
+.filter-field {
+  max-width: 420px;
+  margin-bottom: 18px;
 }
 
 
@@ -1061,7 +1097,7 @@ h1, h2, h3, h4, p {
 .sidebar-card .eyebrow {
   margin: 0 14px 8px;
 
-  color: #5b3df5;
+  color: #111827;
 
   font-size: 11px;
 
@@ -1264,3 +1300,401 @@ h1, h2, h3, h4, p {
   }
 
 }
+
+.main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.global-search-wrapper {
+  position: relative;
+}
+
+.global-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 300px;
+  height: 42px;
+  padding: 0 14px;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.global-search:hover {
+  border-color: #d1cdfb;
+}
+
+.global-search.is-open,
+.global-search:focus-within {
+  border-color: #5b3df5;
+  box-shadow: 0 0 0 3px rgba(91, 61, 245, 0.12);
+}
+
+.search-icon {
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+  color: #9ca3af;
+  transition: color 0.2s ease;
+}
+
+.global-search.is-open .search-icon,
+.global-search:focus-within .search-icon {
+  color: #5b3df5;
+}
+
+.global-search input {
+  flex: 1;
+  min-width: 0;
+
+  border: none;
+  outline: none;
+
+  font-size: 14px;
+  color: #111827;
+  background: transparent;
+}
+
+.global-search input::placeholder {
+  color: #9ca3af;
+}
+
+.search-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+
+  border: none;
+  border-radius: 999px;
+  background: #f1f5f9;
+
+  font-size: 15px;
+  line-height: 1;
+  color: #64748b;
+
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.search-clear:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.search-spinner {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #5b3df5;
+  border-radius: 50%;
+  animation: search-spin 0.7s linear infinite;
+}
+
+@keyframes search-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.search-results {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+
+  width: min(420px, 90vw);
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 6px;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.14);
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  width: 100%;
+  padding: 10px;
+
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #111827;
+  text-align: left;
+
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.search-result-item + .search-result-item {
+  margin-top: 2px;
+}
+
+.search-result-item:hover,
+.search-result-item:focus-visible,
+.search-result-item.is-active {
+  background: #f1efff;
+  outline: none;
+}
+
+.search-result-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6f4ff7, #5b3df5);
+
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.search-result-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.search-result-body strong {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-result-item span,
+.search-result-item small,
+.search-message {
+  color: #64748b;
+}
+
+.search-result-body small {
+  font-size: 0.78rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-result-status {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+}
+
+.search-message {
+  padding: 14px 10px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.panel-heading .action-row {
+  margin-top: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+@media (max-width: 640px) {
+  .global-search-wrapper,
+  .global-search {
+    width: 100%;
+  }
+
+  .search-results {
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   Payroll
+   ========================================================================== */
+
+.form-hint {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin: 4px 0 0;
+}
+
+.payroll-employee-select {
+  max-width: 420px;
+  margin-bottom: 18px;
+}
+
+.payroll-net-preview,
+.payslip-net {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 4px;
+  padding: 14px 18px;
+
+  background: linear-gradient(135deg, #f1efff, #eef2ff);
+  border: 1px solid #ddd8ff;
+  border-radius: 14px;
+}
+
+.payroll-net-preview span,
+.payslip-net span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #5b3df5;
+}
+
+.payroll-net-preview strong,
+.payslip-net strong {
+  font-size: 1.4rem;
+  color: #111827;
+}
+
+.payslip-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.payslip-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+
+  padding-bottom: 16px;
+  border-bottom: 1px dashed #e5e7eb;
+}
+
+.payslip-header h4 {
+  font-size: 1.2rem;
+  color: #111827;
+}
+
+.payslip-header p {
+  margin-top: 4px;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.payslip-meta p {
+  font-size: 0.88rem;
+  color: #374151;
+}
+
+.payslip-meta p + p {
+  margin-top: 4px;
+}
+
+@media print {
+  .sidebar-card,
+  .dashboard-header,
+  .panel-heading .action-row {
+    display: none !important;
+  }
+
+  .dashboard-page {
+    display: block;
+  }
+
+  .payslip-panel {
+    box-shadow: none;
+    border: none;
+  }
+}
+
+
+/* ==========================================================================
+   Attendance
+   ========================================================================== */
+
+.attendance-today {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.attendance-clock {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 16px;
+  padding: 20px 24px;
+  color: #011827;
+}
+
+.attendance-clock-time {
+  /* font-size: 2rem; */
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.attendance-clock-date {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+}
+
+.report-tabs {
+  display: inline-flex;
+  gap: 4px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  padding: 4px;
+  margin-bottom: 18px;
+}
+
+.report-tab {
+  border: none;
+  background: transparent;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.report-tab:hover {
+  color: #1f2937;
+}
+
+.report-tab-active {
+  background: #ffffff;
+  color: #5b3df5;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);
+}
+
+

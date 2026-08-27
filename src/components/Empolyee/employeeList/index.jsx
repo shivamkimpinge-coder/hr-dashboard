@@ -93,7 +93,7 @@ function DeleteModal({ employee, onCancel, onConfirm, deleting, error }) {
   )
 }
 
-function EmployeeList({ employees, loading, error, onChanged }) {
+function EmployeeList({ employees, loading, error, searchTerm = '', onChanged }) {
   const { deleteEmployee } = useApi()
 
   const [viewingEmployee, setViewingEmployee] = useState(null)
@@ -133,9 +133,16 @@ function EmployeeList({ employees, loading, error, onChanged }) {
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Employee directory</p>
-          <h3>All employees</h3>
+          <h3>{searchTerm ? `Search results for "${searchTerm}"` : 'All employees'}</h3>
         </div>
-        <Button to="/dashboard/add-employee">+ Add Employee</Button>
+        <div className="action-row">
+          {searchTerm ? (
+            <Button variant="secondary" to="/dashboard/employees">
+              Clear Search
+            </Button>
+          ) : null}
+          <Button to="/dashboard/add-employee">+ Add Employee</Button>
+        </div>
       </div>
 
       {error ? <div className="feedback-banner feedback-banner-error">{error}</div> : null}
@@ -159,7 +166,11 @@ function EmployeeList({ employees, loading, error, onChanged }) {
               </tr>
             ) : employees.length === 0 ? (
               <tr>
-                <td colSpan={6}>No employees found. Add your first employee.</td>
+                <td colSpan={6}>
+                  {searchTerm
+                    ? `No employees found for "${searchTerm}".`
+                    : 'No employees found. Add your first employee.'}
+                </td>
               </tr>
             ) : (
               employees.map((employee) => (

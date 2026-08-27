@@ -6,6 +6,9 @@ const variantClass = {
   view: 'action-btn action-btn-view',
   edit: 'action-btn action-btn-edit',
   delete: 'action-btn action-btn-delete',
+  approve: 'action-btn action-btn-edit',
+  reject: 'action-btn action-btn-delete',
+  warn: 'action-btn action-btn-warn',
   logout: 'sidebar-logout',
   close: 'close-btn',
 }
