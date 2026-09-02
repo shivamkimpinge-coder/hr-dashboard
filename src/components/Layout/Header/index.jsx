@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import Button from '../../../utils/Button/button'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import useApi from '../../../hooks/useApi'
+import { IconChevronDown, IconLogout, IconUser } from '../Sidebar/icons'
 
 const getInitials = (name = '') =>
   name
@@ -15,18 +15,21 @@ function Header({
   eyebrow = 'Employee management system',
   title = 'HR Dashboard',
   currentUser,
+  onLogout,
 }) {
   const { listEmployees } = useApi()
   const navigate = useNavigate()
   const location = useLocation()
   const wrapperRef = useRef(null)
   const inputRef = useRef(null)
+  const userMenuRef = useRef(null)
 
   const [search, setSearch] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [searching, setSearching] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
 
   useEffect(() => {
     const params = new URLSearchParams(location.search)
@@ -57,6 +60,28 @@ function Header({
       document.removeEventListener('keydown', handleKeyDown)
     }
   }, [isOpen])
+
+  // Close the user menu on outside click and on Escape
+  useEffect(() => {
+    if (!isUserMenuOpen) return undefined
+
+    const handlePointerDown = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setIsUserMenuOpen(false)
+      }
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') setIsUserMenuOpen(false)
+    }
+
+    document.addEventListener('mousedown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isUserMenuOpen])
 
   const openEmployeeSearch = (searchText = search) => {
     const query = searchText.trim()
@@ -258,20 +283,43 @@ function Header({
         </form>
 
         {currentUser ? (
-          <span className="header-user">
-            Hi, {currentUser.name}
-          </span>
+          <div className="header-user-menu" ref={userMenuRef}>
+            <button
+              type="button"
+              className={`header-user-trigger${isUserMenuOpen ? ' is-open' : ''}`}
+              aria-expanded={isUserMenuOpen}
+              onClick={() => setIsUserMenuOpen((prev) => !prev)}
+            >
+              <span className="header-user-avatar" aria-hidden="true">
+                {getInitials(currentUser.name)}
+              </span>
+              <span className="header-user-name">{currentUser.name}</span>
+              <span className={`header-user-chevron${isUserMenuOpen ? ' is-open' : ''}`}>
+                <IconChevronDown />
+              </span>
+            </button>
+
+            {isUserMenuOpen && (
+              <div className="header-user-dropdown">
+                <Link to="/dashboard/profile" onClick={() => setIsUserMenuOpen(false)}>
+                  <IconUser />
+                  Profile
+                </Link>
+                <div className="header-user-divider" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsUserMenuOpen(false)
+                    onLogout?.()
+                  }}
+                >
+                  <IconLogout />
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         ) : null}
-
-        <Button to="/dashboard/add-employee">
-          + Add Employee
-        </Button>
-
-        {/*
-        <Button variant="secondary" onClick={onLogout}>
-          Logout
-        </Button>
-        */}
 
       </div>
 

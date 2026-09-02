@@ -1,13 +1,20 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
+import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import useApi from '../../../hooks/useApi'
 import {
+  REQUIRED_WORKING_HOURS,
   formatDateDisplay,
   formatHours,
   formatTimeDisplay,
   getDateKey,
+  getHoursStatus,
+  getOvertimeHours,
+  getRemainingHours,
   getWeekDates,
+  HOURS_STATUS_LABEL,
+  hoursStatusPillClass,
   statusPillClass,
 } from '../attendanceStore'
 
@@ -33,7 +40,8 @@ function LiveClock() {
 
 // Ticks the "working hours" figure forward every 30s while checked in but
 // not yet checked out, purely for display — the backend recomputes the
-// authoritative value once checkOut is actually recorded.
+// authoritative value once checkOut is actually recorded. There is no
+// fixed shift end time, so this simply reflects elapsed time since check-in.
 const useLiveElapsedHours = (checkIn, checkOut) => {
   const [elapsedHours, setElapsedHours] = useState(0)
 
@@ -53,8 +61,25 @@ const useLiveElapsedHours = (checkIn, checkOut) => {
   return elapsedHours
 }
 
-function CheckInOut({ currentUser }) {
-  const isAdmin = currentUser?.role === 'Admin'
+function HoursProgressBar({ workingHours, overtimeHours }) {
+  const percent = Math.min(100, (workingHours / REQUIRED_WORKING_HOURS) * 100)
+
+  return (
+    <div className="hours-progress">
+      <div className="hours-progress-track">
+        <div className="hours-progress-fill" style={{ width: `${percent}%` }} />
+      </div>
+      <div className="hours-progress-meta">
+        <span>
+          {formatHours(workingHours)} / {REQUIRED_WORKING_HOURS}h
+        </span>
+        {overtimeHours > 0 ? <span className="hours-progress-overtime">+{formatHours(overtimeHours)} overtime</span> : null}
+      </div>
+    </div>
+  )
+}
+
+function CheckInOut() {
   const { checkInAttendance, checkOutAttendance, getMyAttendance } = useApi()
 
   const [history, setHistory] = useState([])
@@ -99,33 +124,45 @@ function CheckInOut({ currentUser }) {
   const handleCheckOut = async () => {
     try {
       const data = await checkOutAttendance()
-      const flags = [data.attendance?.isLate && 'Late entry', data.attendance?.isEarlyExit && 'Early exit']
-        .filter(Boolean)
-        .join(' · ')
-      toast.success(flags ? `Checked out. ${flags} noted.` : 'Checked out successfully.')
+      const hours = data.attendance?.workingHours || 0
+      if (hours >= REQUIRED_WORKING_HOURS) {
+        const overtime = getOvertimeHours(hours)
+        toast.success(
+          overtime > 0 ? `Checked out. ${formatHours(overtime)} overtime today.` : 'Checked out. Required hours completed.'
+        )
+      } else {
+        toast.success(`Checked out. ${formatHours(getRemainingHours(hours))} short of the required 8h.`)
+      }
       refresh()
     } catch (err) {
       toast.error(err.message)
     }
   }
 
-  const status = !record?.checkIn ? 'Not Checked In' : !record?.checkOut ? 'Checked In' : 'Checked Out'
-  const todayPillClass = !record?.checkIn ? 'pill-muted' : !record?.checkOut ? 'pill-warning' : 'pill-success'
+  // Hours worked so far — final (from the backend) once checked out, a live
+  // estimate while still checked in, and 0 before check-in. Required/short/
+  // overtime are always graded against this, never against a clock time.
+  const workingHours = record?.checkOut ? record.workingHours || 0 : record?.checkIn ? elapsedHours : 0
+  const remainingHours = getRemainingHours(workingHours)
+  const overtimeHours = getOvertimeHours(workingHours)
+
+  const hoursStatus = getHoursStatus(record)
+  const statusLabel = hoursStatus ? HOURS_STATUS_LABEL[hoursStatus] : 'Not Checked In'
+  const statusClass = hoursStatus ? hoursStatusPillClass(hoursStatus) : 'pill-muted'
 
   return (
     <div className="panel detail-panel">
+      <SectionTabs
+        tabs={[
+          { label: 'My Attendance', to: '/dashboard/attendance', end: true },
+          { label: 'Reports', to: '/dashboard/attendance/reports' },
+        ]}
+      />
+
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Attendance</p>
-          <h3>Mark Attendance</h3>
-        </div>
-        <div className="action-row">
-          {isAdmin ? (
-            <Button variant="secondary" to="/dashboard/attendance/mark">
-              Mark for Employee
-            </Button>
-          ) : null}
-          <Button to="/dashboard/attendance/reports">View Reports</Button>
+          <h3>My Attendance</h3>
         </div>
       </div>
 
@@ -142,7 +179,7 @@ function CheckInOut({ currentUser }) {
               <div className="detail-card">
                 <p className="eyebrow">Today's Status</p>
                 <p>
-                  <span className={`pill ${todayPillClass}`}>{status}</span>
+                  <span className={`pill ${statusClass}`}>{statusLabel}</span>
                 </p>
                 <p>
                   <strong>Check In:</strong> {formatTimeDisplay(record?.checkIn)}
@@ -151,26 +188,37 @@ function CheckInOut({ currentUser }) {
                   <strong>Check Out:</strong> {formatTimeDisplay(record?.checkOut)}
                 </p>
                 <p>
-                  <strong>Working Hours:</strong> {formatHours(record?.checkOut ? record.workingHours : elapsedHours)}
-                  {record?.checkIn && !record?.checkOut ? ' (running)' : ''}
+                  <strong>Working Hours:</strong> {formatHours(workingHours)}
+                  {record?.checkIn && !record?.checkOut ? ' (estimate)' : ''}
                 </p>
+                <p>
+                  <strong>Required Hours:</strong> {REQUIRED_WORKING_HOURS}h
+                </p>
+                {remainingHours > 0 ? (
+                  <p>
+                    <strong>Remaining Hours:</strong> {formatHours(remainingHours)}
+                  </p>
+                ) : null}
+                {overtimeHours > 0 ? (
+                  <p>
+                    <strong>Overtime:</strong> {formatHours(overtimeHours)}
+                  </p>
+                ) : null}
+
+                <HoursProgressBar workingHours={workingHours} overtimeHours={overtimeHours} />
               </div>
 
               <div className="detail-card">
-                <p className="eyebrow">Flags</p>
-                {!record?.checkOut ? (
-                  <p>Check out to see today's overtime and timing flags.</p>
+                <p className="eyebrow">Summary</p>
+                {!record?.checkIn ? (
+                  <p>Check in to see today's summary.</p>
                 ) : (
                   <div className="d-flex flex-column gap-2">
-                    <span className={`pill ${record.isLate ? 'pill-warning' : 'pill-success'}`}>
-                      {record.isLate ? 'Late Entry' : 'On Time'}
-                    </span>
-                    <span className={`pill ${record.isEarlyExit ? 'pill-danger' : 'pill-success'}`}>
-                      {record.isEarlyExit ? 'Early Exit' : 'Full Shift'}
-                    </span>
-                    {record.overtimeHours > 0 ? (
-                      <span className="pill pill-success">Overtime: {formatHours(record.overtimeHours)}</span>
+                    <span className={`pill ${statusClass}`}>{statusLabel}</span>
+                    {overtimeHours > 0 ? (
+                      <span className="pill pill-success">Overtime: {formatHours(overtimeHours)}</span>
                     ) : null}
+                    {!record?.checkOut ? <span className="form-hint">Estimate — check out to finalize.</span> : null}
                   </div>
                 )}
               </div>
@@ -198,26 +246,39 @@ function CheckInOut({ currentUser }) {
                   <th>Check In</th>
                   <th>Check Out</th>
                   <th>Working Hours</th>
+                  <th>Overtime</th>
                   <th>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {weekHistory.length === 0 ? (
                   <tr>
-                    <td colSpan={5}>No attendance recorded this week yet.</td>
+                    <td colSpan={6}>No attendance recorded this week yet.</td>
                   </tr>
                 ) : (
-                  weekHistory.map((item) => (
-                    <tr key={item.date}>
-                      <td>{formatDateDisplay(item.date)}</td>
-                      <td>{formatTimeDisplay(item.checkIn)}</td>
-                      <td>{formatTimeDisplay(item.checkOut)}</td>
-                      <td>{formatHours(item.workingHours)}</td>
-                      <td>
-                        <span className={`pill ${statusPillClass(item.status)}`}>{item.status}</span>
-                      </td>
-                    </tr>
-                  ))
+                  weekHistory.map((item) => {
+                    const itemHoursStatus = getHoursStatus(item)
+                    const itemOvertime = getOvertimeHours(item.workingHours || 0)
+
+                    return (
+                      <tr key={item.date}>
+                        <td>{formatDateDisplay(item.date)}</td>
+                        <td>{formatTimeDisplay(item.checkIn)}</td>
+                        <td>{formatTimeDisplay(item.checkOut)}</td>
+                        <td>{formatHours(item.workingHours)}</td>
+                        <td>{itemOvertime > 0 ? formatHours(itemOvertime) : '—'}</td>
+                        <td>
+                          {itemHoursStatus ? (
+                            <span className={`pill ${hoursStatusPillClass(itemHoursStatus)}`}>
+                              {HOURS_STATUS_LABEL[itemHoursStatus]}
+                            </span>
+                          ) : (
+                            <span className={`pill ${statusPillClass(item.status)}`}>{item.status}</span>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })
                 )}
               </tbody>
             </table>

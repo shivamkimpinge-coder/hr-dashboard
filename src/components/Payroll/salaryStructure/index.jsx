@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
+import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import CommonForm from '../../../utils/Form/commonform'
 
 import useApi from '../../../hooks/useApi'
@@ -88,14 +89,19 @@ function SalaryStructure() {
 
   return (
     <div className="panel detail-panel">
+      <SectionTabs
+        tabs={[
+          { label: 'My Payslips', to: '/dashboard/payroll', end: true },
+          { label: 'Salary Structure', to: '/dashboard/payroll/structure' },
+          { label: 'Generate Salary', to: '/dashboard/payroll/generate' },
+        ]}
+      />
+
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Payroll</p>
           <h3>Salary Structure</h3>
         </div>
-        <Button variant="close" to="/dashboard/payroll" aria-label="Close">
-          ✕
-        </Button>
       </div>
 
       <div className="form-field payroll-employee-select">

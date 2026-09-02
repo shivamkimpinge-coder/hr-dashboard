@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
+import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import useApi from '../../../hooks/useApi'
 import LeaveDetails from '../leaveDetails'
 
@@ -58,13 +59,17 @@ function LeaveList({ currentUser }) {
 
   return (
     <div className="panel detail-panel">
+      <SectionTabs
+        tabs={[
+          { label: 'My Requests', to: '/dashboard/leave', end: true },
+          { label: 'Apply Leave', to: '/dashboard/leave/apply' },
+        ]}
+      />
+
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Leave</p>
           <h3>{isAdmin ? 'Leave Requests' : 'My Leave Requests'}</h3>
-        </div>
-        <div className="action-row">
-          <Button to="/dashboard/leave/apply">+ Apply Leave</Button>
         </div>
       </div>
 

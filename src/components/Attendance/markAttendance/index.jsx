@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
+import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import useApi from '../../../hooks/useApi'
 import {
   ATTENDANCE_STATUS,
@@ -111,17 +112,19 @@ function MarkAttendance() {
 
   return (
     <div className="panel detail-panel">
+      <SectionTabs
+        tabs={[
+          { label: 'My Attendance', to: '/dashboard/attendance', end: true },
+          { label: 'Reports', to: '/dashboard/attendance/reports' },
+        ]}
+      />
+
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Attendance</p>
           <h3>Mark Attendance</h3>
         </div>
-        <Button variant="close" to="/dashboard/attendance" aria-label="Close">
-          ✕
-        </Button>
       </div>
-
-      {selectedEmployee?.name ? null : null}
 
       <form className="employee-form" onSubmit={handleSubmit} noValidate>
         <div className="form-grid">

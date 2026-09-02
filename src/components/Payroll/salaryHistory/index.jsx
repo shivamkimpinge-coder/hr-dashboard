@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Button from '../../../utils/Button/button'
+import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import useApi from '../../../hooks/useApi'
 import Payslip from '../payslip'
 
@@ -56,19 +57,19 @@ function SalaryHistory({ currentUser }) {
 
   return (
     <div className="panel detail-panel">
+      <SectionTabs
+        tabs={[
+          { label: 'My Payslips', to: '/dashboard/payroll', end: true },
+          isAdmin && { label: 'Salary Structure', to: '/dashboard/payroll/structure' },
+          isAdmin && { label: 'Generate Salary', to: '/dashboard/payroll/generate' },
+        ]}
+      />
+
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Payroll</p>
           <h3>{isAdmin ? 'Salary History' : 'My Salary Slips'}</h3>
         </div>
-        {isAdmin ? (
-          <div className="action-row">
-            <Button variant="secondary" to="/dashboard/payroll/structure">
-              Salary Structure
-            </Button>
-            <Button to="/dashboard/payroll/generate">+ Generate Salary</Button>
-          </div>
-        ) : null}
       </div>
 
       {isAdmin ? (

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
+import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import CommonForm from '../../../utils/Form/commonform'
 import useApi from '../../../hooks/useApi'
 
@@ -35,14 +36,18 @@ function ApplyLeave() {
 
   return (
     <div className="panel detail-panel">
+      <SectionTabs
+        tabs={[
+          { label: 'My Requests', to: '/dashboard/leave', end: true },
+          { label: 'Apply Leave', to: '/dashboard/leave/apply' },
+        ]}
+      />
+
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Leave</p>
           <h3>Apply Leave</h3>
         </div>
-        <Button variant="close" to="/dashboard/leave" aria-label="Close">
-          ✕
-        </Button>
       </div>
 
       <CommonForm

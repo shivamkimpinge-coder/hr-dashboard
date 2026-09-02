@@ -138,6 +138,33 @@ export const attendanceApi = {
   mark: (payload) => request('/attendance/mark', { method: 'POST', body: payload }),
 }
 
+
+export const taskApi = {
+  list: (params = {}) => {
+    const query = new URLSearchParams(params).toString()
+    return request(`/tasks${query ? `?${query}` : ''}`)
+  },
+
+  get: (id) => request(`/tasks/${id}`),
+
+  create: (payload) =>
+    request('/tasks', {
+      method: 'POST',
+      body: payload,
+    }),
+
+  update: (id, payload) =>
+    request(`/tasks/${id}`, {
+      method: 'PUT',
+      body: payload,
+    }),
+
+  remove: (id) =>
+    request(`/tasks/${id}`, {
+      method: 'DELETE',
+    }),
+}
+
 export const api = {
   auth: authApi,
   employees: employeeApi,
@@ -145,4 +172,6 @@ export const api = {
   payroll: payrollApi,
   leaves: leaveApi,
   attendance: attendanceApi,
+    tasks: taskApi,
+
 }

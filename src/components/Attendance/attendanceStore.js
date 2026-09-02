@@ -21,8 +21,14 @@ export const getDateKey = (date = new Date()) => {
 
 export const formatHours = (hours) => {
   if (!hours || hours <= 0) return '0h 0m'
-  const wholeHours = Math.floor(hours)
-  const minutes = Math.round((hours - wholeHours) * 60)
+  let wholeHours = Math.floor(hours)
+  let minutes = Math.round((hours - wholeHours) * 60)
+  // Rounding minutes up can land exactly on 60 (e.g. 7h 59.6m) — carry
+  // that into the next hour instead of ever displaying "60m".
+  if (minutes === 60) {
+    minutes = 0
+    wholeHours += 1
+  }
   return `${wholeHours}h ${minutes}m`
 }
 
@@ -53,6 +59,49 @@ export const statusPillClass = (status) => {
       return 'pill-danger'
     default:
       return 'pill-muted' // On Leave
+  }
+}
+
+// Flexible working hours: there is no fixed shift start/end time, so a day
+// is graded purely on total hours worked against this requirement — never
+// against a clock-in/clock-out cutoff.
+export const REQUIRED_WORKING_HOURS = 8
+
+// null   = no check-in yet today (Absent / On Leave / not started)
+// 'in-progress' = checked in, not checked out — hours aren't final yet
+// 'completed'   = checked out with workingHours >= required
+// 'short'       = checked out with workingHours < required
+export const getHoursStatus = (record) => {
+  if (!record?.checkIn) return null
+  if (!record.checkOut) return 'in-progress'
+  return (record.workingHours || 0) >= REQUIRED_WORKING_HOURS ? 'completed' : 'short'
+}
+
+// Overtime/remaining are derived from `workingHours` against the 8h
+// requirement, on the frontend — the backend's own `overtimeHours` field is
+// still pegged to its old fixed-shift-length constant, so it isn't used
+// here; `workingHours` (raw checkOut − checkIn) is unaffected by that and
+// safe to reuse as-is.
+export const getOvertimeHours = (workingHours = 0) => Math.max(0, (workingHours || 0) - REQUIRED_WORKING_HOURS)
+
+export const getRemainingHours = (workingHours = 0) => Math.max(0, REQUIRED_WORKING_HOURS - (workingHours || 0))
+
+export const HOURS_STATUS_LABEL = {
+  'in-progress': 'Currently Working',
+  completed: 'Completed',
+  short: 'Short Hours',
+}
+
+export const hoursStatusPillClass = (hoursStatus) => {
+  switch (hoursStatus) {
+    case 'completed':
+      return 'pill-success'
+    case 'short':
+      return 'pill-warning'
+    case 'in-progress':
+      return 'pill-warning'
+    default:
+      return 'pill-muted'
   }
 }
 
@@ -90,8 +139,7 @@ export const summarizeByEmployee = (records) => {
         absent: 0,
         halfDay: 0,
         onLeave: 0,
-        late: 0,
-        earlyExit: 0,
+        shortHoursDays: 0,
         totalHours: 0,
         overtimeHours: 0,
       })
@@ -104,10 +152,9 @@ export const summarizeByEmployee = (records) => {
     else if (record.status === ATTENDANCE_STATUS.HALF_DAY) summary.halfDay += 1
     else if (record.status === ATTENDANCE_STATUS.ON_LEAVE) summary.onLeave += 1
 
-    if (record.isLate) summary.late += 1
-    if (record.isEarlyExit) summary.earlyExit += 1
+    if (getHoursStatus(record) === 'short') summary.shortHoursDays += 1
     summary.totalHours += record.workingHours || 0
-    summary.overtimeHours += record.overtimeHours || 0
+    summary.overtimeHours += getOvertimeHours(record.workingHours)
   })
 
   return Array.from(byEmployee.values())

@@ -3,6 +3,7 @@ import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import useApi from '../../../hooks/useApi'
 import EditEmployee from '../editEmployee'
+import CreateEmployee from '../createEmployee'
 import { formatSalary, toDateInput } from '../employeeFormConfig'
 
 function EmployeeModal({ employee, onClose }) {
@@ -98,6 +99,7 @@ function EmployeeList({ employees, loading, error, searchTerm = '', onChanged })
 
   const [viewingEmployee, setViewingEmployee] = useState(null)
   const [editingEmployee, setEditingEmployee] = useState(null)
+  const [isAddingEmployee, setIsAddingEmployee] = useState(false)
   const [employeeToDelete, setEmployeeToDelete] = useState(null)
   const [deleteError, setDeleteError] = useState('')
   const [deleting, setDeleting] = useState(false)
@@ -141,7 +143,7 @@ function EmployeeList({ employees, loading, error, searchTerm = '', onChanged })
               Clear Search
             </Button>
           ) : null}
-          <Button to="/dashboard/add-employee">+ Add Employee</Button>
+          <Button onClick={() => setIsAddingEmployee(true)}>+ Add Employee</Button>
         </div>
       </div>
 
@@ -207,6 +209,11 @@ function EmployeeList({ employees, loading, error, searchTerm = '', onChanged })
       </div>
 
       <EmployeeModal employee={viewingEmployee} onClose={() => setViewingEmployee(null)} />
+      <CreateEmployee
+        open={isAddingEmployee}
+        onClose={() => setIsAddingEmployee(false)}
+        onCreated={onChanged}
+      />
       <DeleteModal
         employee={employeeToDelete}
         onCancel={cancelDelete}

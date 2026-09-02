@@ -1,13 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import Button from '../../../utils/Button/button'
+import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import useApi from '../../../hooks/useApi'
 import {
   formatDateDisplay,
   formatHours,
   formatTimeDisplay,
   getDateKey,
+  getHoursStatus,
   getMonthDates,
+  getOvertimeHours,
   getWeekDates,
+  HOURS_STATUS_LABEL,
+  hoursStatusPillClass,
   statusPillClass,
   summarizeByEmployee,
 } from '../attendanceStore'
@@ -78,14 +82,14 @@ function AttendanceReports({ currentUser }) {
   const stats = useMemo(() => {
     const present = records.filter((r) => r.status === 'Present').length
     const absent = records.filter((r) => r.status === 'Absent').length
-    const lateCount = records.filter((r) => r.isLate).length
-    const totalOvertime = records.reduce((sum, r) => sum + (r.overtimeHours || 0), 0)
+    const shortHoursCount = records.filter((r) => getHoursStatus(r) === 'short').length
+    const totalOvertime = records.reduce((sum, r) => sum + getOvertimeHours(r.workingHours), 0)
 
     return [
       { label: 'Present', value: present, trend: `${range.dates.length} day period` },
       { label: 'Absent', value: absent, trend: 'Marked absent' },
-      { label: 'Late Entries', value: lateCount, trend: `After shift start` },
-      { label: 'Total Overtime', value: formatHours(totalOvertime), trend: 'Beyond standard hours' },
+      { label: 'Short Hours Days', value: shortHoursCount, trend: 'Below 8h required' },
+      { label: 'Total Overtime', value: formatHours(totalOvertime), trend: 'Beyond 8h required' },
     ]
   }, [records, range.dates.length])
 
@@ -93,14 +97,18 @@ function AttendanceReports({ currentUser }) {
 
   return (
     <div className="panel detail-panel">
+      <SectionTabs
+        tabs={[
+          { label: 'My Attendance', to: '/dashboard/attendance', end: true },
+          { label: 'Reports', to: '/dashboard/attendance/reports' },
+        ]}
+      />
+
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Attendance</p>
           <h3>Attendance Reports</h3>
         </div>
-        <Button variant="close" to="/dashboard/attendance" aria-label="Close">
-          ✕
-        </Button>
       </div>
 
       <div className="report-tabs">
@@ -168,7 +176,7 @@ function AttendanceReports({ currentUser }) {
                 <th>Check Out</th>
                 <th>Working Hours</th>
                 <th>Status</th>
-                <th>Flags</th>
+                <th>Hours Status</th>
               </tr>
             </thead>
             <tbody>
@@ -177,26 +185,34 @@ function AttendanceReports({ currentUser }) {
                   <td colSpan={isAdmin ? 6 : 5}>No attendance records for this date.</td>
                 </tr>
               ) : (
-                records.map((record) => (
-                  <tr key={`${record.employeeId}-${record.date}`}>
-                    {isAdmin ? (
+                records.map((record) => {
+                  const hoursStatus = getHoursStatus(record)
+                  const overtime = getOvertimeHours(record.workingHours)
+
+                  return (
+                    <tr key={`${record.employeeId}-${record.date}`}>
+                      {isAdmin ? (
+                        <td>
+                          {record.employeeName} <span className="text-muted">({record.employeeId})</span>
+                        </td>
+                      ) : null}
+                      <td>{formatTimeDisplay(record.checkIn)}</td>
+                      <td>{formatTimeDisplay(record.checkOut)}</td>
+                      <td>{formatHours(record.workingHours)}</td>
                       <td>
-                        {record.employeeName} <span className="text-muted">({record.employeeId})</span>
+                        <span className={`pill ${statusPillClass(record.status)}`}>{record.status}</span>
                       </td>
-                    ) : null}
-                    <td>{formatTimeDisplay(record.checkIn)}</td>
-                    <td>{formatTimeDisplay(record.checkOut)}</td>
-                    <td>{formatHours(record.workingHours)}</td>
-                    <td>
-                      <span className={`pill ${statusPillClass(record.status)}`}>{record.status}</span>
-                    </td>
-                    <td>
-                      {record.isLate ? <span className="pill pill-warning">Late</span> : null}{' '}
-                      {record.isEarlyExit ? <span className="pill pill-danger">Early Exit</span> : null}{' '}
-                      {record.overtimeHours > 0 ? <span className="pill pill-success">OT</span> : null}
-                    </td>
-                  </tr>
-                ))
+                      <td>
+                        {hoursStatus ? (
+                          <span className={`pill ${hoursStatusPillClass(hoursStatus)}`}>
+                            {HOURS_STATUS_LABEL[hoursStatus]}
+                          </span>
+                        ) : null}{' '}
+                        {overtime > 0 ? <span className="pill pill-success">OT {formatHours(overtime)}</span> : null}
+                      </td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>
@@ -207,8 +223,7 @@ function AttendanceReports({ currentUser }) {
                 <th>Employee</th>
                 <th>Present</th>
                 <th>Absent</th>
-                <th>Late</th>
-                <th>Early Exit</th>
+                <th>Short Hours Days</th>
                 <th>Total Hours</th>
                 <th>Overtime</th>
               </tr>
@@ -216,7 +231,7 @@ function AttendanceReports({ currentUser }) {
             <tbody>
               {employeeSummaries.length === 0 ? (
                 <tr>
-                  <td colSpan={7}>No attendance records for this period.</td>
+                  <td colSpan={6}>No attendance records for this period.</td>
                 </tr>
               ) : (
                 employeeSummaries.map((summary) => (
@@ -226,8 +241,7 @@ function AttendanceReports({ currentUser }) {
                     </td>
                     <td>{summary.present}</td>
                     <td>{summary.absent}</td>
-                    <td>{summary.late}</td>
-                    <td>{summary.earlyExit}</td>
+                    <td>{summary.shortHoursDays}</td>
                     <td>{formatHours(summary.totalHours)}</td>
                     <td>{formatHours(summary.overtimeHours)}</td>
                   </tr>
@@ -243,26 +257,39 @@ function AttendanceReports({ currentUser }) {
                 <th>Check In</th>
                 <th>Check Out</th>
                 <th>Working Hours</th>
+                <th>Overtime</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
               {records.length === 0 ? (
                 <tr>
-                  <td colSpan={5}>No attendance records for this period.</td>
+                  <td colSpan={6}>No attendance records for this period.</td>
                 </tr>
               ) : (
-                records.map((record) => (
+                records.map((record) => {
+                  const hoursStatus = getHoursStatus(record)
+                  const overtime = getOvertimeHours(record.workingHours)
+
+                  return (
                   <tr key={record.date}>
                     <td>{formatDateDisplay(record.date)}</td>
                     <td>{formatTimeDisplay(record.checkIn)}</td>
                     <td>{formatTimeDisplay(record.checkOut)}</td>
                     <td>{formatHours(record.workingHours)}</td>
+                    <td>{overtime > 0 ? formatHours(overtime) : '—'}</td>
                     <td>
-                      <span className={`pill ${statusPillClass(record.status)}`}>{record.status}</span>
+                      {hoursStatus ? (
+                        <span className={`pill ${hoursStatusPillClass(hoursStatus)}`}>
+                          {HOURS_STATUS_LABEL[hoursStatus]}
+                        </span>
+                      ) : (
+                        <span className={`pill ${statusPillClass(record.status)}`}>{record.status}</span>
+                      )}
                     </td>
                   </tr>
-                ))
+                  )
+                })
               )}
             </tbody>
           </table>

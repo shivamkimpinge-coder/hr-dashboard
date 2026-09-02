@@ -12,6 +12,207 @@ const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp
 const DEFAULT_AVATAR =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='40' fill='%23cbd5e1'/%3E%3Ccircle cx='40' cy='32' r='14' fill='%23f1f5f9'/%3E%3Cpath d='M14 72c4-16 18-24 26-24s22 8 26 24' fill='%23f1f5f9'/%3E%3C/svg%3E"
 
+const GENDER_OPTIONS = [
+  { value: '', label: 'Prefer not to say' },
+  { value: 'Male', label: 'Male' },
+  { value: 'Female', label: 'Female' },
+  { value: 'Other', label: 'Other' },
+]
+
+const toDateInputValue = (value) => {
+  if (!value) return ''
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
+  return date.toISOString().slice(0, 10)
+}
+
+function DetailsTab({ user, updateProfile, onSaved }) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    mode: 'onTouched',
+    defaultValues: {
+      name: user?.name || '',
+      email: user?.email || '',
+      phone: user?.phone || '',
+      gender: user?.gender || '',
+      dob: toDateInputValue(user?.dob),
+    },
+  })
+
+  const onSubmit = async (formData) => {
+    try {
+      const data = await updateProfile(formData)
+      toast.success('Profile updated successfully.')
+      onSaved(data.user)
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
+  return (
+    <CommonForm
+      formClassName="employee-form"
+      layoutClassName="form-grid"
+      register={register}
+      errors={errors}
+      fields={[
+        {
+          name: 'name',
+          label: 'Full Name',
+          id: 'edit-profile-name',
+          rules: { required: 'Full name is required' },
+        },
+        {
+          name: 'email',
+          label: 'Email',
+          id: 'edit-profile-email',
+          type: 'email',
+          rules: {
+            required: 'Email is required',
+            pattern: { value: EMAIL_PATTERN, message: 'Please enter a valid email address' },
+          },
+        },
+        {
+          name: 'phone',
+          label: 'Phone Number',
+          id: 'edit-profile-phone',
+          type: 'tel',
+          rules: {
+            pattern: { value: /^[0-9+\-\s()]{7,20}$/, message: 'Please enter a valid phone number' },
+          },
+        },
+        {
+          name: 'gender',
+          label: 'Gender',
+          id: 'edit-profile-gender',
+          type: 'select',
+          options: GENDER_OPTIONS,
+        },
+        {
+          name: 'dob',
+          label: 'Date of Birth',
+          id: 'edit-profile-dob',
+          type: 'date',
+        },
+      ]}
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <div className="action-row">
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Saving...' : 'Save Changes'}
+        </Button>
+      </div>
+    </CommonForm>
+  )
+}
+
+function PasswordTab({ changePassword, onDone }) {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    mode: 'onTouched',
+    defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
+  })
+
+  const onSubmit = async ({ currentPassword, newPassword }) => {
+    try {
+      await changePassword({ currentPassword, newPassword })
+      reset()
+      toast.success('Password changed successfully.')
+      onDone?.()
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
+  return (
+    <CommonForm
+      formClassName="employee-form"
+      layoutClassName="form-grid"
+      register={register}
+      errors={errors}
+      fields={[
+        {
+          name: 'currentPassword',
+          label: 'Current Password',
+          id: 'edit-current-password',
+          type: 'password',
+          rules: { required: 'Current password is required' },
+        },
+        {
+          name: 'newPassword',
+          label: 'New Password',
+          id: 'edit-new-password',
+          type: 'password',
+          rules: {
+            required: 'New password is required',
+            minLength: { value: 6, message: 'New password must be at least 6 characters long.' },
+          },
+        },
+        {
+          name: 'confirmPassword',
+          label: 'Confirm New Password',
+          id: 'edit-confirm-password',
+          type: 'password',
+          rules: {
+            required: 'Please confirm your new password',
+            validate: (value) => value === watch('newPassword') || 'New password and confirmation do not match.',
+          },
+        },
+      ]}
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <div className="action-row">
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Updating...' : 'Change Password'}
+        </Button>
+      </div>
+    </CommonForm>
+  )
+}
+
+function ProfileEditModal({ user, updateProfile, changePassword, onClose, onSaved }) {
+  const [activeTab, setActiveTab] = useState('details') // 'details' | 'password'
+
+  return (
+    <div className="modal-backdrop" role="dialog" aria-modal="true">
+      <div className="modal-card">
+        <div className="panel-heading">
+          <div>
+            <p className="eyebrow">Profile</p>
+            <h3>Update Profile</h3>
+          </div>
+          <Button variant="close" onClick={onClose} aria-label="Close">
+            ✕
+          </Button>
+        </div>
+
+        <div className="range-toggle">
+          <button type="button" className={activeTab === 'details' ? 'is-active' : ''} onClick={() => setActiveTab('details')}>
+            Profile Details
+          </button>
+          <button type="button" className={activeTab === 'password' ? 'is-active' : ''} onClick={() => setActiveTab('password')}>
+            Change Password
+          </button>
+        </div>
+
+        {activeTab === 'details' ? (
+          <DetailsTab user={user} updateProfile={updateProfile} onSaved={onSaved} />
+        ) : (
+          <PasswordTab changePassword={changePassword} onDone={onClose} />
+        )}
+      </div>
+    </div>
+  )
+}
+
 function Profile({ currentUser, onProfileUpdate, onLogout }) {
   const { getProfile, updateProfile, uploadProfileImage, changePassword } = useApi()
 
@@ -19,28 +220,8 @@ function Profile({ currentUser, onProfileUpdate, onLogout }) {
   const [loading, setLoading] = useState(true)
   const [imagePreview, setImagePreview] = useState(null)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
   const fileInputRef = useRef(null)
-
-  const {
-    register: registerProfile,
-    handleSubmit: handleProfileSubmit,
-    reset: resetProfileForm,
-    formState: { errors: profileErrors, isSubmitting: savingProfile },
-  } = useForm({
-    mode: 'onTouched',
-    defaultValues: { name: '', email: '' },
-  })
-
-  const {
-    register: registerPassword,
-    handleSubmit: handlePasswordSubmit,
-    watch: watchPassword,
-    reset: resetPasswordForm,
-    formState: { errors: passwordErrors, isSubmitting: changingPassword },
-  } = useForm({
-    mode: 'onTouched',
-    defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
-  })
 
   useEffect(() => {
     let ignore = false
@@ -51,7 +232,6 @@ function Profile({ currentUser, onProfileUpdate, onLogout }) {
         const data = await getProfile()
         if (ignore) return
         setUser(data.user)
-        resetProfileForm({ name: data.user.name || '', email: data.user.email || '' })
       } catch (error) {
         if (error.status === 401) {
           onLogout?.()
@@ -67,18 +247,7 @@ function Profile({ currentUser, onProfileUpdate, onLogout }) {
     return () => {
       ignore = true
     }
-  }, [getProfile, onLogout, resetProfileForm])
-
-  const onProfileSubmit = async (formData) => {
-    try {
-      const data = await updateProfile(formData)
-      setUser(data.user)
-      onProfileUpdate?.(data.user)
-      toast.success('Profile updated successfully.')
-    } catch (error) {
-      toast.error(error.message)
-    }
-  }
+  }, [getProfile, onLogout])
 
   const handleImageChange = async (event) => {
     const file = event.target.files?.[0]
@@ -115,16 +284,6 @@ function Profile({ currentUser, onProfileUpdate, onLogout }) {
     }
   }
 
-  const onPasswordSubmit = async ({ currentPassword, newPassword }) => {
-    try {
-      await changePassword({ currentPassword, newPassword })
-      resetPasswordForm()
-      toast.success('Password changed successfully.')
-    } catch (error) {
-      toast.error(error.message)
-    }
-  }
-
   return (
     <div className="panel detail-panel">
       <div className="panel-heading">
@@ -132,6 +291,7 @@ function Profile({ currentUser, onProfileUpdate, onLogout }) {
           <p className="eyebrow">Profile</p>
           <h3>Account details</h3>
         </div>
+        <Button onClick={() => setEditOpen(true)}>Update Profile</Button>
       </div>
 
       {loading ? (
@@ -178,94 +338,53 @@ function Profile({ currentUser, onProfileUpdate, onLogout }) {
             </div>
           </div>
 
-          <CommonForm
-            formClassName="employee-form"
-            layoutClassName="form-grid"
-            register={registerProfile}
-            errors={profileErrors}
-            fields={[
-              {
-                name: 'name',
-                label: 'Full Name',
-                id: 'profile-name',
-                rules: { required: 'Full name is required' },
-              },
-              {
-                name: 'email',
-                label: 'Email',
-                id: 'profile-email',
-                type: 'email',
-                rules: {
-                  required: 'Email is required',
-                  pattern: { value: EMAIL_PATTERN, message: 'Please enter a valid email address' },
-                },
-              },
-              {
-                name: 'role',
-                label: 'Role',
-                id: 'profile-role',
-                static: true,
-                value: user?.role || 'User',
-                disabled: true,
-              },
-            ]}
-            onSubmit={handleProfileSubmit(onProfileSubmit)}
-          >
-            <div className="action-row">
-              <Button type="submit" disabled={savingProfile}>
-                {savingProfile ? 'Saving...' : 'Save Changes'}
-              </Button>
+          <div className="form-grid">
+            <div className="form-field">
+              <label htmlFor="profile-name">Full Name</label>
+              <input id="profile-name" type="text" value={user?.name || ''} readOnly />
             </div>
-          </CommonForm>
-
-          <div className="detail-card mt-3">
-            <p className="eyebrow">Change password</p>
-            <CommonForm
-              formClassName="employee-form"
-              layoutClassName="form-grid"
-              register={registerPassword}
-              errors={passwordErrors}
-              fields={[
-                {
-                  name: 'currentPassword',
-                  label: 'Current Password',
-                  id: 'current-password',
-                  type: 'password',
-                  rules: { required: 'Current password is required' },
-                },
-                {
-                  name: 'newPassword',
-                  label: 'New Password',
-                  id: 'new-password',
-                  type: 'password',
-                  rules: {
-                    required: 'New password is required',
-                    minLength: { value: 6, message: 'New password must be at least 6 characters long.' },
-                  },
-                },
-                {
-                  name: 'confirmPassword',
-                  label: 'Confirm New Password',
-                  id: 'confirm-password',
-                  type: 'password',
-                  rules: {
-                    required: 'Please confirm your new password',
-                    validate: (value) =>
-                      value === watchPassword('newPassword') || 'New password and confirmation do not match.',
-                  },
-                },
-              ]}
-              onSubmit={handlePasswordSubmit(onPasswordSubmit)}
-            >
-              <div className="action-row">
-                <Button type="submit" disabled={changingPassword}>
-                  {changingPassword ? 'Updating...' : 'Change Password'}
-                </Button>
-              </div>
-            </CommonForm>
+            <div className="form-field">
+              <label htmlFor="profile-email">Email</label>
+              <input id="profile-email" type="email" value={user?.email || ''} readOnly />
+            </div>
+            <div className="form-field">
+              <label htmlFor="profile-phone">Phone Number</label>
+              <input id="profile-phone" type="text" value={user?.phone || '—'} readOnly />
+            </div>
+            <div className="form-field">
+              <label htmlFor="profile-gender">Gender</label>
+              <input id="profile-gender" type="text" value={user?.gender || '—'} readOnly />
+            </div>
+            <div className="form-field">
+              <label htmlFor="profile-dob">Date of Birth</label>
+              <input
+                id="profile-dob"
+                type="text"
+                value={user?.dob ? new Date(user.dob).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                readOnly
+              />
+            </div>
+            <div className="form-field">
+              <label htmlFor="profile-role">Role</label>
+              <input id="profile-role" type="text" value={user?.role || 'User'} readOnly disabled />
+            </div>
           </div>
         </>
       )}
+
+      {editOpen ? (
+        <ProfileEditModal
+          user={user}
+          updateProfile={updateProfile}
+          changePassword={changePassword}
+          onClose={() => setEditOpen(false)}
+          onSaved={(updatedUser) => {
+            setUser(updatedUser)
+            onProfileUpdate?.(updatedUser)
+            setEditOpen(false)
+          }}
+        />
+      ) : null}
     </div>
   )
 }
