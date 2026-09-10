@@ -1,12 +1,33 @@
-
 import { useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import toast, { Toaster } from 'react-hot-toast'
-import Dashboard from './components/Dashboard/dashboard'
+
+import DashboardLayout, { DashboardHome, EmployeeListPage } from './components/Dashboard/dashboard'
+import Profile from './components/Dashboard/profile'
+import Settings from './components/Dashboard/settings'
+import EmployeeDetails from './components/Empolyee/employeeDetails'
+import SalaryHistory from './components/Payroll/salaryHistory'
+import SalaryStructure from './components/Payroll/salaryStructure'
+import GenerateSalary from './components/Payroll/generateSalary'
+import LeaveList from './components/Leave/leaveList'
+import ApplyLeave from './components/Leave/applyLeave'
+import CheckInOut from './components/Attendance/checkInOut'
+import TeamAttendanceOverview from './components/Attendance/teamOverview'
+import MarkAttendance from './components/Attendance/markAttendance'
+import AttendanceReports from './components/Attendance/attendanceReports'
+import TaskBoard from './components/Tasks/taskBoard'
+import Goals from './components/Performance/goals'
+import PerformanceReview from './components/Performance/performanceReview'
+import Promotions from './components/Performance/promotions'
+import Notifications from './components/Notifications'
+
 import ForgetPass from './components/Auth/forgotpass'
 import Login from './components/Auth/login'
 import Signup from './components/Auth/signup'
 import ResetPass from './components/Auth/resetpass'
+
+import RequireManager from './utils/RequireManager'
+import { isManagerRole } from './utils/roles'
 import { clearToken, getToken, setToken } from './utils/api'
 
 const CURRENT_USER_KEY = 'hrCurrentUser'
@@ -51,23 +72,90 @@ function AppRoutes() {
     toast.success('Signed out successfully.')
   }
 
+  const isManager = isManagerRole(currentUser)
+
   return (
     <Routes>
+      {/* ---------- Public ---------- */}
       <Route path="/" element={<Login onLoginSuccess={handleAuthSuccess} onForgotPassword={() => navigate('/forgot-password')} />} />
+      <Route path="/signup" element={<Signup onSignupSuccess={handleSignupSuccess} />} />
+      <Route path="/forgot-password" element={<ForgetPass onBack={() => navigate('/')} />} />
+      <Route path="/reset-password" element={<ResetPass onBack={() => navigate('/')} />} />
+
+      {/* ---------- Dashboard (layout route: shell renders once, pages swap in) ---------- */}
       <Route
-        path="/dashboard/*"
+        path="/dashboard"
         element={
           isLoggedIn ? (
-            <Dashboard currentUser={currentUser} onLogout={handleLogout} onProfileUpdate={handleProfileUpdate} />
+            <DashboardLayout currentUser={currentUser} onLogout={handleLogout} onProfileUpdate={handleProfileUpdate} />
           ) : (
             <Navigate to="/" replace />
           )
         }
-      />
-      <Route path="/forgot-password" element={<ForgetPass onBack={() => navigate('/')} />} />
-      <Route path="/reset-password" element={<ResetPass onBack={() => navigate('/')} />} />
+      >
+        <Route index element={<DashboardHome />} />
 
-      <Route path="/signup" element={<Signup onSignupSuccess={handleSignupSuccess} />} />
+        {/* Employees */}
+        <Route
+          path="employees"
+          element={
+            <RequireManager currentUser={currentUser}>
+              <EmployeeListPage />
+            </RequireManager>
+          }
+        />
+        <Route path="employees/:employeeId/*" element={<EmployeeDetails />} />
+
+        {/* Attendance */}
+        <Route path="attendance" element={isManager ? <TeamAttendanceOverview /> : <CheckInOut currentUser={currentUser} />} />
+        <Route
+          path="attendance/mark"
+          element={
+            <RequireManager currentUser={currentUser}>
+              <MarkAttendance />
+            </RequireManager>
+          }
+        />
+        <Route path="attendance/reports" element={<AttendanceReports currentUser={currentUser} />} />
+
+        {/* Leave */}
+        <Route path="leave" element={<LeaveList currentUser={currentUser} />} />
+        <Route path="leave/apply" element={<ApplyLeave currentUser={currentUser} />} />
+
+        {/* Payroll */}
+        <Route path="payroll" element={<SalaryHistory currentUser={currentUser} />} />
+        <Route
+          path="payroll/structure"
+          element={
+            <RequireManager currentUser={currentUser}>
+              <SalaryStructure />
+            </RequireManager>
+          }
+        />
+        <Route
+          path="payroll/generate"
+          element={
+            <RequireManager currentUser={currentUser}>
+              <GenerateSalary />
+            </RequireManager>
+          }
+        />
+
+        {/* Performance */}
+        <Route path="performance" element={<Goals currentUser={currentUser} />} />
+        <Route path="performance/reviews" element={<PerformanceReview currentUser={currentUser} />} />
+        <Route path="performance/promotions" element={<Promotions currentUser={currentUser} />} />
+
+        {/* Everything else */}
+        <Route path="tasks" element={<TaskBoard currentUser={currentUser} />} />
+        <Route path="notifications" element={<Notifications currentUser={currentUser} />} />
+        <Route
+          path="profile"
+          element={<Profile currentUser={currentUser} onProfileUpdate={handleProfileUpdate} onLogout={handleLogout} />}
+        />
+        <Route path="settings" element={<Settings currentUser={currentUser} />} />
+      </Route>
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

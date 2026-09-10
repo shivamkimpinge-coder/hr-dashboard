@@ -12,6 +12,21 @@ export const ATTENDANCE_STATUS = {
 
 export const ATTENDANCE_STATUSES = Object.values(ATTENDANCE_STATUS)
 
+// Admin/HR land on the team overview + get a "Mark Attendance" tab; a plain
+// employee only ever sees their own check-in history. Shared by every page
+// in this module so the tab set stays identical wherever it appears.
+export const getAttendanceTabs = (isManager) =>
+  isManager
+    ? [
+        { label: 'Team Overview', to: '/dashboard/attendance', end: true },
+        { label: 'Mark Attendance', to: '/dashboard/attendance/mark' },
+        { label: 'Reports', to: '/dashboard/attendance/reports' },
+      ]
+    : [
+        { label: 'My Attendance', to: '/dashboard/attendance', end: true },
+        { label: 'Reports', to: '/dashboard/attendance/reports' },
+      ]
+
 const pad2 = (value) => String(value).padStart(2, '0')
 
 export const getDateKey = (date = new Date()) => {
@@ -67,14 +82,29 @@ export const statusPillClass = (status) => {
 // against a clock-in/clock-out cutoff.
 export const REQUIRED_WORKING_HOURS = 8
 
+// An employee may check in/out up to this many times per day (e.g. to cover
+// breaks) — mirrors the backend's Attendance.MAX_SESSIONS_PER_DAY. The
+// backend always echoes the real cap on a record as `maxSessionsPerDay`;
+// this is only the fallback for a day with no record yet.
+export const MAX_SESSIONS_PER_DAY = 3
+
 // null   = no check-in yet today (Absent / On Leave / not started)
-// 'in-progress' = checked in, not checked out — hours aren't final yet
-// 'completed'   = checked out with workingHours >= required
-// 'short'       = checked out with workingHours < required
+// 'in-progress' = currently checked into a session — hours aren't final yet
+// 'completed'   = every session for today is closed, workingHours >= required
+// 'short'       = every session for today is closed, workingHours < required
 export const getHoursStatus = (record) => {
   if (!record?.checkIn) return null
-  if (!record.checkOut) return 'in-progress'
+  if (record.hasOpenSession) return 'in-progress'
   return (record.workingHours || 0) >= REQUIRED_WORKING_HOURS ? 'completed' : 'short'
+}
+
+// Whether a new check-in session can still be started today — false while
+// currently checked in, or once the daily session cap has been used up.
+export const canStartNewSession = (record) => {
+  if (!record) return true
+  const used = record.sessionsUsed ?? (record.checkIn ? 1 : 0)
+  const max = record.maxSessionsPerDay ?? MAX_SESSIONS_PER_DAY
+  return !record.hasOpenSession && used < max
 }
 
 // Overtime/remaining are derived from `workingHours` against the 8h
@@ -122,6 +152,20 @@ export const getMonthDates = (monthValue) => {
   const [year, month] = monthValue.split('-').map(Number)
   const daysInMonth = new Date(year, month, 0).getDate()
   return Array.from({ length: daysInMonth }, (_, i) => getDateKey(new Date(year, month - 1, i + 1)))
+}
+
+// "YYYY-MM" for the calendar month a date falls in, and for the month right
+// before it — used to compare this-month vs last-month attendance stats.
+export const monthValueOf = (date = new Date()) => getDateKey(date).slice(0, 7)
+
+export const previousMonthValue = (monthValue) => {
+  const [year, month] = monthValue.split('-').map(Number)
+  return monthValueOf(new Date(year, month - 2, 1))
+}
+
+export const isWeekday = (dateKey) => {
+  const day = new Date(`${dateKey}T00:00:00`).getDay()
+  return day !== 0 && day !== 6
 }
 
 // Groups records by employee and totals up present/absent/late/hours —

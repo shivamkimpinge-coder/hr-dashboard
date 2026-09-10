@@ -5,12 +5,14 @@ import Button from '../../../utils/Button/button'
 import CommonForm from '../../../utils/Form/commonform'
 import useApi from '../../../hooks/useApi'
 import { emptyForm, getEmployeeFields, toDateInput } from '../employeeFormConfig'
+import { isAdminRole } from '../../../utils/roles'
 
-function EditEmployee({ employee, onClose, onUpdated }) {
+function EditEmployee({ employee, onClose, onUpdated, currentUser }) {
   const { updateEmployee } = useApi()
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
@@ -30,6 +32,8 @@ function EditEmployee({ employee, onClose, onUpdated }) {
         dob: toDateInput(employee.dob),
         department: employee.department || '',
         designation: employee.designation || '',
+        workType: employee.workType || 'Full Time',
+        reportingManager: employee.reportingManager || '',
         salary: employee.salary ?? '',
         joiningDate: toDateInput(employee.joiningDate),
         address: employee.address || '',
@@ -72,8 +76,9 @@ function EditEmployee({ employee, onClose, onUpdated }) {
         <CommonForm
           formClassName="employee-form"
           layoutClassName="form-grid"
-          fields={getEmployeeFields({ idPrefix: 'edit-', includePassword: true })}
+          fields={getEmployeeFields({ idPrefix: 'edit-', includePassword: true, canManageRole: isAdminRole(currentUser) })}
           register={register}
+          control={control}
           errors={errors}
           onSubmit={handleSubmit(onSubmit)}
         >

@@ -1,9 +1,8 @@
-// Client-side task store. Frontend-only for now (no backend yet) — tasks
-// live in localStorage, the same pattern Attendance started with. Swapping
-// this for real API calls later only means rewriting the functions below;
-// every Task screen only talks to this module.
-
-const STORAGE_KEY = 'hrTaskRecords'
+// Shared constants + pure display helpers for the Tasks module. All CRUD
+// goes through the real API (see useApi.js — listTasks, createTask,
+// updateTask, deleteTask, addTaskComment) — this file only holds the
+// status/priority enums and formatting/derived logic reused across the
+// task board and task detail views.
 
 export const TASK_STATUS = {
   TODO: 'To Do',
@@ -21,78 +20,14 @@ export const TASK_PRIORITY = {
 
 export const TASK_PRIORITIES = Object.values(TASK_PRIORITY)
 
-const generateId = () =>
-  typeof crypto !== 'undefined' && crypto.randomUUID
-    ? crypto.randomUUID()
-    : `task-${Date.now()}-${Math.random().toString(16).slice(2)}`
-
-const readAll = () => {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-  } catch {
-    return []
-  }
-}
-
-const writeAll = (tasks) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
-}
-
-export const listTasks = () => readAll().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-
-export const createTask = (task) => {
-  const all = readAll()
-  const newTask = {
-    id: generateId(),
-    status: TASK_STATUS.TODO,
-    comments: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    ...task,
-  }
-  all.push(newTask)
-  writeAll(all)
-  return newTask
-}
-
-export const updateTask = (id, patch) => {
-  const all = readAll()
-  const index = all.findIndex((task) => task.id === id)
-  if (index === -1) return null
-  all[index] = { ...all[index], ...patch, updatedAt: new Date().toISOString() }
-  writeAll(all)
-  return all[index]
-}
-
-export const deleteTask = (id) => {
-  writeAll(readAll().filter((task) => task.id !== id))
-}
-
-export const addComment = (id, comment) => {
-  const all = readAll()
-  const index = all.findIndex((task) => task.id === id)
-  if (index === -1) return null
-  const newComment = { id: generateId(), createdAt: new Date().toISOString(), ...comment }
-  all[index] = {
-    ...all[index],
-    comments: [...(all[index].comments || []), newComment],
-    updatedAt: new Date().toISOString(),
-  }
-  writeAll(all)
-  return all[index]
-}
-
-export const getDateKey = (date = new Date()) => {
-  const d = new Date(date)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-
 export const isOverdue = (task) =>
-  Boolean(task.dueDate) && task.status !== TASK_STATUS.DONE && task.dueDate < getDateKey()
+  Boolean(task.dueDate) &&
+  task.status !== TASK_STATUS.DONE &&
+  String(task.dueDate).slice(0, 10) < new Date().toISOString().slice(0, 10)
 
-export const formatDateDisplay = (dateKey) => {
-  if (!dateKey) return 'No due date'
-  return new Date(`${dateKey}T00:00:00`).toLocaleDateString(undefined, {
+export const formatDateDisplay = (value) => {
+  if (!value) return 'No due date'
+  return new Date(value).toLocaleDateString(undefined, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',

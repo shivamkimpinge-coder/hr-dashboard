@@ -193,3 +193,73 @@ export function IconSparkle(props) {
     </svg>
   )
 }
+
+export function IconBriefcase(props) {
+  return (
+    <svg {...base(props)}>
+      <rect x="2.75" y="6.25" width="14.5" height="10" rx="1.8" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M7.25 6.25V4.9c0-.75.6-1.35 1.35-1.35h2.8c.75 0 1.35.6 1.35 1.35v1.35" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M2.75 10.4h14.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export function IconIdBadge(props) {
+  return (
+    <svg {...base(props)}>
+      <rect x="2.75" y="3.75" width="14.5" height="12.5" rx="1.8" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="7.4" cy="8.6" r="1.75" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M4.6 13.6c.4-1.4 1.5-2.2 2.8-2.2s2.4.8 2.8 2.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M12.6 8.2h2.8M12.6 11.3h2.8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export function IconBuilding(props) {
+  return (
+    <svg {...base(props)}>
+      <path d="M3.75 16.75V4.6c0-.75.6-1.35 1.35-1.35h6.3c.75 0 1.35.6 1.35 1.35v12.15" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M12.75 8.25h2.5c.75 0 1.35.6 1.35 1.35v7.15" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M6.4 6.4h3.3M6.4 9.3h3.3M6.4 12.2h3.3M2.75 16.75h14.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export function IconMail(props) {
+  return (
+    <svg {...base(props)}>
+      <rect x="2.75" y="4.75" width="14.5" height="10.5" rx="1.8" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M3.5 6l6.5 4.6L16.5 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+export function IconChevronLeft(props) {
+  return (
+    <svg {...base(props)} width={16} height={16} viewBox="0 0 16 16">
+      <path d="M10 4L6 8l4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+export function IconChevronRight(props) {
+  return (
+    <svg {...base(props)} width={16} height={16} viewBox="0 0 16 16">
+      <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+export function IconBell(props) {
+  return (
+    <svg {...base(props)}>
+      <path
+        d="M10 2.9a4.85 4.85 0 00-4.85 4.85v2.6L3.9 13h12.2l-1.25-2.65v-2.6A4.85 4.85 0 0010 2.9z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path d="M8.15 15.3a1.9 1.9 0 003.7 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}

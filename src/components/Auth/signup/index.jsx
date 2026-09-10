@@ -12,10 +12,11 @@ function Signup({ onSignupSuccess }) {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm({
     mode: 'onTouched',
-    defaultValues: { name: '', email: '', password: '' },
+    defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
   })
 
   const onSubmit = async ({ name, email, password }) => {
@@ -62,11 +63,24 @@ function Signup({ onSignupSuccess }) {
               name: 'password',
               label: 'Password',
               type: 'password',
+              showToggle: true,
               placeholder: 'Create a password',
               className: 'auth-input',
               rules: {
                 required: 'Password is required',
                 minLength: { value: 6, message: 'Password must be at least 6 characters long.' },
+              },
+            },
+            {
+              name: 'confirmPassword',
+              label: 'Confirm Password',
+              type: 'password',
+              showToggle: true,
+              placeholder: 'Re-enter your password',
+              className: 'auth-input',
+              rules: {
+                required: 'Please confirm your password',
+                validate: (value) => value === watch('password') || 'Passwords do not match',
               },
             },
           ]}

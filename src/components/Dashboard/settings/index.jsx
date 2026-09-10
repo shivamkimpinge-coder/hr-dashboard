@@ -1,7 +1,8 @@
 import Button from '../../../utils/Button/button'
+import { isManagerRole } from '../../../utils/roles'
 
 function Settings({ currentUser }) {
-  const isAdmin = currentUser?.role === 'Admin'
+  const isManager = isManagerRole(currentUser)
 
   return (
     <section className="row g-3">
@@ -25,7 +26,7 @@ function Settings({ currentUser }) {
               </div>
             </div>
 
-            {isAdmin ? (
+            {isManager ? (
               <div className="col-lg-4">
                 <div className="overview-card">
                   <h4>Salary structure</h4>

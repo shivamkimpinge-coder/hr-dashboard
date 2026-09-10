@@ -1,41 +1,56 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
+import useApi from '../../../hooks/useApi'
 import {
   TASK_STATUSES,
-  addComment,
-  deleteTask,
   formatDateDisplay,
   formatDateTimeDisplay,
   isOverdue,
   priorityPillClass,
   statusPillClass,
-  updateTask,
 } from '../taskStore'
 
-function TaskDetails({ task, isAdmin, currentUser, onClose, onChanged, onEdit }) {
+function TaskDetails({ task, isManager, currentUser, onClose, onChanged, onEdit }) {
+  const { updateTask, deleteTask, addTaskComment } = useApi()
   const [commentText, setCommentText] = useState('')
+  const [posting, setPosting] = useState(false)
 
   if (!task) return null
 
-  const handleStatusChange = (event) => {
-    updateTask(task.id, { status: event.target.value })
-    toast.success('Status updated.')
-    onChanged()
+  const handleStatusChange = async (event) => {
+    try {
+      await updateTask(task._id, { status: event.target.value })
+      toast.success('Status updated.')
+      onChanged()
+    } catch (error) {
+      toast.error(error.message)
+    }
   }
 
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (!commentText.trim()) return
-    addComment(task.id, { author: currentUser?.name || 'You', text: commentText.trim() })
-    setCommentText('')
-    onChanged()
+    setPosting(true)
+    try {
+      await addTaskComment(task._id, { author: currentUser?.name || 'You', text: commentText.trim() })
+      setCommentText('')
+      onChanged()
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      setPosting(false)
+    }
   }
 
-  const handleDelete = () => {
-    deleteTask(task.id)
-    toast.success('Task deleted successfully.')
-    onChanged()
-    onClose()
+  const handleDelete = async () => {
+    try {
+      await deleteTask(task._id)
+      toast.success('Task deleted successfully.')
+      onChanged()
+      onClose()
+    } catch (error) {
+      toast.error(error.message)
+    }
   }
 
   const overdue = isOverdue(task)
@@ -91,7 +106,7 @@ function TaskDetails({ task, isAdmin, currentUser, onClose, onChanged, onEdit })
             </div>
           </div>
 
-          {isAdmin ? (
+          {isManager ? (
             <div className="action-row" style={{ marginTop: 4 }}>
               <Button variant="secondary" onClick={onEdit}>
                 Update Task
@@ -110,7 +125,7 @@ function TaskDetails({ task, isAdmin, currentUser, onClose, onChanged, onEdit })
               <p className="form-hint">No comments yet.</p>
             ) : (
               task.comments.map((comment) => (
-                <div className="comment-item" key={comment.id}>
+                <div className="comment-item" key={comment._id}>
                   <div className="comment-item-head">
                     <strong>{comment.author}</strong>
                     <span>{formatDateTimeDisplay(comment.createdAt)}</span>
@@ -128,7 +143,9 @@ function TaskDetails({ task, isAdmin, currentUser, onClose, onChanged, onEdit })
               value={commentText}
               onChange={(event) => setCommentText(event.target.value)}
             />
-            <Button onClick={handleAddComment}>Add Comment</Button>
+            <Button onClick={handleAddComment} disabled={posting}>
+              {posting ? 'Posting...' : 'Add Comment'}
+            </Button>
           </div>
         </div>
       </div>

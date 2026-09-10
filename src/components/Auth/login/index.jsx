@@ -63,6 +63,7 @@ function Login({ onLoginSuccess, onForgotPassword }) {
               name: 'password',
               label: 'Password',
               type: 'password',
+              showToggle: true,
               placeholder: 'Enter your password',
               className: 'auth-input',
               rules: { required: 'Password is required' },

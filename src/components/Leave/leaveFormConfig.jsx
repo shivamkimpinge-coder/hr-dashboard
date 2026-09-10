@@ -1,3 +1,5 @@
+import { isAdminRole } from '../../utils/roles'
+
 export const LEAVE_TYPES = ['Casual Leave', 'Sick Leave', 'Annual Leave', 'Work From Home']
 
 export const LEAVE_STATUS = {
@@ -39,6 +41,15 @@ export const statusPillClass = (status) => {
       return 'pill-muted' // Cancelled
   }
 }
+
+// Admin oversees leave but never applies for it themselves — HR and
+// Employees do. Enforced for real in backend/controllers/leaveController.js;
+// this just keeps the tab out of Admin's way.
+export const getLeaveTabs = (currentUser) =>
+  [
+    { label: 'My Requests', to: '/dashboard/leave', end: true },
+    !isAdminRole(currentUser) && { label: 'Apply Leave', to: '/dashboard/leave/apply' },
+  ].filter(Boolean)
 
 // Apply Leave always applies for the logged-in user themselves — no employee
 // picker. The backend resolves "who" from the JWT, not from the request body.

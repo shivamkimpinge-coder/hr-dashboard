@@ -5,12 +5,14 @@ import Button from '../../../utils/Button/button'
 import CommonForm from '../../../utils/Form/commonform'
 import useApi from '../../../hooks/useApi'
 import { emptyForm, getEmployeeFields } from '../employeeFormConfig'
+import { isAdminRole } from '../../../utils/roles'
 
-function CreateEmployee({ open, onClose, onCreated }) {
+function CreateEmployee({ open, onClose, onCreated, currentUser }) {
   const { createEmployee } = useApi()
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
@@ -52,8 +54,9 @@ function CreateEmployee({ open, onClose, onCreated }) {
         <CommonForm
           formClassName="employee-form"
           layoutClassName="form-grid"
-          fields={getEmployeeFields()}
+          fields={getEmployeeFields({ canManageRole: isAdminRole(currentUser) })}
           register={register}
+          control={control}
           errors={errors}
           onSubmit={handleSubmit(onSubmit)}
         >

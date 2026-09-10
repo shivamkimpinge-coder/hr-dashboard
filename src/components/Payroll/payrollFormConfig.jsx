@@ -117,4 +117,5 @@ export const getSalaryComponentFields = ({ idPrefix = '' } = {}) => [
     step: '0.01',
     rules: { valueAsNumber: true, min: { value: 0, message: 'Deduction cannot be negative' } },
   },
-]
+]                                                                                                            
+                                                                                                                                                                                        

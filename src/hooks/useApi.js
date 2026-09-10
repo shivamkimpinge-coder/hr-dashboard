@@ -30,6 +30,7 @@ export default function useApi() {
   const getCurrentUser = useCallback(() => run(() => api.auth.me()), [run])
 
   const listEmployees = useCallback((params) => run(() => api.employees.list(params)), [run])
+  const getEmployeeDirectory = useCallback(() => run(() => api.employees.directory()), [run])
   const getEmployeeStats = useCallback(() => run(() => api.employees.stats()), [run])
   const getEmployee = useCallback((id) => run(() => api.employees.get(id)), [run])
   const createEmployee = useCallback((payload) => run(() => api.employees.create(payload)), [run])
@@ -65,6 +66,45 @@ export default function useApi() {
   const listAttendance = useCallback((params) => run(() => api.attendance.list(params)), [run])
   const markAttendance = useCallback((payload) => run(() => api.attendance.mark(payload)), [run])
 
+  // Tasks
+  const listTasks = useCallback((params) => run(() => api.tasks.list(params)), [run])
+  const getMyTasks = useCallback(() => run(() => api.tasks.my()), [run])
+  const createTask = useCallback((payload) => run(() => api.tasks.create(payload)), [run])
+  const updateTask = useCallback((id, payload) => run(() => api.tasks.update(id, payload)), [run])
+  const deleteTask = useCallback((id) => run(() => api.tasks.remove(id)), [run])
+  const addTaskComment = useCallback((id, payload) => run(() => api.tasks.addComment(id, payload)), [run])
+
+  // Performance — Goals
+  const listGoals = useCallback((params) => run(() => api.goals.list(params)), [run])
+  const getMyGoals = useCallback(() => run(() => api.goals.my()), [run])
+  const createGoal = useCallback((payload) => run(() => api.goals.create(payload)), [run])
+  const updateGoal = useCallback((id, payload) => run(() => api.goals.update(id, payload)), [run])
+  const deleteGoal = useCallback((id) => run(() => api.goals.remove(id)), [run])
+
+  // Performance — Reviews
+  const listReviews = useCallback((params) => run(() => api.performanceReviews.list(params)), [run])
+  const getMyReviews = useCallback(() => run(() => api.performanceReviews.my()), [run])
+  const createReview = useCallback((payload) => run(() => api.performanceReviews.create(payload)), [run])
+  const updateReview = useCallback((id, payload) => run(() => api.performanceReviews.update(id, payload)), [run])
+  const acknowledgeReview = useCallback((id) => run(() => api.performanceReviews.acknowledge(id)), [run])
+  const deleteReview = useCallback((id) => run(() => api.performanceReviews.remove(id)), [run])
+
+  // Performance — Promotions
+  const listPromotions = useCallback((params) => run(() => api.promotions.list(params)), [run])
+  const getMyPromotions = useCallback(() => run(() => api.promotions.my()), [run])
+  const createPromotion = useCallback((payload) => run(() => api.promotions.create(payload)), [run])
+  const updatePromotion = useCallback((id, payload) => run(() => api.promotions.update(id, payload)), [run])
+  const approvePromotion = useCallback((id) => run(() => api.promotions.approve(id)), [run])
+  const rejectPromotion = useCallback((id) => run(() => api.promotions.reject(id)), [run])
+  const deletePromotion = useCallback((id) => run(() => api.promotions.remove(id)), [run])
+
+  // Notifications
+  const listNotifications = useCallback((params) => run(() => api.notifications.list(params)), [run])
+  const markNotificationRead = useCallback((id) => run(() => api.notifications.markRead(id)), [run])
+  const markAllNotificationsRead = useCallback(() => run(() => api.notifications.markAllRead()), [run])
+  const sendNotification = useCallback((payload) => run(() => api.notifications.send(payload)), [run])
+  const deleteNotification = useCallback((id) => run(() => api.notifications.remove(id)), [run])
+
   return {
     loading,
     error,
@@ -79,6 +119,7 @@ export default function useApi() {
 
     // Employees
     listEmployees,
+    getEmployeeDirectory,
     getEmployeeStats,
     getEmployee,
     createEmployee,
@@ -114,5 +155,44 @@ export default function useApi() {
     getMyAttendance,
     listAttendance,
     markAttendance,
+
+    // Tasks
+    listTasks,
+    getMyTasks,
+    createTask,
+    updateTask,
+    deleteTask,
+    addTaskComment,
+
+    // Performance — Goals
+    listGoals,
+    getMyGoals,
+    createGoal,
+    updateGoal,
+    deleteGoal,
+
+    // Performance — Reviews
+    listReviews,
+    getMyReviews,
+    createReview,
+    updateReview,
+    acknowledgeReview,
+    deleteReview,
+
+    // Performance — Promotions
+    listPromotions,
+    getMyPromotions,
+    createPromotion,
+    updatePromotion,
+    approvePromotion,
+    rejectPromotion,
+    deletePromotion,
+
+    // Notifications
+    listNotifications,
+    markNotificationRead,
+    markAllNotificationsRead,
+    sendNotification,
+    deleteNotification,
   }
 }

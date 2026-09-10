@@ -1,3 +1,5 @@
+import { isValidPhoneNumber } from 'react-phone-number-input'
+
 export const emptyForm = {
   name: '',
   email: '',
@@ -6,6 +8,8 @@ export const emptyForm = {
   dob: '',
   department: 'Engineering',
   designation: '',
+  workType: 'Full Time',
+  reportingManager: '',
   salary: '',
   joiningDate: '',
   address: '',
@@ -23,7 +27,7 @@ export const formatSalary = (value) => {
 
 export const toDateInput = (value) => (value ? String(value).slice(0, 10) : '')
 
-export const getEmployeeFields = ({ idPrefix = '', includePassword = false } = {}) => {
+export const getEmployeeFields = ({ idPrefix = '', includePassword = false, canManageRole = false } = {}) => {
   const fields = [
     { name: 'name', label: 'Full Name', id: `${idPrefix}name`, rules: { required: 'Full name is required' } },
     {
@@ -52,7 +56,16 @@ export const getEmployeeFields = ({ idPrefix = '', includePassword = false } = {
   }
 
   fields.push(
-    { name: 'phone', label: 'Phone Number', id: `${idPrefix}phone`, rules: { required: 'Phone number is required' } },
+    {
+      name: 'phone',
+      label: 'Phone Number',
+      id: `${idPrefix}phone`,
+      type: 'phone',
+      rules: {
+        required: 'Phone number is required',
+        validate: (value) => (value ? isValidPhoneNumber(value) || 'Please enter a valid phone number' : true),
+      },
+    },
     {
       name: 'gender',
       label: 'Gender',
@@ -87,6 +100,24 @@ export const getEmployeeFields = ({ idPrefix = '', includePassword = false } = {
     },
     { name: 'designation', label: 'Designation', id: `${idPrefix}designation`, rules: { required: 'Designation is required' } },
     {
+      name: 'workType',
+      label: 'Work Type',
+      id: `${idPrefix}workType`,
+      type: 'select',
+      options: [
+        { value: 'Full Time', label: 'Full Time' },
+        { value: 'Part Time', label: 'Part Time' },
+        { value: 'Contract', label: 'Contract' },
+        { value: 'Intern', label: 'Intern' },
+      ],
+    },
+    {
+      name: 'reportingManager',
+      label: 'Reporting Manager',
+      id: `${idPrefix}reportingManager`,
+      placeholder: 'e.g. Priya Sharma',
+    },
+    {
       name: 'salary',
       label: 'Salary',
       id: `${idPrefix}salary`,
@@ -104,18 +135,6 @@ export const getEmployeeFields = ({ idPrefix = '', includePassword = false } = {
       id: `${idPrefix}joiningDate`,
       type: 'date',
       rules: { required: 'Joining date is required' },
-    },
-    {
-      name: 'role',
-      label: 'Role',
-      id: `${idPrefix}role`,
-      type: 'select',
-      options: [
-        { value: 'Employee', label: 'Employee' },
-        { value: 'Manager', label: 'Manager' },
-        { value: 'HR', label: 'HR' },
-        { value: 'Admin', label: 'Admin' },
-      ],
     },
     {
       name: 'status',
@@ -137,6 +156,23 @@ export const getEmployeeFields = ({ idPrefix = '', includePassword = false } = {
       rules: { required: 'Address is required' },
     }
   )
+
+  // Only a true Admin can assign or change someone's role — HR (and
+  // everyone else) simply doesn't see this field, matching what the
+  // backend enforces (see empolyeeController.js's role-escalation guard).
+  if (canManageRole) {
+    fields.push({
+      name: 'role',
+      label: 'Role',
+      id: `${idPrefix}role`,
+      type: 'select',
+      options: [
+        { value: 'Employee', label: 'Employee' },
+        { value: 'HR', label: 'HR' },
+        { value: 'Admin', label: 'Admin' },
+      ],
+    })
+  }
 
   return fields
 }

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { isManagerRole } from '../../../utils/roles'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Button from '../../../utils/Button/button'
 import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
@@ -8,7 +9,7 @@ import Payslip from '../payslip'
 import { formatCurrency } from '../payrollFormConfig'
 
 function SalaryHistory({ currentUser }) {
-  const isAdmin = currentUser?.role === 'Admin'
+  const isManager = isManagerRole(currentUser)
   const navigate = useNavigate()
   const location = useLocation()
   const { listEmployees, listPayroll, getMyPayroll } = useApi()
@@ -21,11 +22,11 @@ function SalaryHistory({ currentUser }) {
   const [selectedPayroll, setSelectedPayroll] = useState(null)
 
   useEffect(() => {
-    if (!isAdmin) return
+    if (!isManager) return
     listEmployees({ limit: 200 })
       .then((data) => setEmployees(data.employees || []))
       .catch(() => {})
-  }, [isAdmin, listEmployees])
+  }, [isManager, listEmployees])
 
   const fetchPayrolls = useCallback(async () => {
     setLoading(true)
@@ -33,14 +34,14 @@ function SalaryHistory({ currentUser }) {
     try {
       const params = { limit: 200 }
       if (employeeFilter) params.employeeId = employeeFilter
-      const data = isAdmin ? await listPayroll(params) : await getMyPayroll()
+      const data = isManager ? await listPayroll(params) : await getMyPayroll()
       setPayrolls(data.payrolls || [])
     } catch (err) {
       setError(err.message)
     } finally {
       setLoading(false)
     }
-  }, [isAdmin, employeeFilter, listPayroll, getMyPayroll])
+  }, [isManager, employeeFilter, listPayroll, getMyPayroll])
 
   useEffect(() => {
     fetchPayrolls()
@@ -60,19 +61,19 @@ function SalaryHistory({ currentUser }) {
       <SectionTabs
         tabs={[
           { label: 'My Payslips', to: '/dashboard/payroll', end: true },
-          isAdmin && { label: 'Salary Structure', to: '/dashboard/payroll/structure' },
-          isAdmin && { label: 'Generate Salary', to: '/dashboard/payroll/generate' },
+          isManager && { label: 'Salary Structure', to: '/dashboard/payroll/structure' },
+          isManager && { label: 'Generate Salary', to: '/dashboard/payroll/generate' },
         ]}
       />
 
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Payroll</p>
-          <h3>{isAdmin ? 'Salary History' : 'My Salary Slips'}</h3>
+          <h3>{isManager ? 'Salary History' : 'My Salary Slips'}</h3>
         </div>
       </div>
 
-      {isAdmin ? (
+      {isManager ? (
         <div className="form-field filter-field">
           <label htmlFor="history-employee-filter">Filter by employee</label>
           <select
@@ -97,7 +98,7 @@ function SalaryHistory({ currentUser }) {
           <thead>
             <tr>
               <th>Payslip No</th>
-              {isAdmin ? <th>Employee</th> : null}
+              {isManager ? <th>Employee</th> : null}
               <th>Period</th>
               <th>Net Salary</th>
               <th>Status</th>
@@ -107,17 +108,17 @@ function SalaryHistory({ currentUser }) {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={isAdmin ? 6 : 5}>Loading salary history...</td>
+                <td colSpan={isManager ? 6 : 5}>Loading salary history...</td>
               </tr>
             ) : payrolls.length === 0 ? (
               <tr>
-                <td colSpan={isAdmin ? 6 : 5}>No payroll records found.</td>
+                <td colSpan={isManager ? 6 : 5}>No payroll records found.</td>
               </tr>
             ) : (
               payrolls.map((payroll) => (
                 <tr key={payroll._id}>
                   <td>{payroll.payslipNo}</td>
-                  {isAdmin ? (
+                  {isManager ? (
                     <td>
                       {payroll.employeeName} <span className="text-muted">({payroll.employeeId})</span>
                     </td>

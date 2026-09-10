@@ -5,6 +5,7 @@ import Button from '../../../utils/Button/button'
 import CommonForm from '../../../utils/Form/commonform'
 import useApi from '../../../hooks/useApi'
 import { getProfileImageUrl } from '../../../utils/api'
+import { isValidPhoneNumber } from 'react-phone-number-input'
 
 const EMAIL_PATTERN = /\S+@\S+\.\S+/
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024
@@ -13,7 +14,6 @@ const DEFAULT_AVATAR =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='40' fill='%23cbd5e1'/%3E%3Ccircle cx='40' cy='32' r='14' fill='%23f1f5f9'/%3E%3Cpath d='M14 72c4-16 18-24 26-24s22 8 26 24' fill='%23f1f5f9'/%3E%3C/svg%3E"
 
 const GENDER_OPTIONS = [
-  { value: '', label: 'Prefer not to say' },
   { value: 'Male', label: 'Male' },
   { value: 'Female', label: 'Female' },
   { value: 'Other', label: 'Other' },
@@ -26,95 +26,11 @@ const toDateInputValue = (value) => {
   return date.toISOString().slice(0, 10)
 }
 
-function DetailsTab({ user, updateProfile, onSaved }) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm({
-    mode: 'onTouched',
-    defaultValues: {
-      name: user?.name || '',
-      email: user?.email || '',
-      phone: user?.phone || '',
-      gender: user?.gender || '',
-      dob: toDateInputValue(user?.dob),
-    },
-  })
-
-  const onSubmit = async (formData) => {
-    try {
-      const data = await updateProfile(formData)
-      toast.success('Profile updated successfully.')
-      onSaved(data.user)
-    } catch (error) {
-      toast.error(error.message)
-    }
-  }
-
-  return (
-    <CommonForm
-      formClassName="employee-form"
-      layoutClassName="form-grid"
-      register={register}
-      errors={errors}
-      fields={[
-        {
-          name: 'name',
-          label: 'Full Name',
-          id: 'edit-profile-name',
-          rules: { required: 'Full name is required' },
-        },
-        {
-          name: 'email',
-          label: 'Email',
-          id: 'edit-profile-email',
-          type: 'email',
-          rules: {
-            required: 'Email is required',
-            pattern: { value: EMAIL_PATTERN, message: 'Please enter a valid email address' },
-          },
-        },
-        {
-          name: 'phone',
-          label: 'Phone Number',
-          id: 'edit-profile-phone',
-          type: 'tel',
-          rules: {
-            pattern: { value: /^[0-9+\-\s()]{7,20}$/, message: 'Please enter a valid phone number' },
-          },
-        },
-        {
-          name: 'gender',
-          label: 'Gender',
-          id: 'edit-profile-gender',
-          type: 'select',
-          options: GENDER_OPTIONS,
-        },
-        {
-          name: 'dob',
-          label: 'Date of Birth',
-          id: 'edit-profile-dob',
-          type: 'date',
-        },
-      ]}
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <div className="action-row">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Saving...' : 'Save Changes'}
-        </Button>
-      </div>
-    </CommonForm>
-  )
-}
-
-function PasswordTab({ changePassword, onDone }) {
+function ChangePasswordModal({ changePassword, onClose }) {
   const {
     register,
     handleSubmit,
     watch,
-    reset,
     formState: { errors, isSubmitting },
   } = useForm({
     mode: 'onTouched',
@@ -124,62 +40,12 @@ function PasswordTab({ changePassword, onDone }) {
   const onSubmit = async ({ currentPassword, newPassword }) => {
     try {
       await changePassword({ currentPassword, newPassword })
-      reset()
       toast.success('Password changed successfully.')
-      onDone?.()
+      onClose()
     } catch (error) {
       toast.error(error.message)
     }
   }
-
-  return (
-    <CommonForm
-      formClassName="employee-form"
-      layoutClassName="form-grid"
-      register={register}
-      errors={errors}
-      fields={[
-        {
-          name: 'currentPassword',
-          label: 'Current Password',
-          id: 'edit-current-password',
-          type: 'password',
-          rules: { required: 'Current password is required' },
-        },
-        {
-          name: 'newPassword',
-          label: 'New Password',
-          id: 'edit-new-password',
-          type: 'password',
-          rules: {
-            required: 'New password is required',
-            minLength: { value: 6, message: 'New password must be at least 6 characters long.' },
-          },
-        },
-        {
-          name: 'confirmPassword',
-          label: 'Confirm New Password',
-          id: 'edit-confirm-password',
-          type: 'password',
-          rules: {
-            required: 'Please confirm your new password',
-            validate: (value) => value === watch('newPassword') || 'New password and confirmation do not match.',
-          },
-        },
-      ]}
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <div className="action-row">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Updating...' : 'Change Password'}
-        </Button>
-      </div>
-    </CommonForm>
-  )
-}
-
-function ProfileEditModal({ user, updateProfile, changePassword, onClose, onSaved }) {
-  const [activeTab, setActiveTab] = useState('details') // 'details' | 'password'
 
   return (
     <div className="modal-backdrop" role="dialog" aria-modal="true">
@@ -187,27 +53,55 @@ function ProfileEditModal({ user, updateProfile, changePassword, onClose, onSave
         <div className="panel-heading">
           <div>
             <p className="eyebrow">Profile</p>
-            <h3>Update Profile</h3>
+            <h3>Change Password</h3>
           </div>
           <Button variant="close" onClick={onClose} aria-label="Close">
             ✕
           </Button>
         </div>
 
-        <div className="range-toggle">
-          <button type="button" className={activeTab === 'details' ? 'is-active' : ''} onClick={() => setActiveTab('details')}>
-            Profile Details
-          </button>
-          <button type="button" className={activeTab === 'password' ? 'is-active' : ''} onClick={() => setActiveTab('password')}>
-            Change Password
-          </button>
-        </div>
-
-        {activeTab === 'details' ? (
-          <DetailsTab user={user} updateProfile={updateProfile} onSaved={onSaved} />
-        ) : (
-          <PasswordTab changePassword={changePassword} onDone={onClose} />
-        )}
+        <CommonForm
+          formClassName="employee-form"
+          layoutClassName="form-grid"
+          register={register}
+          errors={errors}
+          fields={[
+            {
+              name: 'currentPassword',
+              label: 'Current Password',
+              id: 'edit-current-password',
+              type: 'password',
+              rules: { required: 'Current password is required' },
+            },
+            {
+              name: 'newPassword',
+              label: 'New Password',
+              id: 'edit-new-password',
+              type: 'password',
+              rules: {
+                required: 'New password is required',
+                minLength: { value: 6, message: 'New password must be at least 6 characters long.' },
+              },
+            },
+            {
+              name: 'confirmPassword',
+              label: 'Confirm New Password',
+              id: 'edit-confirm-password',
+              type: 'password',
+              rules: {
+                required: 'Please confirm your new password',
+                validate: (value) => value === watch('newPassword') || 'New password and confirmation do not match.',
+              },
+            },
+          ]}
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <div className="action-row">
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Updating...' : 'Change Password'}
+            </Button>
+          </div>
+        </CommonForm>
       </div>
     </div>
   )
@@ -220,8 +114,19 @@ function Profile({ currentUser, onProfileUpdate, onLogout }) {
   const [loading, setLoading] = useState(true)
   const [imagePreview, setImagePreview] = useState(null)
   const [uploadingImage, setUploadingImage] = useState(false)
-  const [editOpen, setEditOpen] = useState(false)
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false)
   const fileInputRef = useRef(null)
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    mode: 'onTouched',
+    defaultValues: { name: '', email: '', phone: '', gender: '', dob: '' },
+  })
 
   useEffect(() => {
     let ignore = false
@@ -232,6 +137,13 @@ function Profile({ currentUser, onProfileUpdate, onLogout }) {
         const data = await getProfile()
         if (ignore) return
         setUser(data.user)
+        reset({
+          name: data.user.name || '',
+          email: data.user.email || '',
+          phone: data.user.phone || '',
+          gender: data.user.gender || '',
+          dob: toDateInputValue(data.user.dob),
+        })
       } catch (error) {
         if (error.status === 401) {
           onLogout?.()
@@ -247,7 +159,18 @@ function Profile({ currentUser, onProfileUpdate, onLogout }) {
     return () => {
       ignore = true
     }
-  }, [getProfile, onLogout])
+  }, [getProfile, onLogout, reset])
+
+  const onProfileSubmit = async (formData) => {
+    try {
+      const data = await updateProfile(formData)
+      setUser(data.user)
+      onProfileUpdate?.(data.user)
+      toast.success('Profile updated successfully.')
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
 
   const handleImageChange = async (event) => {
     const file = event.target.files?.[0]
@@ -284,41 +207,46 @@ function Profile({ currentUser, onProfileUpdate, onLogout }) {
     }
   }
 
+  const rolePillClass =
+    user?.role === 'Admin' ? 'pill-danger' : user?.role === 'HR' ? 'pill-warning' : 'pill-muted'
+  const memberSince = user?.createdAt
+    ? new Date(user.createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+    : null
+
   return (
     <div className="panel detail-panel">
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Profile</p>
-          <h3>Account details</h3>
+          <h3>Account settings</h3>
         </div>
-        <Button onClick={() => setEditOpen(true)}>Update Profile</Button>
       </div>
 
       {loading ? (
         <p>Loading profile...</p>
       ) : (
-        <>
-          <div className="overview-card">
-            <h4>Welcome back, {user?.name}</h4>
-          </div>
-
-          <div className="detail-card" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <img
-              src={imagePreview || getProfileImageUrl(user?.profileImage) || DEFAULT_AVATAR}
-              alt="Profile avatar"
-              onError={(e) => {
-                e.currentTarget.onerror = null
-                e.currentTarget.src = DEFAULT_AVATAR
-              }}
-              style={{
-                width: 80,
-                height: 80,
-                borderRadius: '50%',
-                objectFit: 'cover',
-                border: '1px solid var(--border-color, #ddd)',
-              }}
-            />
-            <div>
+        <div className="profile-layout">
+          <aside className="profile-summary">
+            <div className="profile-avatar-wrap">
+              <img
+                className="profile-avatar-img"
+                src={imagePreview || getProfileImageUrl(user?.profileImage) || DEFAULT_AVATAR}
+                alt="Profile avatar"
+                onError={(e) => {
+                  e.currentTarget.onerror = null
+                  e.currentTarget.src = DEFAULT_AVATAR
+                }}
+              />
+              <button
+                type="button"
+                className="profile-avatar-edit"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingImage}
+                aria-label="Change photo"
+                title="Change photo"
+              >
+                {uploadingImage ? '...' : '✎'}
+              </button>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -327,63 +255,85 @@ function Profile({ currentUser, onProfileUpdate, onLogout }) {
                 disabled={uploadingImage}
                 style={{ display: 'none' }}
               />
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploadingImage}
-              >
-                {uploadingImage ? 'Uploading...' : 'Change Photo'}
-              </Button>
             </div>
-          </div>
 
-          <div className="form-grid">
-            <div className="form-field">
-              <label htmlFor="profile-name">Full Name</label>
-              <input id="profile-name" type="text" value={user?.name || ''} readOnly />
-            </div>
-            <div className="form-field">
-              <label htmlFor="profile-email">Email</label>
-              <input id="profile-email" type="email" value={user?.email || ''} readOnly />
-            </div>
-            <div className="form-field">
-              <label htmlFor="profile-phone">Phone Number</label>
-              <input id="profile-phone" type="text" value={user?.phone || '—'} readOnly />
-            </div>
-            <div className="form-field">
-              <label htmlFor="profile-gender">Gender</label>
-              <input id="profile-gender" type="text" value={user?.gender || '—'} readOnly />
-            </div>
-            <div className="form-field">
-              <label htmlFor="profile-dob">Date of Birth</label>
-              <input
-                id="profile-dob"
-                type="text"
-                value={user?.dob ? new Date(user.dob).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
-                readOnly
-              />
-            </div>
-            <div className="form-field">
-              <label htmlFor="profile-role">Role</label>
-              <input id="profile-role" type="text" value={user?.role || 'User'} readOnly disabled />
-            </div>
+            <h4 className="profile-summary-name">{user?.name}</h4>
+            <p className="profile-summary-email">{user?.email}</p>
+            <span className={`pill ${rolePillClass}`}>{user?.role || 'User'}</span>
+            {memberSince ? <p className="profile-summary-since">Member since {memberSince}</p> : null}
+
+            <Button
+              type="button"
+              variant="secondary"
+              className="profile-summary-action"
+              onClick={() => setPasswordModalOpen(true)}
+            >
+              Change Password
+            </Button>
+          </aside>
+
+          <div className="profile-form-col">
+            <CommonForm
+              formClassName="employee-form"
+              layoutClassName="form-grid"
+              register={register}
+              control={control}
+              errors={errors}
+              fields={[
+                {
+                  name: 'name',
+                  label: 'Full Name',
+                  id: 'profile-name',
+                  rules: { required: 'Full name is required' },
+                },
+                {
+                  name: 'email',
+                  label: 'Email',
+                  id: 'profile-email',
+                  type: 'email',
+                  rules: {
+                    required: 'Email is required',
+                    pattern: { value: EMAIL_PATTERN, message: 'Please enter a valid email address' },
+                  },
+                },
+                {
+                  name: 'phone',
+                  label: 'Phone Number',
+                  id: 'profile-phone',
+                  type: 'phone',
+                  rules: {
+                    validate: (value) =>
+                      value ? isValidPhoneNumber(value) || 'Please enter a valid phone number' : true,
+                  },
+                },
+                {
+                  name: 'gender',
+                  label: 'Gender',
+                  id: 'profile-gender',
+                  type: 'select',
+                  options: GENDER_OPTIONS,
+                },
+                {
+                  name: 'dob',
+                  label: 'Date of Birth',
+                  id: 'profile-dob',
+                  type: 'date',
+                },
+              ]}
+              onSubmit={handleSubmit(onProfileSubmit)}
+            >
+              <div className="action-row">
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            </CommonForm>
           </div>
-        </>
+        </div>
       )}
 
-      {editOpen ? (
-        <ProfileEditModal
-          user={user}
-          updateProfile={updateProfile}
-          changePassword={changePassword}
-          onClose={() => setEditOpen(false)}
-          onSaved={(updatedUser) => {
-            setUser(updatedUser)
-            onProfileUpdate?.(updatedUser)
-            setEditOpen(false)
-          }}
-        />
+      {passwordModalOpen ? (
+        <ChangePasswordModal changePassword={changePassword} onClose={() => setPasswordModalOpen(false)} />
       ) : null}
     </div>
   )

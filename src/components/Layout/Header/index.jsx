@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import useApi from '../../../hooks/useApi'
 import { IconChevronDown, IconLogout, IconUser } from '../Sidebar/icons'
+import NotificationBell from './NotificationBell'
 
 const getInitials = (name = '') =>
   name
@@ -16,6 +17,7 @@ function Header({
   title = 'HR Dashboard',
   currentUser,
   onLogout,
+  onToggleSidebar,
 }) {
   const { listEmployees } = useApi()
   const navigate = useNavigate()
@@ -82,6 +84,20 @@ function Header({
       document.removeEventListener('keydown', handleKeyDown)
     }
   }, [isUserMenuOpen])
+
+  // The ⌘K / Ctrl+K chip in the search field is a real shortcut, not decoration.
+  useEffect(() => {
+    const handleShortcut = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        inputRef.current?.focus()
+        inputRef.current?.select()
+      }
+    }
+
+    document.addEventListener('keydown', handleShortcut)
+    return () => document.removeEventListener('keydown', handleShortcut)
+  }, [])
 
   const openEmployeeSearch = (searchText = search) => {
     const query = searchText.trim()
@@ -161,9 +177,22 @@ function Header({
   return (
     <header className="dashboard-header">
 
-      <div>
-        <p className="eyebrow">{eyebrow}</p>
-        <h1>{title}</h1>
+      <div className="header-lead">
+        <button
+          type="button"
+          className="header-menu-toggle"
+          onClick={onToggleSidebar}
+          aria-label="Toggle navigation"
+        >
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
+        </button>
+
+        <div className="header-title-block">
+          <p className="eyebrow">{eyebrow}</p>
+          <h1>{title}</h1>
+        </div>
       </div>
 
       <div className="header-actions">
@@ -209,6 +238,13 @@ function Header({
             />
 
             {searching ? <span className="search-spinner" aria-hidden="true" /> : null}
+
+            {!search && !searching && (
+              <span className="search-kbd" aria-hidden="true">
+                <kbd>⌘</kbd>
+                <kbd>K</kbd>
+              </span>
+            )}
 
             {search && !searching && (
               <button
@@ -281,6 +317,8 @@ function Header({
           )}
 
         </form>
+
+        <NotificationBell />
 
         {currentUser ? (
           <div className="header-user-menu" ref={userMenuRef}>

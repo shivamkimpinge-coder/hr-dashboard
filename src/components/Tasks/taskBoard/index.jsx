@@ -1,16 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { isManagerRole } from '../../../utils/roles'
+import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import useApi from '../../../hooks/useApi'
 import TaskForm from '../taskForm'
 import TaskDetails from '../taskDetails'
-import {
-  TASK_STATUSES,
-  formatDateDisplay,
-  isOverdue,
-  listTasks,
-  priorityPillClass,
-  updateTask,
-} from '../taskStore'
+import { TASK_STATUSES, formatDateDisplay, isOverdue, priorityPillClass } from '../taskStore'
 
 function TaskCard({ task, onOpen, onDragStart }) {
   const overdue = isOverdue(task)
@@ -19,8 +14,8 @@ function TaskCard({ task, onOpen, onDragStart }) {
     <div
       className="task-card"
       draggable
-      onDragStart={() => onDragStart(task.id)}
-      onClick={() => onOpen(task.id)}
+      onDragStart={() => onDragStart(task._id)}
+      onClick={() => onOpen(task._id)}
     >
       <div className="task-card-head">
         <span className={`pill ${priorityPillClass(task.priority)}`}>{task.priority}</span>
@@ -37,41 +32,56 @@ function TaskCard({ task, onOpen, onDragStart }) {
 }
 
 function TaskBoard({ currentUser }) {
-  const isAdmin = currentUser?.role === 'Admin'
-  const { listEmployees } = useApi()
+  const isManager = isManagerRole(currentUser)
+  const { listEmployees, listTasks, getMyTasks, updateTask } = useApi()
 
   const [tasks, setTasks] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [employees, setEmployees] = useState([])
   const [assigneeFilter, setAssigneeFilter] = useState('')
   const [draggingId, setDraggingId] = useState(null)
   const [formTask, setFormTask] = useState(undefined) // undefined = closed, null = create, task = edit
   const [openTaskId, setOpenTaskId] = useState(null)
 
-  const refresh = () => setTasks(listTasks())
+  const refresh = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const data = isManager
+        ? await listTasks({ assigneeId: assigneeFilter || undefined })
+        : await getMyTasks()
+      setTasks(data.tasks || [])
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [isManager, assigneeFilter, listTasks, getMyTasks])
 
   useEffect(() => {
     refresh()
-  }, [])
+  }, [refresh])
 
   useEffect(() => {
-    if (!isAdmin) return
+    if (!isManager) return
     listEmployees({ limit: 200 })
       .then((data) => setEmployees(data.employees || []))
       .catch(() => {})
-  }, [isAdmin, listEmployees])
+  }, [isManager, listEmployees])
 
-  const visibleTasks = useMemo(() => {
-    if (!isAdmin) return tasks.filter((task) => task.assigneeEmail === currentUser?.email)
-    return assigneeFilter ? tasks.filter((task) => task.assigneeId === assigneeFilter) : tasks
-  }, [tasks, isAdmin, assigneeFilter, currentUser])
+  const openTask = useMemo(() => tasks.find((task) => task._id === openTaskId) || null, [tasks, openTaskId])
 
-  const openTask = useMemo(() => tasks.find((task) => task.id === openTaskId) || null, [tasks, openTaskId])
-
-  const handleDrop = (status) => {
+  const handleDrop = async (status) => {
     if (!draggingId) return
-    updateTask(draggingId, { status })
+    const id = draggingId
     setDraggingId(null)
-    refresh()
+    try {
+      await updateTask(id, { status })
+      refresh()
+    } catch (err) {
+      toast.error(err.message)
+    }
   }
 
   return (
@@ -79,12 +89,12 @@ function TaskBoard({ currentUser }) {
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Tasks</p>
-          <h3>{isAdmin ? 'Task Board' : 'My Tasks'}</h3>
+          <h3>{isManager ? 'Task Board' : 'My Tasks'}</h3>
         </div>
-        {isAdmin ? <Button onClick={() => setFormTask(null)}>+ Create Task</Button> : null}
+        {isManager ? <Button onClick={() => setFormTask(null)}>+ Create Task</Button> : null}
       </div>
 
-      {isAdmin ? (
+      {isManager ? (
         <div className="form-field filter-field">
           <label htmlFor="task-employee-filter">Filter by employee</label>
           <select
@@ -102,31 +112,37 @@ function TaskBoard({ currentUser }) {
         </div>
       ) : null}
 
-      <div className="kanban-board">
-        {TASK_STATUSES.map((status) => (
-          <div
-            className="kanban-column"
-            key={status}
-            onDragOver={(event) => event.preventDefault()}
-            onDrop={() => handleDrop(status)}
-          >
-            <div className="kanban-column-header">
-              <h4>{status}</h4>
-              <span className="pill pill-muted">{visibleTasks.filter((task) => task.status === status).length}</span>
+      {error ? <div className="feedback-banner feedback-banner-error">{error}</div> : null}
+
+      {loading ? (
+        <p className="form-hint">Loading tasks...</p>
+      ) : (
+        <div className="kanban-board">
+          {TASK_STATUSES.map((status) => (
+            <div
+              className="kanban-column"
+              key={status}
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={() => handleDrop(status)}
+            >
+              <div className="kanban-column-header">
+                <h4>{status}</h4>
+                <span className="pill pill-muted">{tasks.filter((task) => task.status === status).length}</span>
+              </div>
+              <div className="kanban-column-body">
+                {tasks
+                  .filter((task) => task.status === status)
+                  .map((task) => (
+                    <TaskCard key={task._id} task={task} onOpen={setOpenTaskId} onDragStart={setDraggingId} />
+                  ))}
+                {tasks.filter((task) => task.status === status).length === 0 ? (
+                  <p className="form-hint">No tasks here.</p>
+                ) : null}
+              </div>
             </div>
-            <div className="kanban-column-body">
-              {visibleTasks
-                .filter((task) => task.status === status)
-                .map((task) => (
-                  <TaskCard key={task.id} task={task} onOpen={setOpenTaskId} onDragStart={setDraggingId} />
-                ))}
-              {visibleTasks.filter((task) => task.status === status).length === 0 ? (
-                <p className="form-hint">No tasks here.</p>
-              ) : null}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {formTask !== undefined ? (
         <TaskForm
@@ -144,7 +160,7 @@ function TaskBoard({ currentUser }) {
       {openTask ? (
         <TaskDetails
           task={openTask}
-          isAdmin={isAdmin}
+          isManager={isManager}
           currentUser={currentUser}
           onClose={() => setOpenTaskId(null)}
           onChanged={refresh}

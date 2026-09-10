@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
+import { isManagerRole } from '../../../utils/roles'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import useApi from '../../../hooks/useApi'
 import LeaveDetails from '../leaveDetails'
 
-import { LEAVE_STATUS, formatDateDisplay, statusPillClass } from '../leaveFormConfig'
+import { LEAVE_STATUS, formatDateDisplay, getLeaveTabs, statusPillClass } from '../leaveFormConfig'
 
 function LeaveList({ currentUser }) {
-  const isAdmin = currentUser?.role === 'Admin'
+  const isManager = isManagerRole(currentUser)
   const { listEmployees, listLeaves, getMyLeaves, approveLeave, rejectLeave, cancelLeave } = useApi()
 
   const [employees, setEmployees] = useState([])
@@ -20,27 +21,27 @@ function LeaveList({ currentUser }) {
   const [selectedLeave, setSelectedLeave] = useState(null)
 
   useEffect(() => {
-    if (!isAdmin) return
+    if (!isManager) return
     listEmployees({ limit: 200 })
       .then((data) => setEmployees(data.employees || []))
       .catch(() => {})
-  }, [isAdmin, listEmployees])
+  }, [isManager, listEmployees])
 
   const fetchLeaves = useCallback(async () => {
     setLoading(true)
     setError('')
     try {
-      const data = isAdmin
+      const data = isManager
         ? await listLeaves({ employeeId: employeeFilter || undefined, status: statusFilter || undefined })
         : await getMyLeaves()
       const all = data.leaves || []
-      setLeaves(isAdmin ? all : all.filter((leave) => !statusFilter || leave.status === statusFilter))
+      setLeaves(isManager ? all : all.filter((leave) => !statusFilter || leave.status === statusFilter))
     } catch (err) {
       setError(err.message)
     } finally {
       setLoading(false)
     }
-  }, [isAdmin, employeeFilter, statusFilter, listLeaves, getMyLeaves])
+  }, [isManager, employeeFilter, statusFilter, listLeaves, getMyLeaves])
 
   useEffect(() => {
     fetchLeaves()
@@ -59,22 +60,17 @@ function LeaveList({ currentUser }) {
 
   return (
     <div className="panel detail-panel">
-      <SectionTabs
-        tabs={[
-          { label: 'My Requests', to: '/dashboard/leave', end: true },
-          { label: 'Apply Leave', to: '/dashboard/leave/apply' },
-        ]}
-      />
+      <SectionTabs tabs={getLeaveTabs(currentUser)} />
 
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Leave</p>
-          <h3>{isAdmin ? 'Leave Requests' : 'My Leave Requests'}</h3>
+          <h3>{isManager ? 'Leave Requests' : 'My Leave Requests'}</h3>
         </div>
       </div>
 
       <div className="row g-3">
-        {isAdmin ? (
+        {isManager ? (
           <div className="form-field filter-field">
             <label htmlFor="leave-employee-filter">Filter by employee</label>
             <select
@@ -115,7 +111,7 @@ function LeaveList({ currentUser }) {
         <table className="table table-dark table-hover align-middle mb-0">
           <thead>
             <tr>
-              {isAdmin ? <th>Employee</th> : null}
+              {isManager ? <th>Employee</th> : null}
               <th>Leave Type</th>
               <th>Period</th>
               <th>Days</th>
@@ -126,16 +122,16 @@ function LeaveList({ currentUser }) {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={isAdmin ? 6 : 5}>Loading leave requests...</td>
+                <td colSpan={isManager ? 6 : 5}>Loading leave requests...</td>
               </tr>
             ) : leaves.length === 0 ? (
               <tr>
-                <td colSpan={isAdmin ? 6 : 5}>No leave requests found.</td>
+                <td colSpan={isManager ? 6 : 5}>No leave requests found.</td>
               </tr>
             ) : (
               leaves.map((leave) => (
                 <tr key={leave._id}>
-                  {isAdmin ? (
+                  {isManager ? (
                     <td>
                       {leave.employeeName} <span className="text-muted">({leave.employeeId})</span>
                     </td>
@@ -153,7 +149,7 @@ function LeaveList({ currentUser }) {
                       <Button variant="view" onClick={() => setSelectedLeave(leave)}>
                         View
                       </Button>
-                      {isAdmin && leave.status === LEAVE_STATUS.PENDING ? (
+                      {isManager && leave.status === LEAVE_STATUS.PENDING ? (
                         <>
                           <Button variant="approve" onClick={() => decide(leave, approveLeave, 'Leave approved.')}>
                             Approve
@@ -163,7 +159,7 @@ function LeaveList({ currentUser }) {
                           </Button>
                         </>
                       ) : null}
-                      {!isAdmin && leave.status === LEAVE_STATUS.PENDING ? (
+                      {!isManager && leave.status === LEAVE_STATUS.PENDING ? (
                         <Button variant="warn" onClick={() => decide(leave, cancelLeave, 'Leave cancelled.')}>
                           Cancel
                         </Button>

@@ -1,26 +1,21 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { isManagerRole } from '../../../utils/roles'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import { IconClock, IconUserCheck, IconUsers } from '../../Layout/Sidebar/icons'
 import { PERFORMANCE_TABS } from '../performanceTabs'
+import useApi from '../../../hooks/useApi'
 import useEmployeeDirectory from '../useEmployeeDirectory'
 import PerfAvatar from '../PerfAvatar'
 import PerfStats from '../PerfStats'
 import StarRating from '../StarRating'
-import {
-  REVIEW_STATUS,
-  REVIEW_STATUSES,
-  createReview,
-  deleteReview,
-  formatDateDisplay,
-  listReviews,
-  reviewStatusPillClass,
-  updateReview,
-} from '../performanceStore'
+import { REVIEW_STATUS, REVIEW_STATUSES, formatDateDisplay, reviewStatusPillClass } from '../performanceStore'
 
 function ReviewForm({ review, employees, currentUser, onClose, onSaved }) {
+  const { createReview, updateReview } = useApi()
   const isEdit = Boolean(review)
+  const [saving, setSaving] = useState(false)
 
   const [form, setForm] = useState({
     employeeId: review?.employeeId || '',
@@ -36,7 +31,7 @@ function ReviewForm({ review, employees, currentUser, onClose, onSaved }) {
     setForm((prev) => ({ ...prev, [field]: event.target.value }))
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
 
     if (!form.employeeId) {
@@ -48,11 +43,8 @@ function ReviewForm({ review, employees, currentUser, onClose, onSaved }) {
       return
     }
 
-    const employee = employees.find((emp) => emp.employeeId === form.employeeId)
     const payload = {
       employeeId: form.employeeId,
-      employeeName: employee?.name || form.employeeId,
-      employeeEmail: employee?.email || '',
       reviewerName: currentUser?.name || 'Admin',
       reviewPeriod: form.reviewPeriod.trim(),
       rating: Number(form.rating),
@@ -62,15 +54,21 @@ function ReviewForm({ review, employees, currentUser, onClose, onSaved }) {
       status: form.status,
     }
 
-    if (isEdit) {
-      updateReview(review.id, payload)
-      toast.success('Review updated successfully.')
-    } else {
-      createReview(payload)
-      toast.success('Review submitted successfully.')
+    setSaving(true)
+    try {
+      if (isEdit) {
+        await updateReview(review._id, payload)
+        toast.success('Review updated successfully.')
+      } else {
+        await createReview(payload)
+        toast.success('Review submitted successfully.')
+      }
+      onSaved()
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      setSaving(false)
     }
-
-    onSaved()
   }
 
   return (
@@ -145,7 +143,9 @@ function ReviewForm({ review, employees, currentUser, onClose, onSaved }) {
           </div>
 
           <div className="action-row">
-            <Button type="submit">{isEdit ? 'Save Changes' : 'Submit Review'}</Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Submit Review'}
+            </Button>
           </div>
         </form>
       </div>
@@ -154,13 +154,23 @@ function ReviewForm({ review, employees, currentUser, onClose, onSaved }) {
 }
 
 function ReviewDetails({ review, canAcknowledge, onClose, onChanged }) {
+  const { acknowledgeReview } = useApi()
+  const [acking, setAcking] = useState(false)
+
   if (!review) return null
 
-  const acknowledge = () => {
-    updateReview(review.id, { status: REVIEW_STATUS.ACKNOWLEDGED })
-    toast.success('Review acknowledged.')
-    onChanged()
-    onClose()
+  const acknowledge = async () => {
+    setAcking(true)
+    try {
+      await acknowledgeReview(review._id)
+      toast.success('Review acknowledged.')
+      onChanged()
+      onClose()
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      setAcking(false)
+    }
   }
 
   return (
@@ -218,7 +228,9 @@ function ReviewDetails({ review, canAcknowledge, onClose, onChanged }) {
 
           {canAcknowledge && review.status === REVIEW_STATUS.SUBMITTED ? (
             <div className="action-row">
-              <Button onClick={acknowledge}>Acknowledge Review</Button>
+              <Button onClick={acknowledge} disabled={acking}>
+                {acking ? 'Acknowledging...' : 'Acknowledge Review'}
+              </Button>
             </div>
           ) : null}
         </div>
@@ -227,11 +239,11 @@ function ReviewDetails({ review, canAcknowledge, onClose, onChanged }) {
   )
 }
 
-function ReviewCard({ review, isAdmin, onView, onEdit, onDelete }) {
+function ReviewCard({ review, isManager, onView, onEdit, onDelete }) {
   return (
     <div className="perf-card">
       <div className="perf-card-head">
-        {isAdmin ? (
+        {isManager ? (
           <div className="perf-card-person">
             <PerfAvatar name={review.employeeName} size="sm" />
             <div>
@@ -258,7 +270,7 @@ function ReviewCard({ review, isAdmin, onView, onEdit, onDelete }) {
         <Button variant="view" onClick={onView}>
           View
         </Button>
-        {isAdmin ? (
+        {isManager ? (
           <>
             <Button variant="edit" onClick={onEdit}>
               Edit
@@ -274,45 +286,59 @@ function ReviewCard({ review, isAdmin, onView, onEdit, onDelete }) {
 }
 
 function PerformanceReview({ currentUser }) {
-  const isAdmin = currentUser?.role === 'Admin'
+  const isManager = isManagerRole(currentUser)
   const { employees } = useEmployeeDirectory(currentUser)
+  const { listReviews, getMyReviews, deleteReview } = useApi()
 
   const [reviews, setReviews] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [employeeFilter, setEmployeeFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [formReview, setFormReview] = useState(undefined) // undefined = closed, null = create, review = edit
   const [selectedReview, setSelectedReview] = useState(null)
 
-  const refresh = () => setReviews(listReviews())
+  const refresh = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const data = isManager
+        ? await listReviews({ employeeId: employeeFilter || undefined, status: statusFilter || undefined })
+        : await getMyReviews()
+      const all = data.reviews || []
+      setReviews(isManager ? all : all.filter((review) => !statusFilter || review.status === statusFilter))
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [isManager, employeeFilter, statusFilter, listReviews, getMyReviews])
 
   useEffect(() => {
     refresh()
-  }, [])
-
-  const visibleReviews = useMemo(() => {
-    let result = isAdmin ? reviews : reviews.filter((review) => review.employeeEmail === currentUser?.email)
-    if (isAdmin && employeeFilter) result = result.filter((review) => review.employeeId === employeeFilter)
-    if (statusFilter) result = result.filter((review) => review.status === statusFilter)
-    return result
-  }, [reviews, isAdmin, employeeFilter, statusFilter, currentUser])
+  }, [refresh])
 
   const stats = useMemo(() => {
-    const total = visibleReviews.length
-    const avgRating = total ? (visibleReviews.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) / total).toFixed(1) : '—'
-    const acknowledged = visibleReviews.filter((r) => r.status === REVIEW_STATUS.ACKNOWLEDGED).length
-    const pending = visibleReviews.filter((r) => r.status === REVIEW_STATUS.SUBMITTED).length
+    const total = reviews.length
+    const avgRating = total ? (reviews.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) / total).toFixed(1) : '—'
+    const acknowledged = reviews.filter((r) => r.status === REVIEW_STATUS.ACKNOWLEDGED).length
+    const pending = reviews.filter((r) => r.status === REVIEW_STATUS.SUBMITTED).length
     return [
       { label: 'Total Reviews', value: total, icon: IconUsers, tone: 'primary' },
       { label: 'Average Rating', value: total ? `${avgRating} / 5` : '—', icon: IconUserCheck, tone: 'blue' },
       { label: 'Acknowledged', value: acknowledged, icon: IconUserCheck, tone: 'green' },
       { label: 'Awaiting Acknowledgement', value: pending, icon: IconClock, tone: 'amber' },
     ]
-  }, [visibleReviews])
+  }, [reviews])
 
-  const handleDelete = (review) => {
-    deleteReview(review.id)
-    toast.success('Review deleted.')
-    refresh()
+  const handleDelete = async (review) => {
+    try {
+      await deleteReview(review._id)
+      toast.success('Review deleted.')
+      refresh()
+    } catch (err) {
+      toast.error(err.message)
+    }
   }
 
   return (
@@ -322,15 +348,15 @@ function PerformanceReview({ currentUser }) {
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Performance</p>
-          <h3>{isAdmin ? 'Performance Reviews' : 'My Performance Reviews'}</h3>
+          <h3>{isManager ? 'Performance Reviews' : 'My Performance Reviews'}</h3>
         </div>
-        {isAdmin ? <Button onClick={() => setFormReview(null)}>+ New Review</Button> : null}
+        {isManager ? <Button onClick={() => setFormReview(null)}>+ New Review</Button> : null}
       </div>
 
       <PerfStats items={stats} />
 
       <div className="row g-3">
-        {isAdmin ? (
+        {isManager ? (
           <div className="form-field filter-field">
             <label htmlFor="review-employee-filter">Filter by employee</label>
             <select id="review-employee-filter" value={employeeFilter} onChange={(event) => setEmployeeFilter(event.target.value)}>
@@ -357,7 +383,11 @@ function PerformanceReview({ currentUser }) {
         </div>
       </div>
 
-      {visibleReviews.length === 0 ? (
+      {error ? <div className="feedback-banner feedback-banner-error">{error}</div> : null}
+
+      {loading ? (
+        <p className="form-hint">Loading reviews...</p>
+      ) : reviews.length === 0 ? (
         <div className="empty-state">
           <span className="perf-empty-icon">
             <IconUsers />
@@ -366,11 +396,11 @@ function PerformanceReview({ currentUser }) {
         </div>
       ) : (
         <div className="perf-card-grid">
-          {visibleReviews.map((review) => (
+          {reviews.map((review) => (
             <ReviewCard
-              key={review.id}
+              key={review._id}
               review={review}
-              isAdmin={isAdmin}
+              isManager={isManager}
               onView={() => setSelectedReview(review)}
               onEdit={() => setFormReview(review)}
               onDelete={() => handleDelete(review)}
@@ -394,7 +424,7 @@ function PerformanceReview({ currentUser }) {
 
       <ReviewDetails
         review={selectedReview}
-        canAcknowledge={!isAdmin}
+        canAcknowledge={!isManager}
         onClose={() => setSelectedReview(null)}
         onChanged={refresh}
       />

@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { isManagerRole } from '../../../utils/roles'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import { IconAlertTriangle, IconClock, IconTarget, IconUserCheck } from '../../Layout/Sidebar/icons'
 import { PERFORMANCE_TABS } from '../performanceTabs'
+import useApi from '../../../hooks/useApi'
 import useEmployeeDirectory from '../useEmployeeDirectory'
 import PerfAvatar from '../PerfAvatar'
 import PerfStats from '../PerfStats'
@@ -12,24 +14,22 @@ import {
   GOAL_CATEGORY,
   GOAL_STATUS,
   GOAL_STATUSES,
-  createGoal,
-  deleteGoal,
   formatDateDisplay,
   goalStatusPillClass,
   isGoalOverdue,
-  listGoals,
-  updateGoal,
 } from '../performanceStore'
 
-function GoalForm({ goal, employees, currentUser, me, isAdmin, onClose, onSaved }) {
+function GoalForm({ goal, employees, isManager, onClose, onSaved }) {
+  const { createGoal, updateGoal } = useApi()
   const isEdit = Boolean(goal)
+  const [saving, setSaving] = useState(false)
 
   const [form, setForm] = useState({
     employeeId: goal?.employeeId || '',
     title: goal?.title || '',
     description: goal?.description || '',
     category: goal?.category || GOAL_CATEGORY.PROFESSIONAL,
-    targetDate: goal?.targetDate || '',
+    targetDate: goal?.targetDate ? goal.targetDate.slice(0, 10) : '',
     status: goal?.status || GOAL_STATUS.NOT_STARTED,
     progress: goal?.progress ?? 0,
   })
@@ -39,40 +39,43 @@ function GoalForm({ goal, employees, currentUser, me, isAdmin, onClose, onSaved 
     setForm((prev) => ({ ...prev, [field]: field === 'progress' ? Number(value) : value }))
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
 
     if (!form.title.trim()) {
       toast.error('Goal title is required.')
       return
     }
-    if (isAdmin && !form.employeeId) {
+    if (isManager && !form.employeeId) {
       toast.error('Please assign this goal to an employee.')
       return
     }
 
-    const employee = employees.find((emp) => emp.employeeId === form.employeeId)
     const payload = {
-      employeeId: isAdmin ? form.employeeId : me?.employeeId || '',
-      employeeName: isAdmin ? employee?.name || form.employeeId : currentUser?.name,
-      employeeEmail: isAdmin ? employee?.email || '' : currentUser?.email,
+      ...(isManager ? { employeeId: form.employeeId } : {}),
       title: form.title.trim(),
       description: form.description.trim(),
       category: form.category,
-      targetDate: form.targetDate,
+      targetDate: form.targetDate || null,
       status: form.status,
       progress: form.status === GOAL_STATUS.COMPLETED ? 100 : Math.min(100, Math.max(0, Number(form.progress) || 0)),
     }
 
-    if (isEdit) {
-      updateGoal(goal.id, payload)
-      toast.success('Goal updated successfully.')
-    } else {
-      createGoal(payload)
-      toast.success('Goal created successfully.')
+    setSaving(true)
+    try {
+      if (isEdit) {
+        await updateGoal(goal._id, payload)
+        toast.success('Goal updated successfully.')
+      } else {
+        await createGoal(payload)
+        toast.success('Goal created successfully.')
+      }
+      onSaved()
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      setSaving(false)
     }
-
-    onSaved()
   }
 
   return (
@@ -90,7 +93,7 @@ function GoalForm({ goal, employees, currentUser, me, isAdmin, onClose, onSaved 
 
         <form className="employee-form" onSubmit={handleSubmit} noValidate>
           <div className="form-grid">
-            {isAdmin ? (
+            {isManager ? (
               <div className="form-field">
                 <label htmlFor="goal-employee">Employee</label>
                 <select id="goal-employee" value={form.employeeId} onChange={handleChange('employeeId')} required>
@@ -157,7 +160,9 @@ function GoalForm({ goal, employees, currentUser, me, isAdmin, onClose, onSaved 
           </div>
 
           <div className="action-row">
-            <Button type="submit">{isEdit ? 'Save Changes' : 'Create Goal'}</Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Goal'}
+            </Button>
           </div>
         </form>
       </div>
@@ -171,13 +176,13 @@ function goalProgressTone(goal) {
   return ''
 }
 
-function GoalCard({ goal, isAdmin, onEdit, onDelete }) {
+function GoalCard({ goal, isManager, onEdit, onDelete }) {
   const overdue = isGoalOverdue(goal)
 
   return (
     <div className="perf-card">
       <div className="perf-card-head">
-        {isAdmin ? (
+        {isManager ? (
           <div className="perf-card-person">
             <PerfAvatar name={goal.employeeName} size="sm" />
             <div>
@@ -222,44 +227,58 @@ function GoalCard({ goal, isAdmin, onEdit, onDelete }) {
 }
 
 function GoalsList({ currentUser }) {
-  const isAdmin = currentUser?.role === 'Admin'
-  const { employees, me } = useEmployeeDirectory(currentUser)
+  const isManager = isManagerRole(currentUser)
+  const { employees } = useEmployeeDirectory(currentUser)
+  const { listGoals, getMyGoals, deleteGoal } = useApi()
 
   const [goals, setGoals] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [employeeFilter, setEmployeeFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [formGoal, setFormGoal] = useState(undefined) // undefined = closed, null = create, goal = edit
 
-  const refresh = () => setGoals(listGoals())
+  const refresh = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const data = isManager
+        ? await listGoals({ employeeId: employeeFilter || undefined, status: statusFilter || undefined })
+        : await getMyGoals()
+      const all = data.goals || []
+      setGoals(isManager ? all : all.filter((goal) => !statusFilter || goal.status === statusFilter))
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [isManager, employeeFilter, statusFilter, listGoals, getMyGoals])
 
   useEffect(() => {
     refresh()
-  }, [])
-
-  const visibleGoals = useMemo(() => {
-    let result = isAdmin ? goals : goals.filter((goal) => goal.employeeEmail === currentUser?.email)
-    if (isAdmin && employeeFilter) result = result.filter((goal) => goal.employeeId === employeeFilter)
-    if (statusFilter) result = result.filter((goal) => goal.status === statusFilter)
-    return result
-  }, [goals, isAdmin, employeeFilter, statusFilter, currentUser])
+  }, [refresh])
 
   const stats = useMemo(() => {
-    const total = visibleGoals.length
-    const completed = visibleGoals.filter((goal) => goal.status === GOAL_STATUS.COMPLETED).length
-    const inProgress = visibleGoals.filter((goal) => goal.status === GOAL_STATUS.IN_PROGRESS).length
-    const overdue = visibleGoals.filter(isGoalOverdue).length
+    const total = goals.length
+    const completed = goals.filter((goal) => goal.status === GOAL_STATUS.COMPLETED).length
+    const inProgress = goals.filter((goal) => goal.status === GOAL_STATUS.IN_PROGRESS).length
+    const overdue = goals.filter(isGoalOverdue).length
     return [
       { label: 'Total Goals', value: total, icon: IconTarget, tone: 'primary' },
       { label: 'Completed', value: completed, icon: IconUserCheck, tone: 'green' },
       { label: 'In Progress', value: inProgress, icon: IconClock, tone: 'blue' },
       { label: 'Overdue', value: overdue, icon: IconAlertTriangle, tone: overdue ? 'red' : 'amber' },
     ]
-  }, [visibleGoals])
+  }, [goals])
 
-  const handleDelete = (goal) => {
-    deleteGoal(goal.id)
-    toast.success('Goal deleted.')
-    refresh()
+  const handleDelete = async (goal) => {
+    try {
+      await deleteGoal(goal._id)
+      toast.success('Goal deleted.')
+      refresh()
+    } catch (err) {
+      toast.error(err.message)
+    }
   }
 
   return (
@@ -269,7 +288,7 @@ function GoalsList({ currentUser }) {
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Performance</p>
-          <h3>{isAdmin ? 'Employee Goals' : 'My Goals'}</h3>
+          <h3>{isManager ? 'Employee Goals' : 'My Goals'}</h3>
         </div>
         <Button onClick={() => setFormGoal(null)}>+ Add Goal</Button>
       </div>
@@ -277,7 +296,7 @@ function GoalsList({ currentUser }) {
       <PerfStats items={stats} />
 
       <div className="row g-3">
-        {isAdmin ? (
+        {isManager ? (
           <div className="form-field filter-field">
             <label htmlFor="goal-employee-filter">Filter by employee</label>
             <select id="goal-employee-filter" value={employeeFilter} onChange={(event) => setEmployeeFilter(event.target.value)}>
@@ -304,20 +323,24 @@ function GoalsList({ currentUser }) {
         </div>
       </div>
 
-      {visibleGoals.length === 0 ? (
+      {error ? <div className="feedback-banner feedback-banner-error">{error}</div> : null}
+
+      {loading ? (
+        <p className="form-hint">Loading goals...</p>
+      ) : goals.length === 0 ? (
         <div className="empty-state">
           <span className="perf-empty-icon">
             <IconTarget />
           </span>
-          <p>No goals found. {isAdmin ? 'Add one to get started.' : 'Set one to track your progress.'}</p>
+          <p>No goals found. {isManager ? 'Add one to get started.' : 'Set one to track your progress.'}</p>
         </div>
       ) : (
         <div className="perf-card-grid">
-          {visibleGoals.map((goal) => (
+          {goals.map((goal) => (
             <GoalCard
-              key={goal.id}
+              key={goal._id}
               goal={goal}
-              isAdmin={isAdmin}
+              isManager={isManager}
               onEdit={() => setFormGoal(goal)}
               onDelete={() => handleDelete(goal)}
             />
@@ -329,9 +352,7 @@ function GoalsList({ currentUser }) {
         <GoalForm
           goal={formGoal}
           employees={employees}
-          currentUser={currentUser}
-          me={me}
-          isAdmin={isAdmin}
+          isManager={isManager}
           onClose={() => setFormGoal(undefined)}
           onSaved={() => {
             setFormGoal(undefined)

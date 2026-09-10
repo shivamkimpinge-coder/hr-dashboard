@@ -1,15 +1,16 @@
 import { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import CommonForm from '../../../utils/Form/commonform'
 import useApi from '../../../hooks/useApi'
+import { isAdminRole } from '../../../utils/roles'
 
-import { emptyApplyForm, getApplyLeaveFields, computeLeaveDays } from '../leaveFormConfig'
+import { emptyApplyForm, getApplyLeaveFields, computeLeaveDays, getLeaveTabs } from '../leaveFormConfig'
 
-function ApplyLeave() {
+function ApplyLeave({ currentUser }) {
   const navigate = useNavigate()
   const { applyLeave } = useApi()
 
@@ -34,14 +35,15 @@ function ApplyLeave() {
     }
   }
 
+  // Admin oversees leave requests but doesn't file them — bounce them back to
+  // the list even if they reach this URL directly.
+  if (isAdminRole(currentUser)) {
+    return <Navigate to="/dashboard/leave" replace />
+  }
+
   return (
     <div className="panel detail-panel">
-      <SectionTabs
-        tabs={[
-          { label: 'My Requests', to: '/dashboard/leave', end: true },
-          { label: 'Apply Leave', to: '/dashboard/leave/apply' },
-        ]}
-      />
+      <SectionTabs tabs={getLeaveTabs(currentUser)} />
 
       <div className="panel-heading">
         <div>

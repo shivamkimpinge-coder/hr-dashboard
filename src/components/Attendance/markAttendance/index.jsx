@@ -8,6 +8,7 @@ import {
   ATTENDANCE_STATUSES,
   formatHours,
   formatTimeDisplay,
+  getAttendanceTabs,
   getDateKey,
   statusPillClass,
 } from '../attendanceStore'
@@ -112,12 +113,7 @@ function MarkAttendance() {
 
   return (
     <div className="panel detail-panel">
-      <SectionTabs
-        tabs={[
-          { label: 'My Attendance', to: '/dashboard/attendance', end: true },
-          { label: 'Reports', to: '/dashboard/attendance/reports' },
-        ]}
-      />
+      <SectionTabs tabs={getAttendanceTabs(true)} />
 
       <div className="panel-heading">
         <div>

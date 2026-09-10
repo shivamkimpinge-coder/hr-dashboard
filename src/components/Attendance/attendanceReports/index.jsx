@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { isManagerRole } from '../../../utils/roles'
 import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import useApi from '../../../hooks/useApi'
 import {
   formatDateDisplay,
   formatHours,
   formatTimeDisplay,
+  getAttendanceTabs,
   getDateKey,
   getHoursStatus,
   getMonthDates,
@@ -39,7 +41,7 @@ function StatCards({ stats }) {
 }
 
 function AttendanceReports({ currentUser }) {
-  const isAdmin = currentUser?.role === 'Admin'
+  const isManager = isManagerRole(currentUser)
   const { listAttendance, getMyAttendance } = useApi()
 
   const [period, setPeriod] = useState('daily')
@@ -64,7 +66,7 @@ function AttendanceReports({ currentUser }) {
     setLoading(true)
     setError('')
     try {
-      const data = isAdmin
+      const data = isManager
         ? await listAttendance({ from: range.from, to: range.to })
         : await getMyAttendance({ from: range.from, to: range.to })
       setRecords(data.attendance || [])
@@ -73,7 +75,7 @@ function AttendanceReports({ currentUser }) {
     } finally {
       setLoading(false)
     }
-  }, [isAdmin, range, listAttendance, getMyAttendance])
+  }, [isManager, range, listAttendance, getMyAttendance])
 
   useEffect(() => {
     fetchRecords()
@@ -97,12 +99,7 @@ function AttendanceReports({ currentUser }) {
 
   return (
     <div className="panel detail-panel">
-      <SectionTabs
-        tabs={[
-          { label: 'My Attendance', to: '/dashboard/attendance', end: true },
-          { label: 'Reports', to: '/dashboard/attendance/reports' },
-        ]}
-      />
+      <SectionTabs tabs={getAttendanceTabs(isManager)} />
 
       <div className="panel-heading">
         <div>
@@ -171,7 +168,7 @@ function AttendanceReports({ currentUser }) {
           <table className="table table-dark table-hover align-middle mb-0">
             <thead>
               <tr>
-                {isAdmin ? <th>Employee</th> : null}
+                {isManager ? <th>Employee</th> : null}
                 <th>Check In</th>
                 <th>Check Out</th>
                 <th>Working Hours</th>
@@ -182,7 +179,7 @@ function AttendanceReports({ currentUser }) {
             <tbody>
               {records.length === 0 ? (
                 <tr>
-                  <td colSpan={isAdmin ? 6 : 5}>No attendance records for this date.</td>
+                  <td colSpan={isManager ? 6 : 5}>No attendance records for this date.</td>
                 </tr>
               ) : (
                 records.map((record) => {
@@ -191,7 +188,7 @@ function AttendanceReports({ currentUser }) {
 
                   return (
                     <tr key={`${record.employeeId}-${record.date}`}>
-                      {isAdmin ? (
+                      {isManager ? (
                         <td>
                           {record.employeeName} <span className="text-muted">({record.employeeId})</span>
                         </td>
@@ -216,7 +213,7 @@ function AttendanceReports({ currentUser }) {
               )}
             </tbody>
           </table>
-        ) : isAdmin ? (
+        ) : isManager ? (
           <table className="table table-dark table-hover align-middle mb-0">
             <thead>
               <tr>

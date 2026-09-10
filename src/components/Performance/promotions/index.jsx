@@ -1,31 +1,26 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { isManagerRole } from '../../../utils/roles'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import { IconArrowUpRight, IconClock, IconUserCheck, IconUserOff } from '../../Layout/Sidebar/icons'
 import { PERFORMANCE_TABS } from '../performanceTabs'
+import useApi from '../../../hooks/useApi'
 import useEmployeeDirectory from '../useEmployeeDirectory'
 import PerfAvatar from '../PerfAvatar'
 import PerfStats from '../PerfStats'
-import {
-  PROMOTION_STATUS,
-  PROMOTION_STATUSES,
-  createPromotion,
-  deletePromotion,
-  formatDateDisplay,
-  listPromotions,
-  promotionStatusPillClass,
-  updatePromotion,
-} from '../performanceStore'
+import { PROMOTION_STATUS, PROMOTION_STATUSES, formatDateDisplay, promotionStatusPillClass } from '../performanceStore'
 
 function PromotionForm({ promotion, employees, onClose, onSaved }) {
+  const { createPromotion, updatePromotion } = useApi()
   const isEdit = Boolean(promotion)
+  const [saving, setSaving] = useState(false)
 
   const [form, setForm] = useState({
     employeeId: promotion?.employeeId || '',
     currentTitle: promotion?.currentTitle || '',
     proposedTitle: promotion?.proposedTitle || '',
-    effectiveDate: promotion?.effectiveDate || '',
+    effectiveDate: promotion?.effectiveDate ? promotion.effectiveDate.slice(0, 10) : '',
     status: promotion?.status || PROMOTION_STATUS.PROPOSED,
     notes: promotion?.notes || '',
   })
@@ -44,7 +39,7 @@ function PromotionForm({ promotion, employees, onClose, onSaved }) {
     }))
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
 
     if (!form.employeeId) {
@@ -56,27 +51,30 @@ function PromotionForm({ promotion, employees, onClose, onSaved }) {
       return
     }
 
-    const employee = employees.find((emp) => emp.employeeId === form.employeeId)
     const payload = {
       employeeId: form.employeeId,
-      employeeName: employee?.name || form.employeeId,
-      employeeEmail: employee?.email || '',
       currentTitle: form.currentTitle.trim(),
       proposedTitle: form.proposedTitle.trim(),
-      effectiveDate: form.effectiveDate,
+      effectiveDate: form.effectiveDate || null,
       status: form.status,
       notes: form.notes.trim(),
     }
 
-    if (isEdit) {
-      updatePromotion(promotion.id, payload)
-      toast.success('Promotion updated successfully.')
-    } else {
-      createPromotion(payload)
-      toast.success('Promotion proposed successfully.')
+    setSaving(true)
+    try {
+      if (isEdit) {
+        await updatePromotion(promotion._id, payload)
+        toast.success('Promotion updated successfully.')
+      } else {
+        await createPromotion(payload)
+        toast.success('Promotion proposed successfully.')
+      }
+      onSaved()
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      setSaving(false)
     }
-
-    onSaved()
   }
 
   return (
@@ -150,7 +148,9 @@ function PromotionForm({ promotion, employees, onClose, onSaved }) {
           </div>
 
           <div className="action-row">
-            <Button type="submit">{isEdit ? 'Save Changes' : 'Propose Promotion'}</Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Propose Promotion'}
+            </Button>
           </div>
         </form>
       </div>
@@ -158,11 +158,11 @@ function PromotionForm({ promotion, employees, onClose, onSaved }) {
   )
 }
 
-function PromotionCard({ promotion, isAdmin, onEdit, onApprove, onReject, onDelete }) {
+function PromotionCard({ promotion, isManager, onEdit, onApprove, onReject, onDelete }) {
   return (
     <div className="perf-card">
       <div className="perf-card-head">
-        {isAdmin ? (
+        {isManager ? (
           <div className="perf-card-person">
             <PerfAvatar name={promotion.employeeName} size="sm" />
             <div className="perf-card-person-name">{promotion.employeeName}</div>
@@ -189,7 +189,7 @@ function PromotionCard({ promotion, isAdmin, onEdit, onApprove, onReject, onDele
 
       <div className="perf-card-foot perf-card-foot--split">
         <div className="table-actions">
-          {isAdmin && promotion.status === PROMOTION_STATUS.PROPOSED ? (
+          {isManager && promotion.status === PROMOTION_STATUS.PROPOSED ? (
             <>
               <Button variant="approve" onClick={onApprove}>
                 Approve
@@ -200,7 +200,7 @@ function PromotionCard({ promotion, isAdmin, onEdit, onApprove, onReject, onDele
             </>
           ) : null}
         </div>
-        {isAdmin ? (
+        {isManager ? (
           <div className="table-actions">
             <Button variant="edit" onClick={onEdit}>
               Edit
@@ -216,50 +216,68 @@ function PromotionCard({ promotion, isAdmin, onEdit, onApprove, onReject, onDele
 }
 
 function Promotions({ currentUser }) {
-  const isAdmin = currentUser?.role === 'Admin'
+  const isManager = isManagerRole(currentUser)
   const { employees } = useEmployeeDirectory(currentUser)
+  const { listPromotions, getMyPromotions, approvePromotion, rejectPromotion, deletePromotion } = useApi()
 
   const [promotions, setPromotions] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [employeeFilter, setEmployeeFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [formPromotion, setFormPromotion] = useState(undefined) // undefined = closed, null = create, promotion = edit
 
-  const refresh = () => setPromotions(listPromotions())
+  const refresh = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const data = isManager
+        ? await listPromotions({ employeeId: employeeFilter || undefined, status: statusFilter || undefined })
+        : await getMyPromotions()
+      const all = data.promotions || []
+      setPromotions(isManager ? all : all.filter((promo) => !statusFilter || promo.status === statusFilter))
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [isManager, employeeFilter, statusFilter, listPromotions, getMyPromotions])
 
   useEffect(() => {
     refresh()
-  }, [])
-
-  const visiblePromotions = useMemo(() => {
-    let result = isAdmin ? promotions : promotions.filter((promo) => promo.employeeEmail === currentUser?.email)
-    if (isAdmin && employeeFilter) result = result.filter((promo) => promo.employeeId === employeeFilter)
-    if (statusFilter) result = result.filter((promo) => promo.status === statusFilter)
-    return result
-  }, [promotions, isAdmin, employeeFilter, statusFilter, currentUser])
+  }, [refresh])
 
   const stats = useMemo(() => {
-    const total = visiblePromotions.length
-    const proposed = visiblePromotions.filter((p) => p.status === PROMOTION_STATUS.PROPOSED).length
-    const approved = visiblePromotions.filter((p) => p.status === PROMOTION_STATUS.APPROVED).length
-    const rejected = visiblePromotions.filter((p) => p.status === PROMOTION_STATUS.REJECTED).length
+    const total = promotions.length
+    const proposed = promotions.filter((p) => p.status === PROMOTION_STATUS.PROPOSED).length
+    const approved = promotions.filter((p) => p.status === PROMOTION_STATUS.APPROVED).length
+    const rejected = promotions.filter((p) => p.status === PROMOTION_STATUS.REJECTED).length
     return [
       { label: 'Total', value: total, icon: IconArrowUpRight, tone: 'primary' },
       { label: 'Proposed', value: proposed, icon: IconClock, tone: 'amber' },
       { label: 'Approved', value: approved, icon: IconUserCheck, tone: 'green' },
       { label: 'Rejected', value: rejected, icon: IconUserOff, tone: rejected ? 'red' : 'blue' },
     ]
-  }, [visiblePromotions])
+  }, [promotions])
 
-  const decide = (promotion, status, message) => {
-    updatePromotion(promotion.id, { status })
-    toast.success(message)
-    refresh()
+  const decide = async (promotion, action, message) => {
+    try {
+      await action(promotion._id)
+      toast.success(message)
+      refresh()
+    } catch (err) {
+      toast.error(err.message)
+    }
   }
 
-  const handleDelete = (promotion) => {
-    deletePromotion(promotion.id)
-    toast.success('Promotion record deleted.')
-    refresh()
+  const handleDelete = async (promotion) => {
+    try {
+      await deletePromotion(promotion._id)
+      toast.success('Promotion record deleted.')
+      refresh()
+    } catch (err) {
+      toast.error(err.message)
+    }
   }
 
   return (
@@ -269,15 +287,15 @@ function Promotions({ currentUser }) {
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Performance</p>
-          <h3>{isAdmin ? 'Promotions' : 'My Promotions'}</h3>
+          <h3>{isManager ? 'Promotions' : 'My Promotions'}</h3>
         </div>
-        {isAdmin ? <Button onClick={() => setFormPromotion(null)}>+ Propose Promotion</Button> : null}
+        {isManager ? <Button onClick={() => setFormPromotion(null)}>+ Propose Promotion</Button> : null}
       </div>
 
       <PerfStats items={stats} />
 
       <div className="row g-3">
-        {isAdmin ? (
+        {isManager ? (
           <div className="form-field filter-field">
             <label htmlFor="promo-employee-filter">Filter by employee</label>
             <select id="promo-employee-filter" value={employeeFilter} onChange={(event) => setEmployeeFilter(event.target.value)}>
@@ -304,7 +322,11 @@ function Promotions({ currentUser }) {
         </div>
       </div>
 
-      {visiblePromotions.length === 0 ? (
+      {error ? <div className="feedback-banner feedback-banner-error">{error}</div> : null}
+
+      {loading ? (
+        <p className="form-hint">Loading promotions...</p>
+      ) : promotions.length === 0 ? (
         <div className="empty-state">
           <span className="perf-empty-icon">
             <IconArrowUpRight />
@@ -313,14 +335,14 @@ function Promotions({ currentUser }) {
         </div>
       ) : (
         <div className="perf-card-grid">
-          {visiblePromotions.map((promotion) => (
+          {promotions.map((promotion) => (
             <PromotionCard
-              key={promotion.id}
+              key={promotion._id}
               promotion={promotion}
-              isAdmin={isAdmin}
+              isManager={isManager}
               onEdit={() => setFormPromotion(promotion)}
-              onApprove={() => decide(promotion, PROMOTION_STATUS.APPROVED, 'Promotion approved.')}
-              onReject={() => decide(promotion, PROMOTION_STATUS.REJECTED, 'Promotion rejected.')}
+              onApprove={() => decide(promotion, approvePromotion, 'Promotion approved.')}
+              onReject={() => decide(promotion, rejectPromotion, 'Promotion rejected.')}
               onDelete={() => handleDelete(promotion)}
             />
           ))}

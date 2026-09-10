@@ -1,71 +1,92 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import useApi from '../../../hooks/useApi'
 import EditEmployee from '../editEmployee'
 import CreateEmployee from '../createEmployee'
-import { formatSalary, toDateInput } from '../employeeFormConfig'
+import { isAdminRole } from '../../../utils/roles'
+import { formatSalary } from '../employeeFormConfig'
+
+const formatDate = (value) => {
+  if (!value) return '—'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return '—'
+  return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+}
 
 function EmployeeModal({ employee, onClose }) {
   if (!employee) return null
 
   return (
-    <div className="modal-backdrop" role="dialog" aria-modal="true">
-      <div className="modal-card">
+    <div className="modal-backdrop" role="dialog" aria-modal="true" onClick={onClose}>
+      <div className="modal-card" onClick={(event) => event.stopPropagation()}>
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Employee profile</p>
+            <p className="eyebrow">Employee</p>
             <h3>{employee.name}</h3>
           </div>
-          <Button variant="secondary" onClick={onClose}>
-            Close
+          <Button variant="close" onClick={onClose} aria-label="Close">
+            ✕
           </Button>
         </div>
 
-        <div className="detail-grid">
+        <div className="attendance-hero-status-top">
+          <span className={`pill ${employee.role === 'Admin' ? 'pill-danger' : employee.role === 'HR' ? 'pill-warning' : 'pill-muted'}`}>
+            {employee.role || 'Employee'}
+          </span>
+          <span className={`pill ${employee.status === 'Active' ? 'pill-success' : 'pill-muted'}`}>
+            {employee.status || 'Active'}
+          </span>
+        </div>
+
+        <div className="detail-grid mt-3">
           <div className="detail-card">
-            <p className="eyebrow">Basic info</p>
-            <p>
-              <strong>ID:</strong> {employee.employeeId}
-            </p>
-            <p>
-              <strong>Email:</strong> {employee.email}
-            </p>
-            <p>
-              <strong>Phone:</strong> {employee.phone}
-            </p>
-            <p>
-              <strong>Gender:</strong> {employee.gender}
-            </p>
+            <p>Employee ID</p>
+            <p>{employee.employeeId}</p>
           </div>
           <div className="detail-card">
-            <p className="eyebrow">Work info</p>
-            <p>
-              <strong>Department:</strong> {employee.department}
-            </p>
-            <p>
-              <strong>Designation:</strong> {employee.designation}
-            </p>
-            <p>
-              <strong>Salary:</strong> {formatSalary(employee.salary)}
-            </p>
-            <p>
-              <strong>Status:</strong> {employee.status}
-            </p>
+            <p>Email</p>
+            <p>{employee.email}</p>
+          </div>
+          <div className="detail-card">
+            <p>Phone</p>
+            <p>{employee.phone || '—'}</p>
+          </div>
+          <div className="detail-card">
+            <p>Gender</p>
+            <p>{employee.gender || '—'}</p>
+          </div>
+          <div className="detail-card">
+            <p>Date of Birth</p>
+            <p>{formatDate(employee.dob)}</p>
+          </div>
+          <div className="detail-card">
+            <p>Department</p>
+            <p>{employee.department}</p>
+          </div>
+          <div className="detail-card">
+            <p>Designation</p>
+            <p>{employee.designation}</p>
+          </div>
+          <div className="detail-card">
+            <p>Joining Date</p>
+            <p>{formatDate(employee.joiningDate)}</p>
+          </div>
+          <div className="detail-card">
+            <p>Salary</p>
+            <p>{formatSalary(employee.salary)}</p>
+          </div>
+          <div className="detail-card">
+            <p>Address</p>
+            <p>{employee.address || '—'}</p>
           </div>
         </div>
 
-        <div className="detail-card mt-3">
-          <p className="eyebrow">Additional details</p>
-          <p>
-            <strong>Birthdate:</strong> {toDateInput(employee.dob) || '—'}
-          </p>
-          <p>
-            <strong>Joining Date:</strong> {toDateInput(employee.joiningDate)}
-          </p>
-          <p>
-            <strong>Address:</strong> {employee.address}
-          </p>
+        <div className="action-row mt-3">
+          <Button variant="secondary" to={`/dashboard/employees/${employee.employeeId}`}>
+            View Full Details →
+          </Button>
         </div>
       </div>
     </div>
@@ -94,8 +115,9 @@ function DeleteModal({ employee, onCancel, onConfirm, deleting, error }) {
   )
 }
 
-function EmployeeList({ employees, loading, error, searchTerm = '', onChanged }) {
+function EmployeeList({ employees, loading, error, searchTerm = '', onChanged, currentUser }) {
   const { deleteEmployee } = useApi()
+  const isAdmin = isAdminRole(currentUser)
 
   const [viewingEmployee, setViewingEmployee] = useState(null)
   const [editingEmployee, setEditingEmployee] = useState(null)
@@ -157,6 +179,7 @@ function EmployeeList({ employees, loading, error, searchTerm = '', onChanged })
               <th>Full Name</th>
               <th>Email</th>
               <th>Department</th>
+              <th>Role</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -164,11 +187,11 @@ function EmployeeList({ employees, loading, error, searchTerm = '', onChanged })
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6}>Loading employees...</td>
+                <td colSpan={7}>Loading employees...</td>
               </tr>
             ) : employees.length === 0 ? (
               <tr>
-                <td colSpan={6}>
+                <td colSpan={7}>
                   {searchTerm
                     ? `No employees found for "${searchTerm}".`
                     : 'No employees found. Add your first employee.'}
@@ -177,10 +200,19 @@ function EmployeeList({ employees, loading, error, searchTerm = '', onChanged })
             ) : (
               employees.map((employee) => (
                 <tr key={employee._id}>
-                  <td>{employee.employeeId}</td>
+                  <td>
+                    <Link className="table-link" to={`/dashboard/employees/${employee.employeeId}`}>
+                      {employee.employeeId}
+                    </Link>
+                  </td>
                   <td>{employee.name}</td>
                   <td>{employee.email}</td>
                   <td>{employee.department}</td>
+                  <td>
+                    <span className={`pill ${employee.role === 'Admin' ? 'pill-danger' : employee.role === 'HR' ? 'pill-warning' : 'pill-muted'}`}>
+                      {employee.role || 'Employee'}
+                    </span>
+                  </td>
                   <td>
                     <span
                       className={`pill ${employee.status === 'Active' ? 'pill-success' : 'pill-muted'}`}
@@ -196,9 +228,11 @@ function EmployeeList({ employees, loading, error, searchTerm = '', onChanged })
                       <Button variant="edit" onClick={() => setEditingEmployee(employee)}>
                         Edit
                       </Button>
-                      <Button variant="delete" onClick={() => handleDeleteRequest(employee)}>
-                        Delete
-                      </Button>
+                      {isAdmin ? (
+                        <Button variant="delete" onClick={() => handleDeleteRequest(employee)}>
+                          Delete
+                        </Button>
+                      ) : null}
                     </div>
                   </td>
                 </tr>
@@ -208,12 +242,13 @@ function EmployeeList({ employees, loading, error, searchTerm = '', onChanged })
         </table>
       </div>
 
-      <EmployeeModal employee={viewingEmployee} onClose={() => setViewingEmployee(null)} />
       <CreateEmployee
         open={isAddingEmployee}
         onClose={() => setIsAddingEmployee(false)}
         onCreated={onChanged}
+        currentUser={currentUser}
       />
+      <EmployeeModal employee={viewingEmployee} onClose={() => setViewingEmployee(null)} />
       <DeleteModal
         employee={employeeToDelete}
         onCancel={cancelDelete}
@@ -221,7 +256,12 @@ function EmployeeList({ employees, loading, error, searchTerm = '', onChanged })
         deleting={deleting}
         error={deleteError}
       />
-      <EditEmployee employee={editingEmployee} onClose={() => setEditingEmployee(null)} onUpdated={onChanged} />
+      <EditEmployee
+        employee={editingEmployee}
+        onClose={() => setEditingEmployee(null)}
+        onUpdated={onChanged}
+        currentUser={currentUser}
+      />
     </div>
   )
 }

@@ -1,24 +1,27 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
-import { TASK_PRIORITIES, TASK_PRIORITY, createTask, updateTask } from '../taskStore'
+import useApi from '../../../hooks/useApi'
+import { TASK_PRIORITIES, TASK_PRIORITY } from '../taskStore'
 
 function TaskForm({ task, employees, currentUser, onClose, onSaved }) {
+  const { createTask, updateTask } = useApi()
   const isEdit = Boolean(task)
+  const [saving, setSaving] = useState(false)
 
   const [form, setForm] = useState({
     title: task?.title || '',
     description: task?.description || '',
     assigneeId: task?.assigneeId || '',
     priority: task?.priority || TASK_PRIORITY.MEDIUM,
-    dueDate: task?.dueDate || '',
+    dueDate: task?.dueDate ? task.dueDate.slice(0, 10) : '',
   })
 
   const handleChange = (field) => (event) => {
     setForm((prev) => ({ ...prev, [field]: event.target.value }))
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
 
     if (!form.title.trim()) {
@@ -30,26 +33,29 @@ function TaskForm({ task, employees, currentUser, onClose, onSaved }) {
       return
     }
 
-    const assignee = employees.find((employee) => employee.employeeId === form.assigneeId)
     const payload = {
       title: form.title.trim(),
       description: form.description.trim(),
       assigneeId: form.assigneeId,
-      assigneeName: assignee?.name || form.assigneeId,
-      assigneeEmail: assignee?.email || '',
       priority: form.priority,
-      dueDate: form.dueDate,
+      dueDate: form.dueDate || null,
     }
 
-    if (isEdit) {
-      updateTask(task.id, payload)
-      toast.success('Task updated successfully.')
-    } else {
-      createTask({ ...payload, createdByName: currentUser?.name || 'Admin' })
-      toast.success('Task created successfully.')
+    setSaving(true)
+    try {
+      if (isEdit) {
+        await updateTask(task._id, payload)
+        toast.success('Task updated successfully.')
+      } else {
+        await createTask({ ...payload, createdByName: currentUser?.name || 'Admin' })
+        toast.success('Task created successfully.')
+      }
+      onSaved()
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      setSaving(false)
     }
-
-    onSaved()
   }
 
   return (
@@ -112,7 +118,9 @@ function TaskForm({ task, employees, currentUser, onClose, onSaved }) {
           </div>
 
           <div className="action-row">
-            <Button type="submit">{isEdit ? 'Save Changes' : 'Create Task'}</Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Task'}
+            </Button>
           </div>
         </form>
       </div>
