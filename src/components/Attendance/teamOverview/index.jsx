@@ -4,7 +4,12 @@ import Button from '../../../utils/Button/button'
 import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import PerfAvatar from '../../Performance/PerfAvatar'
 import useApi from '../../../hooks/useApi'
-import { IconCalendar } from '../../Layout/Sidebar/icons'
+import {
+  IconCalendar,
+  IconUserCheck,
+  IconUserOff,
+  IconUsers,
+} from '../../Layout/Sidebar/icons'
 import {
   ATTENDANCE_STATUS,
   formatHours,
@@ -78,22 +83,14 @@ function TeamAttendanceOverview() {
   const stats = useMemo(() => {
     let present = 0
     let absent = 0
-    let onLeave = 0
-    let working = 0
-    let notMarked = 0
 
     rows.forEach(({ record }) => {
-      if (!record) {
-        notMarked += 1
-        return
-      }
-      if (record.hasOpenSession) working += 1
+      if (!record) return
       if (record.status === ATTENDANCE_STATUS.PRESENT || record.status === ATTENDANCE_STATUS.HALF_DAY) present += 1
       else if (record.status === ATTENDANCE_STATUS.ABSENT) absent += 1
-      else if (record.status === ATTENDANCE_STATUS.ON_LEAVE) onLeave += 1
     })
 
-    return { total: rows.length, present, absent, onLeave, working, notMarked }
+    return { total: rows.length, present, absent }
   }, [rows])
 
   const isToday = date === todayKey
@@ -140,31 +137,24 @@ function TeamAttendanceOverview() {
 
       {error ? <div className="feedback-banner feedback-banner-error">{error}</div> : null}
 
-      <section className="stats-grid">
-        <article className="stat-card">
-          <p>Total Employees</p>
-          <h2>{stats.total}</h2>
-        </article>
-        <article className="stat-card">
-          <p>Present</p>
-          <h2>{stats.present}</h2>
-        </article>
-        <article className="stat-card">
-          <p>Currently Working</p>
-          <h2>{stats.working}</h2>
-        </article>
-        <article className="stat-card">
-          <p>Absent</p>
-          <h2>{stats.absent}</h2>
-        </article>
-        <article className="stat-card">
-          <p>On Leave</p>
-          <h2>{stats.onLeave}</h2>
-        </article>
-        <article className="stat-card">
-          <p>Not Checked In</p>
-          <h2>{stats.notMarked}</h2>
-        </article>
+      {/* Tone per meaning, matching the Employee Details tiles: a count is
+          blue, a healthy state green, a bad state red. */}
+      <section className="stats-grid stats-grid--flow">
+        {[
+          { label: 'Total Employees', value: stats.total, icon: IconUsers, tone: 'blue' },
+          { label: 'Present', value: stats.present, icon: IconUserCheck, tone: 'green' },
+          { label: 'Absent', value: stats.absent, icon: IconUserOff, tone: 'red' },
+        ].map((item) => (
+          <article className={`stat-card stat-card--${item.tone}`} key={item.label}>
+            <div className="stat-card-head">
+              <span className="stat-card-icon">
+                <item.icon />
+              </span>
+              <p>{item.label}</p>
+            </div>
+            <h2>{item.value}</h2>
+          </article>
+        ))}
       </section>
 
       <div className="panel-heading attendance-week-heading">

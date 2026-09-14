@@ -401,7 +401,7 @@ function CheckInOut() {
         trendLabel: 'from last week',
         caption: "This week's total",
         icon: IconClock,
-        tone: 'primary',
+        tone: 'blue',
       },
       {
         label: 'Total Days',
@@ -418,7 +418,7 @@ function CheckInOut() {
         trendLabel: 'from last month',
         caption: "This month's average",
         icon: IconTarget,
-        tone: 'blue',
+        tone: 'purple',
       },
       {
         label: 'Overtime Hours',
@@ -532,9 +532,9 @@ function CheckInOut() {
 
           <section className="stats-grid attendance-stats-grid">
             {stats.map((item) => (
-              <article className="stat-card" key={item.label}>
+              <article className={`stat-card stat-card--${item.tone}`} key={item.label}>
                 <div className="stat-card-head">
-                  <span className={`stat-card-icon stat-card-icon--${item.tone}`}>
+                  <span className="stat-card-icon">
                     <item.icon />
                   </span>
                   {item.period ? <span className="attendance-stat-period">{item.period}</span> : null}

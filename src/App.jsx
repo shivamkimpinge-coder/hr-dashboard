@@ -18,7 +18,6 @@ import AttendanceReports from './components/Attendance/attendanceReports'
 import TaskBoard from './components/Tasks/taskBoard'
 import Goals from './components/Performance/goals'
 import PerformanceReview from './components/Performance/performanceReview'
-import Promotions from './components/Performance/promotions'
 import Notifications from './components/Notifications'
 
 import ForgetPass from './components/Auth/forgotpass'
@@ -144,7 +143,6 @@ function AppRoutes() {
         {/* Performance */}
         <Route path="performance" element={<Goals currentUser={currentUser} />} />
         <Route path="performance/reviews" element={<PerformanceReview currentUser={currentUser} />} />
-        <Route path="performance/promotions" element={<Promotions currentUser={currentUser} />} />
 
         {/* Everything else */}
         <Route path="tasks" element={<TaskBoard currentUser={currentUser} />} />
@@ -168,7 +166,7 @@ export default function App() {
         position="top-right"
         gutter={10}
         toastOptions={{
-          duration: 5000,
+          duration: 2000,
           className: 'app-toast',
           success: {
             className: 'app-toast app-toast-success',

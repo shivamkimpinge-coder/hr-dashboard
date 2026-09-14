@@ -187,18 +187,6 @@ export const performanceReviewApi = {
   remove: (id) => request(`/performance-reviews/${id}`, { method: 'DELETE' }),
 }
 
-export const promotionApi = {
-  list: (params = {}) => {
-    const query = buildQuery(params)
-    return request(`/promotions${query ? `?${query}` : ''}`)
-  },
-  my: () => request('/promotions/my'),
-  create: (payload) => request('/promotions', { method: 'POST', body: payload }),
-  update: (id, payload) => request(`/promotions/${id}`, { method: 'PUT', body: payload }),
-  approve: (id) => request(`/promotions/${id}/approve`, { method: 'PATCH' }),
-  reject: (id) => request(`/promotions/${id}/reject`, { method: 'PATCH' }),
-  remove: (id) => request(`/promotions/${id}`, { method: 'DELETE' }),
-}
 
 export const notificationApi = {
   list: (params = {}) => {
@@ -221,6 +209,5 @@ export const api = {
   tasks: taskApi,
   goals: goalApi,
   performanceReviews: performanceReviewApi,
-  promotions: promotionApi,
   notifications: notificationApi,
 }

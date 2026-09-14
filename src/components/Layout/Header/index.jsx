@@ -239,13 +239,6 @@ function Header({
 
             {searching ? <span className="search-spinner" aria-hidden="true" /> : null}
 
-            {!search && !searching && (
-              <span className="search-kbd" aria-hidden="true">
-                <kbd>⌘</kbd>
-                <kbd>K</kbd>
-              </span>
-            )}
-
             {search && !searching && (
               <button
                 type="button"

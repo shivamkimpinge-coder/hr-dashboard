@@ -89,14 +89,6 @@ export default function useApi() {
   const acknowledgeReview = useCallback((id) => run(() => api.performanceReviews.acknowledge(id)), [run])
   const deleteReview = useCallback((id) => run(() => api.performanceReviews.remove(id)), [run])
 
-  // Performance — Promotions
-  const listPromotions = useCallback((params) => run(() => api.promotions.list(params)), [run])
-  const getMyPromotions = useCallback(() => run(() => api.promotions.my()), [run])
-  const createPromotion = useCallback((payload) => run(() => api.promotions.create(payload)), [run])
-  const updatePromotion = useCallback((id, payload) => run(() => api.promotions.update(id, payload)), [run])
-  const approvePromotion = useCallback((id) => run(() => api.promotions.approve(id)), [run])
-  const rejectPromotion = useCallback((id) => run(() => api.promotions.reject(id)), [run])
-  const deletePromotion = useCallback((id) => run(() => api.promotions.remove(id)), [run])
 
   // Notifications
   const listNotifications = useCallback((params) => run(() => api.notifications.list(params)), [run])
@@ -179,14 +171,6 @@ export default function useApi() {
     acknowledgeReview,
     deleteReview,
 
-    // Performance — Promotions
-    listPromotions,
-    getMyPromotions,
-    createPromotion,
-    updatePromotion,
-    approvePromotion,
-    rejectPromotion,
-    deletePromotion,
 
     // Notifications
     listNotifications,

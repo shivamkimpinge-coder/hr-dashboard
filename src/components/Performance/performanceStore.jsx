@@ -1,7 +1,7 @@
 // Shared constants + pure display helpers for the Performance module. All
 // CRUD now goes through the real API (see useApi.js — listGoals, createGoal,
 // etc.) — this file only holds category/status enums and formatting/derived
-// logic that's reused across the Goals/Reviews/Promotions pages.
+// logic that's reused across the Goals/Reviews pages.
 
 // ---------- Goals ----------
 
@@ -56,27 +56,6 @@ export const reviewStatusPillClass = (status) => {
       return 'pill-warning'
     default:
       return 'pill-muted' // Draft
-  }
-}
-
-// ---------- Promotions ----------
-
-export const PROMOTION_STATUS = {
-  PROPOSED: 'Proposed',
-  APPROVED: 'Approved',
-  REJECTED: 'Rejected',
-}
-
-export const PROMOTION_STATUSES = Object.values(PROMOTION_STATUS)
-
-export const promotionStatusPillClass = (status) => {
-  switch (status) {
-    case PROMOTION_STATUS.APPROVED:
-      return 'pill-success'
-    case PROMOTION_STATUS.REJECTED:
-      return 'pill-danger'
-    default:
-      return 'pill-warning' // Proposed
   }
 }
 

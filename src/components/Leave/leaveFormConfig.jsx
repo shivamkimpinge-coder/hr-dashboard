@@ -47,7 +47,7 @@ export const statusPillClass = (status) => {
 // this just keeps the tab out of Admin's way.
 export const getLeaveTabs = (currentUser) =>
   [
-    { label: 'My Requests', to: '/dashboard/leave', end: true },
+    { label: 'Requests', to: '/dashboard/leave', end: true },
     !isAdminRole(currentUser) && { label: 'Apply Leave', to: '/dashboard/leave/apply' },
   ].filter(Boolean)
 

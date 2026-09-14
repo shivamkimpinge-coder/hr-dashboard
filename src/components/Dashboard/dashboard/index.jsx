@@ -10,27 +10,30 @@ import { MAX_SESSIONS_PER_DAY, canStartNewSession, formatTimeDisplay, getDateKey
 import { TASK_STATUS, formatDateDisplay as taskFormatDate, priorityPillClass as taskPriorityPillClass } from '../../Tasks/taskStore'
 import PerfAvatar from '../../Performance/PerfAvatar'
 import useApi from '../../../hooks/useApi'
-import { isAdminRole, isManagerRole } from '../../../utils/roles'
-import { RadialGauge, RankedBarList, Sparkline, StackedBarChart } from './charts'
+import { isManagerRole } from '../../../utils/roles'
+import { HeadcountChart } from './charts'
 import {
   IconAlertTriangle,
   IconCalendar,
+  IconChevronLeft,
+  IconChevronRight,
   IconClock,
   IconKanban,
   IconUserCheck,
-  IconUserOff,
   IconUserPlus,
   IconUsers,
   IconWallet,
 } from '../../Layout/Sidebar/icons'
 
-const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const ACTIVITY_PAGE_SIZE = 5
 
-const HIRING_RANGES = [
+const HEADCOUNT_RANGES = [
   { value: 'monthly', label: 'Monthly' },
   { value: 'quarterly', label: 'Quarterly' },
   { value: 'annually', label: 'Annually' },
 ]
+
+const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 // The last N periods ending with the current one, for whichever range the
 // toggle is on. Shared by the stacked hiring chart so its columns line up with
@@ -60,131 +63,45 @@ function buildRangeBuckets(range) {
   return buckets
 }
 
-function bucketKeyFor(date, range) {
-  if (range === 'annually') return `${date.getFullYear()}`
-  if (range === 'quarterly') return `${date.getFullYear()}-Q${Math.floor(date.getMonth() / 3) + 1}`
-  return `${date.getFullYear()}-${date.getMonth()}`
-}
-
-// Real headcount grouped by each employee's department, top 5 + "Other".
-function buildDepartmentBreakdown(employees) {
-  const counts = new Map()
-  employees.forEach((employee) => {
-    const dept = (employee.department || '').trim() || 'Unassigned'
-    counts.set(dept, (counts.get(dept) || 0) + 1)
-  })
-
-  const sorted = Array.from(counts.entries())
-    .map(([label, value]) => ({ label, value }))
-    .sort((a, b) => b.value - a.value)
-
-  if (sorted.length <= 6) return sorted
-
-  const top = sorted.slice(0, 5)
-  const otherCount = sorted.slice(5).reduce((sum, d) => sum + d.value, 0)
-  return [...top, { label: 'Other', value: otherCount }]
-}
-
-// Last `months` calendar months ending with the current one.
-function recentMonths(months) {
-  const now = new Date()
-  const out = []
-  for (let i = months - 1; i >= 0; i -= 1) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
-    out.push({ key: `${d.getFullYear()}-${d.getMonth()}`, label: MONTH_LABELS[d.getMonth()], year: d.getFullYear(), month: d.getMonth() })
-  }
-  return out
-}
-
 const joinedDate = (employee) => {
   if (!employee.joiningDate) return null
   const d = new Date(employee.joiningDate)
   return Number.isNaN(d.getTime()) ? null : d
 }
 
-// Cumulative headcount at the end of each of the last `months` months — the
-// series behind the "Headcount" sparkline.
-function buildHeadcountSeries(employees, months = 8) {
-  return recentMonths(months).map(({ year, month }) => {
-    const cutoff = new Date(year, month + 1, 0, 23, 59, 59)
-    return employees.filter((employee) => {
+// Cumulative headcount at the close of each period in the selected range —
+// everyone who had joined by then, not just that period's hires.
+function buildHeadcountTrend(employees, range) {
+  const now = new Date()
+  const buckets = buildRangeBuckets(range)
+
+  return buckets.map((bucket, index) => {
+    let cutoff
+    if (range === 'annually') {
+      cutoff = new Date(now.getFullYear() - (buckets.length - 1 - index) + 1, 0, 0, 23, 59, 59)
+    } else if (range === 'quarterly') {
+      const d = new Date(now.getFullYear(), now.getMonth() - (buckets.length - 1 - index) * 3, 1)
+      const quarterEndMonth = Math.floor(d.getMonth() / 3) * 3 + 3
+      cutoff = new Date(d.getFullYear(), quarterEndMonth, 0, 23, 59, 59)
+    } else {
+      const d = new Date(now.getFullYear(), now.getMonth() - (buckets.length - 1 - index), 1)
+      cutoff = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59)
+    }
+
+    const headcount = employees.filter((employee) => {
       const joined = joinedDate(employee)
       return joined && joined <= cutoff
     }).length
+
+    return { label: bucket.label, headcount }
   })
-}
-
-// Hires per month — the series behind the "New Hires" sparkline.
-function buildHiresSeries(employees, months = 8) {
-  const buckets = recentMonths(months)
-  const index = new Map(buckets.map((b, i) => [b.key, i]))
-  const counts = buckets.map(() => 0)
-
-  employees.forEach((employee) => {
-    const joined = joinedDate(employee)
-    if (!joined) return
-    const i = index.get(`${joined.getFullYear()}-${joined.getMonth()}`)
-    if (i != null) counts[i] += 1
-  })
-
-  return counts
-}
-
-// Hires per period split by department, for the stacked chart. Departments
-// beyond the top four are folded into "Other" so the legend stays readable.
-function buildHiringByDepartment(employees, range) {
-  const buckets = buildRangeBuckets(range)
-  const index = new Map(buckets.map((b, i) => [b.key, i]))
-
-  const totals = new Map()
-  employees.forEach((employee) => {
-    const joined = joinedDate(employee)
-    if (!joined || !index.has(bucketKeyFor(joined, range))) return
-    const dept = (employee.department || '').trim() || 'Unassigned'
-    totals.set(dept, (totals.get(dept) || 0) + 1)
-  })
-
-  const ranked = Array.from(totals.entries()).sort((a, b) => b[1] - a[1])
-  const top = ranked.slice(0, 4).map(([label]) => label)
-
-  const series = top.map((label) => ({ key: label, label }))
-  if (ranked.length > 4) series.push({ key: '__other', label: 'Other' })
-
-  const rows = buckets.map((bucket) => ({ label: bucket.label, values: {} }))
-  employees.forEach((employee) => {
-    const joined = joinedDate(employee)
-    if (!joined) return
-    const i = index.get(bucketKeyFor(joined, range))
-    if (i == null) return
-    const dept = (employee.department || '').trim() || 'Unassigned'
-    const key = top.includes(dept) ? dept : '__other'
-    rows[i].values[key] = (rows[i].values[key] || 0) + 1
-  })
-
-  return { buckets: rows, series }
-}
-
-// Whole-year tenure bands, counted from each employee's joining date.
-function buildTenureBuckets(employees) {
-  const now = new Date()
-  const bands = [
-    { label: '< 1 yr', value: 0 },
-    { label: '1–2 yrs', value: 0 },
-    { label: '2–5 yrs', value: 0 },
-    { label: '5+ yrs', value: 0 },
-  ]
-
-  employees.forEach((employee) => {
-    const joined = joinedDate(employee)
-    if (!joined) return
-    const years = (now - joined) / (365.25 * 24 * 60 * 60 * 1000)
-    if (years < 1) bands[0].value += 1
-    else if (years < 2) bands[1].value += 1
-    else if (years < 5) bands[2].value += 1
-    else bands[3].value += 1
-  })
-
-  return bands
+    // Hires in a period is the rise in headcount over it. Deriving it from the
+    // running total keeps the two series consistent by construction — they can
+    // never disagree the way two independent counts could.
+    .map((bucket, index, all) => ({
+      ...bucket,
+      hires: index === 0 ? 0 : Math.max(0, bucket.headcount - all[index - 1].headcount),
+    }))
 }
 
 function useLiveClock() {
@@ -208,16 +125,10 @@ function DashboardGreeting({ currentUser, subtitle }) {
 
   return (
     <div className="dashboard-greeting">
-      <div>
-        <h2>
-          {greetingForHour(now.getHours())}, {firstName} 👋
-        </h2>
-        <p>{subtitle}</p>
-      </div>
-      <div className="dashboard-greeting-time">
-        <span>{now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</span>
-        <strong>{now.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}</strong>
-      </div>
+      <h2>
+        {greetingForHour(now.getHours())}, {firstName}
+      </h2>
+      <p>{subtitle}</p>
     </div>
   )
 }
@@ -252,23 +163,6 @@ function useCountUp(value, duration = 700) {
 
   return display
 }
-
-// HR files their own leave like any employee, so they get the shortcut too;
-// Admin only oversees leave and never applies for it.
-const getManagerQuickActions = (currentUser) =>
-  [
-    { label: 'Add Employee', desc: 'Create a new employee record', icon: IconUserPlus, to: '/dashboard/employees', tone: 'primary' },
-    { label: 'Mark Attendance', desc: "Log today's attendance", icon: IconClock, to: '/dashboard/attendance/mark', tone: 'blue' },
-    { label: 'Review Leave', desc: 'Approve or reject requests', icon: IconCalendar, to: '/dashboard/leave', tone: 'amber' },
-    { label: 'Run Payroll', desc: 'Generate monthly payroll', icon: IconWallet, to: '/dashboard/payroll/generate', tone: 'green' },
-    !isAdminRole(currentUser) && {
-      label: 'Apply Leave',
-      desc: 'Request time off',
-      icon: IconCalendar,
-      to: '/dashboard/leave/apply',
-      tone: 'blue',
-    },
-  ].filter(Boolean)
 
 function QuickActionButton({ action }) {
   const content = (
@@ -320,17 +214,15 @@ function PendingApprovals({ leaves, loading, onApprove, onReject }) {
   return (
     <div className="panel h-100">
       <div className="panel-heading">
-        <div>
-          <p className="eyebrow">Needs your attention</p>
-          <h3>Pending Leave Requests</h3>
-        </div>
-        <Button variant="secondary" to="/dashboard/leave">
-          View all
-        </Button>
+        <h3>Pending Leave Requests</h3>
       </div>
 
       {loading ? (
-        <p className="form-hint">Loading...</p>
+        <div className="skeleton-list" aria-hidden="true">
+          <span className="skeleton skeleton-row" />
+          <span className="skeleton skeleton-row" />
+          <span className="skeleton skeleton-row" />
+        </div>
       ) : leaves.length === 0 ? (
         <div className="empty-state">
           <span className="perf-empty-icon">
@@ -368,10 +260,10 @@ function PendingApprovals({ leaves, loading, onApprove, onReject }) {
 
 // Backend already rejects non-manager requests with 403 — this just avoids
 // flashing an Admin/HR-only page/API-error before the redirect happens.
-const EMPLOYEE_STAT_ICONS = [
-  { icon: IconKanban, tone: 'primary' },
+const EMPLOYEE_STAT_META = [
+  { icon: IconKanban, tone: 'blue' },
   { icon: IconAlertTriangle, tone: 'amber' },
-  { icon: IconCalendar, tone: 'blue' },
+  { icon: IconCalendar, tone: 'purple' },
   { icon: IconUserCheck, tone: 'green' },
 ]
 
@@ -646,8 +538,10 @@ function EmployeeOverview({ currentUser }) {
 
       <section className="stats-grid">
         {stats.map((item, index) => {
-          const { icon, tone } = EMPLOYEE_STAT_ICONS[index] || EMPLOYEE_STAT_ICONS[0]
-          return <StatCard key={item.label} item={item} icon={icon} tone={tone} onClick={() => navigate(item.to)} />
+          const meta = EMPLOYEE_STAT_META[index] || EMPLOYEE_STAT_META[0]
+          return (
+            <StatCard key={item.label} item={item} icon={meta.icon} tone={meta.tone} onClick={() => navigate(item.to)} />
+          )
         })}
       </section>
 
@@ -677,129 +571,11 @@ function EmployeeOverview({ currentUser }) {
   )
 }
 
-// Reference's "Churn Rate" / "User Growth" tile: a label, a one-line caption,
-// the figure, a signed change, and a sparkline of the same series. The colour
-// follows the actual direction of travel rather than being fixed per card.
-function MiniMetricCard({ label, caption, value, delta, deltaLabel, series, id }) {
-  const tone = delta > 0 ? 'positive' : delta < 0 ? 'negative' : 'flat'
-
-  return (
-    <div className="panel mini-metric h-100">
-      <h3 className="mini-metric-title">{label}</h3>
-      <p className="mini-metric-caption">{caption}</p>
-
-      <div className="mini-metric-body">
-        <div className="mini-metric-figures">
-          <strong className="mini-metric-value">{value}</strong>
-          <p className={`mini-metric-delta mini-metric-delta--${tone}`}>
-            <span>
-              {delta > 0 ? '+' : ''}
-              {delta}
-            </span>{' '}
-            {deltaLabel}
-          </p>
-        </div>
-        <Sparkline data={series} tone={tone} id={id} />
-      </div>
-    </div>
-  )
-}
-
-const WORKFORCE_TABS = [
-  { value: 'department', label: 'Department' },
-  { value: 'status', label: 'Status' },
-  { value: 'tenure', label: 'Tenure' },
-]
-
-// Right-hand column, modelled on the reference's "Product Performance": a
-// segmented control, a two-up summary row, then a nested card holding the
-// visual for whichever tab is active.
-function WorkforcePanel({ stats, departmentData, tenureData, activeRatePercent }) {
-  const [tab, setTab] = useState('department')
-
-  const total = stats[0]?.value ?? 0
-  const active = stats[1]?.value ?? 0
-  const inactive = stats[2]?.value ?? 0
-
-  const topDepartment = departmentData[0] || null
-  const newest = tenureData[0]?.value ?? 0
-  const longest = tenureData[tenureData.length - 1]?.value ?? 0
-
-  const summaries = {
-    department: [
-      { label: 'Departments', value: departmentData.length, direction: 'up' },
-      { label: topDepartment ? topDepartment.label : 'Largest', value: topDepartment ? topDepartment.value : 0, direction: 'up' },
-    ],
-    status: [
-      { label: 'Active', value: active, direction: 'up' },
-      { label: 'Inactive', value: inactive, direction: inactive > 0 ? 'down' : 'up' },
-    ],
-    tenure: [
-      { label: 'Under 1 yr', value: newest, direction: 'up' },
-      { label: '5+ yrs', value: longest, direction: 'up' },
-    ],
-  }
-
-  const nested = {
-    department: { title: 'Headcount by department', figure: `${total} total` },
-    status: { title: 'Active employee rate', figure: `${Math.round(activeRatePercent)}%` },
-    tenure: { title: 'Employees by tenure', figure: `${total} total` },
-  }
-
-  return (
-    <div className="panel workforce-panel h-100">
-      <div className="panel-heading">
-        <div>
-          <h3>Workforce Breakdown</h3>
-        </div>
-      </div>
-
-      <div className="range-toggle workforce-tabs">
-        {WORKFORCE_TABS.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            className={tab === option.value ? 'is-active' : ''}
-            onClick={() => setTab(option.value)}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="workforce-summary">
-        {summaries[tab].map((item) => (
-          <div className="workforce-summary-item" key={item.label}>
-            <span className="workforce-summary-label">{item.label}</span>
-            <strong className={`workforce-summary-value workforce-summary-value--${item.direction}`}>
-              <span aria-hidden="true">{item.direction === 'up' ? '\u2191' : '\u2193'}</span>
-              {item.value}
-            </strong>
-          </div>
-        ))}
-      </div>
-
-      <div className="workforce-nested">
-        <div className="workforce-nested-head">
-          <p>{nested[tab].title}</p>
-          <span className="workforce-nested-figure">{nested[tab].figure}</span>
-        </div>
-
-        {tab === 'status' ? (
-          <RadialGauge percent={activeRatePercent} caption="Share of the team currently marked Active." />
-        ) : (
-          <RankedBarList data={tab === 'department' ? departmentData : tenureData} />
-        )}
-      </div>
-    </div>
-  )
-}
-
-const STAT_ICONS = [
-  { icon: IconUsers, tone: 'primary' },
+const STAT_META = [
+  { icon: IconUsers, tone: 'blue' },
   { icon: IconUserCheck, tone: 'green' },
-  { icon: IconUserOff, tone: 'amber' },
-  { icon: IconUserPlus, tone: 'blue' },
+  { icon: IconCalendar, tone: 'amber' },
+  { icon: IconUserPlus, tone: 'purple' },
 ]
 
 function StatCard({ item, icon: Icon, tone, onClick }) {
@@ -807,7 +583,7 @@ function StatCard({ item, icon: Icon, tone, onClick }) {
 
   return (
     <article
-      className="stat-card stat-card--clickable"
+      className={`stat-card stat-card--clickable stat-card--${tone}`}
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -819,18 +595,25 @@ function StatCard({ item, icon: Icon, tone, onClick }) {
       }}
     >
       <div className="stat-card-head">
-        <span className={`stat-card-icon stat-card-icon--${tone}`}>
+        <span className="stat-card-icon">
           <Icon />
         </span>
-        <span className="stat-card-arrow" aria-hidden="true">
-          →
-        </span>
+        <p>{item.label}</p>
       </div>
-      <p>{item.label}</p>
-      <h2>{displayValue}</h2>
-      <span>{item.trend}</span>
+      <h2>{displayValue.toLocaleString()}</h2>
+      <span className="stat-card-trend">{item.trend}</span>
     </article>
   )
+}
+
+// Employee Details paginates its records table; the activity table now does the
+// same. It renders a window of page numbers rather than all of them — the
+// dashboard can hold 200 employees, and 40 buttons would not fit.
+function pageWindow(current, total, span = 5) {
+  if (total <= span) return Array.from({ length: total }, (_, i) => i + 1)
+  const half = Math.floor(span / 2)
+  const start = Math.min(Math.max(1, current - half), total - span + 1)
+  return Array.from({ length: span }, (_, i) => start + i)
 }
 
 function OverviewContent({
@@ -838,50 +621,76 @@ function OverviewContent({
   employees,
   stats,
   loading,
-  hiringByDepartment,
-  hiringRange,
-  onHiringRangeChange,
-  departmentData,
-  tenureData,
   headcountSeries,
-  hiresSeries,
-  activeRatePercent,
+  headcountRange,
+  onHeadcountRangeChange,
   pendingLeaves,
   pendingLoading,
   onApproveLeave,
   onRejectLeave,
 }) {
   const navigate = useNavigate()
+  const [activityPage, setActivityPage] = useState(1)
 
-  // Both sparklines are monthly, so "delta" is simply the last month against
-  // the one before it.
-  const headcountNow = headcountSeries[headcountSeries.length - 1] ?? 0
-  const headcountDelta = headcountNow - (headcountSeries[headcountSeries.length - 2] ?? headcountNow)
-  const hiresNow = hiresSeries[hiresSeries.length - 1] ?? 0
-  const hiresDelta = hiresNow - (hiresSeries[hiresSeries.length - 2] ?? hiresNow)
+  const totalPages = Math.max(1, Math.ceil(employees.length / ACTIVITY_PAGE_SIZE))
+  const currentPage = Math.min(activityPage, totalPages)
+  const pageEmployees = employees.slice((currentPage - 1) * ACTIVITY_PAGE_SIZE, currentPage * ACTIVITY_PAGE_SIZE)
+  const firstShown = employees.length === 0 ? 0 : (currentPage - 1) * ACTIVITY_PAGE_SIZE + 1
+  const lastShown = Math.min(currentPage * ACTIVITY_PAGE_SIZE, employees.length)
 
   return (
     <>
       <section className="row g-3">
         <div className="col-lg-12">
-          <DashboardGreeting currentUser={currentUser} subtitle="Here's what's happening with your team today." />
+          <div className="page-head">
+            <DashboardGreeting currentUser={currentUser} subtitle="Here's what's happening with your team today." />
+            <Button variant="secondary" to="/dashboard/employees">
+              View all employees
+            </Button>
+          </div>
         </div>
       </section>
 
       <section className="stats-grid">
         {stats.map((item, index) => {
-          const { icon, tone } = STAT_ICONS[index] || STAT_ICONS[0]
+          const meta = STAT_META[index] || STAT_META[0]
           return (
-            <StatCard key={item.label} item={item} icon={icon} tone={tone} onClick={() => navigate('/dashboard/employees')} />
+            <StatCard
+              key={item.label}
+              item={item}
+              icon={meta.icon}
+              tone={meta.tone}
+              onClick={() => navigate('/dashboard/employees')}
+            />
           )
         })}
       </section>
 
       <section className="row g-3">
-        <div className="col-lg-4">
-          <QuickActions actions={getManagerQuickActions(currentUser)} />
+        <div className="col-lg-12">
+          <div className="panel chart-card">
+            <div className="panel-heading chart-card-head">
+              <h3>Headcount</h3>
+              <div className="range-toggle">
+                {HEADCOUNT_RANGES.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={headcountRange === option.value ? 'is-active' : ''}
+                    onClick={() => onHeadcountRangeChange(option.value)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <HeadcountChart data={headcountSeries} />
+          </div>
         </div>
-        <div className="col-lg-8">
+      </section>
+
+      <section className="row g-3">
+        <div className="col-lg-12">
           <PendingApprovals
             leaves={pendingLeaves}
             loading={pendingLoading}
@@ -892,79 +701,10 @@ function OverviewContent({
       </section>
 
       <section className="row g-3">
-        <div className="col-lg-8">
-          <div className="row g-3">
-            <div className="col-md-6">
-              <MiniMetricCard
-                label="Headcount"
-                caption="Everyone on the books"
-                value={headcountNow}
-                delta={headcountDelta}
-                deltaLabel="than last month"
-                series={headcountSeries}
-                id="headcount"
-              />
-            </div>
-
-            <div className="col-md-6">
-              <MiniMetricCard
-                label="New Hires"
-                caption="Joined in the last month"
-                value={hiresNow}
-                delta={hiresDelta}
-                deltaLabel="than last month"
-                series={hiresSeries}
-                id="hires"
-              />
-            </div>
-
-            <div className="col-12">
-              <div className="panel chart-card">
-                <div className="panel-heading chart-card-head">
-                  <div>
-                    <p className="eyebrow">Hiring trend</p>
-                    <h3>New employees by department</h3>
-                  </div>
-                  <div className="range-toggle">
-                    {HIRING_RANGES.map((option) => (
-                      <button
-                        key={option.value}
-                        type="button"
-                        className={hiringRange === option.value ? 'is-active' : ''}
-                        onClick={() => onHiringRangeChange(option.value)}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <StackedBarChart buckets={hiringByDepartment.buckets} series={hiringByDepartment.series} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-lg-4">
-          <WorkforcePanel
-            stats={stats}
-            departmentData={departmentData}
-            tenureData={tenureData}
-            activeRatePercent={activeRatePercent}
-          />
-        </div>
-      </section>
-
-      <section className="row g-3">
         <div className="col-lg-12">
-          <div className="panel h-100">
+          <div className="panel">
             <div className="panel-heading">
-              <div>
-                <p className="eyebrow">Latest updates</p>
-                <h3>Recent employee activity</h3>
-              </div>
-              <Button variant="secondary" to="/dashboard/employees">
-                View all
-              </Button>
+              <h3>Recent Activity</h3>
             </div>
             <div className="table-responsive">
               <table className="table table-dark table-hover align-middle mb-0">
@@ -977,15 +717,25 @@ function OverviewContent({
                 </thead>
                 <tbody>
                   {loading ? (
-                    <tr>
-                      <td colSpan={3}>Loading...</td>
-                    </tr>
+                    [0, 1, 2, 3, 4].map((row) => (
+                      <tr key={row} aria-hidden="true">
+                        <td>
+                          <span className="skeleton skeleton-text" />
+                        </td>
+                        <td>
+                          <span className="skeleton skeleton-text skeleton-text--sm" />
+                        </td>
+                        <td>
+                          <span className="skeleton skeleton-pill" />
+                        </td>
+                      </tr>
+                    ))
                   ) : employees.length === 0 ? (
                     <tr>
                       <td colSpan={3}>No employees yet.</td>
                     </tr>
                   ) : (
-                    employees.slice(0, 6).map((employee) => (
+                    pageEmployees.map((employee) => (
                       <tr
                         key={employee._id}
                         className="activity-row"
@@ -1000,8 +750,9 @@ function OverviewContent({
                         <td>{employee.department}</td>
                         <td>
                           <span
-                            className={`pill ${employee.status === 'Active' ? 'pill-success' : 'pill-muted'}`}
+                            className={`pill pill-dot ${employee.status === 'Active' ? 'pill-success' : 'pill-muted'}`}
                           >
+                            <i aria-hidden="true" />
                             {employee.status || 'Active'}
                           </span>
                         </td>
@@ -1011,6 +762,43 @@ function OverviewContent({
                 </tbody>
               </table>
             </div>
+
+            {!loading && employees.length > 0 ? (
+              <div className="emp-pagination">
+                <p>
+                  Showing {firstShown} to {lastShown} of {employees.length} employees
+                </p>
+                <div className="emp-pager">
+                  <button
+                    type="button"
+                    onClick={() => setActivityPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    aria-label="Previous page"
+                  >
+                    <IconChevronLeft />
+                  </button>
+                  {pageWindow(currentPage, totalPages).map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      className={n === currentPage ? 'is-active' : ''}
+                      aria-current={n === currentPage ? 'page' : undefined}
+                      onClick={() => setActivityPage(n)}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setActivityPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    aria-label="Next page"
+                  >
+                    <IconChevronRight />
+                  </button>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       </section>
@@ -1032,9 +820,10 @@ function DashboardLayout({ onLogout, currentUser, onProfileUpdate }) {
   const [statsData, setStatsData] = useState({ total: 0, active: 0, inactive: 0, newEmployees: 0 })
   const [loading, setLoading] = useState(true)
   const [listError, setListError] = useState('')
-  const [hiringRange, setHiringRange] = useState('monthly')
+  const [headcountRange, setHeadcountRange] = useState('monthly')
   const [pendingLeaves, setPendingLeaves] = useState([])
   const [pendingLoading, setPendingLoading] = useState(true)
+  const [onLeaveToday, setOnLeaveToday] = useState(0)
 
   // One toggle, two behaviours: narrow the rail to icons on desktop, slide the
   // full panel in over the content on small screens.
@@ -1095,6 +884,23 @@ function DashboardLayout({ onLogout, currentUser, onProfileUpdate }) {
     }
   }, [listLeaves, onLogout])
 
+  // "On Leave" means approved leave that covers today — a separate question
+  // from the pending queue, so it needs its own fetch.
+  const fetchOnLeaveToday = useCallback(async () => {
+    try {
+      const data = await listLeaves({ status: 'Approved' })
+      const today = getDateKey()
+      const count = (data.leaves || []).filter((leave) => {
+        const start = getDateKey(new Date(leave.startDate))
+        const end = getDateKey(new Date(leave.endDate))
+        return start <= today && today <= end
+      }).length
+      setOnLeaveToday(count)
+    } catch (error) {
+      if (error.status === 401) onLogout?.()
+    }
+  }, [listLeaves, onLogout])
+
   useEffect(() => {
     if (!isManager) {
       setLoading(false)
@@ -1104,7 +910,8 @@ function DashboardLayout({ onLogout, currentUser, onProfileUpdate }) {
     fetchEmployees()
     fetchStats()
     fetchPendingLeaves()
-  }, [isManager, fetchEmployees, fetchStats, fetchPendingLeaves])
+    fetchOnLeaveToday()
+  }, [isManager, fetchEmployees, fetchStats, fetchPendingLeaves, fetchOnLeaveToday])
 
   const handleApproveLeave = async (leave) => {
     try {
@@ -1129,16 +936,11 @@ function DashboardLayout({ onLogout, currentUser, onProfileUpdate }) {
   const stats = [
     { label: 'Total Employees', value: statsData.total, trend: 'All team members' },
     { label: 'Active Employees', value: statsData.active, trend: 'Currently active' },
-    { label: 'Inactive Employees', value: statsData.inactive, trend: 'Need follow-up' },
-    { label: 'New Employees', value: statsData.newEmployees, trend: 'Joined this week' },
+    { label: 'On Leave', value: onLeaveToday, trend: 'Away today' },
+    { label: 'New Hires', value: statsData.newEmployees, trend: 'Joined this week' },
   ]
 
-  const hiringByDepartment = useMemo(() => buildHiringByDepartment(employees, hiringRange), [employees, hiringRange])
-  const departmentData = useMemo(() => buildDepartmentBreakdown(employees), [employees])
-  const tenureData = useMemo(() => buildTenureBuckets(employees), [employees])
-  const headcountSeries = useMemo(() => buildHeadcountSeries(employees), [employees])
-  const hiresSeries = useMemo(() => buildHiresSeries(employees), [employees])
-  const activeRatePercent = statsData.total > 0 ? (statsData.active / statsData.total) * 100 : 0
+  const headcountSeries = useMemo(() => buildHeadcountTrend(employees, headcountRange), [employees, headcountRange])
 
   const refreshEmployeeData = () => Promise.all([fetchEmployees({ silent: true }), fetchStats()])
 
@@ -1152,14 +954,9 @@ function DashboardLayout({ onLogout, currentUser, onProfileUpdate }) {
     stats,
     loading,
     listError,
-    hiringByDepartment,
-    hiringRange,
-    setHiringRange,
-    departmentData,
-    tenureData,
     headcountSeries,
-    hiresSeries,
-    activeRatePercent,
+    headcountRange,
+    setHeadcountRange,
     pendingLeaves,
     pendingLoading,
     handleApproveLeave,
@@ -1205,14 +1002,9 @@ export function DashboardHome() {
       employees={ctx.employees}
       stats={ctx.stats}
       loading={ctx.loading}
-      hiringByDepartment={ctx.hiringByDepartment}
-      hiringRange={ctx.hiringRange}
-      onHiringRangeChange={ctx.setHiringRange}
-      departmentData={ctx.departmentData}
-      tenureData={ctx.tenureData}
       headcountSeries={ctx.headcountSeries}
-      hiresSeries={ctx.hiresSeries}
-      activeRatePercent={ctx.activeRatePercent}
+      headcountRange={ctx.headcountRange}
+      onHeadcountRangeChange={ctx.setHeadcountRange}
       pendingLeaves={ctx.pendingLeaves}
       pendingLoading={ctx.pendingLoading}
       onApproveLeave={ctx.handleApproveLeave}

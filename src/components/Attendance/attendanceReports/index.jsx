@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { isManagerRole } from '../../../utils/roles'
 import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import useApi from '../../../hooks/useApi'
+import { IconAlertTriangle, IconClock, IconUserCheck, IconUserOff } from '../../Layout/Sidebar/icons'
 import {
   formatDateDisplay,
   formatHours,
@@ -30,10 +31,15 @@ function StatCards({ stats }) {
   return (
     <section className="stats-grid">
       {stats.map((item) => (
-        <article className="stat-card" key={item.label}>
-          <p>{item.label}</p>
+        <article className={`stat-card stat-card--${item.tone}`} key={item.label}>
+          <div className="stat-card-head">
+            <span className="stat-card-icon">
+              <item.icon />
+            </span>
+            <p>{item.label}</p>
+          </div>
           <h2>{item.value}</h2>
-          <span>{item.trend}</span>
+          <span className="stat-card-trend">{item.trend}</span>
         </article>
       ))}
     </section>
@@ -88,10 +94,16 @@ function AttendanceReports({ currentUser }) {
     const totalOvertime = records.reduce((sum, r) => sum + getOvertimeHours(r.workingHours), 0)
 
     return [
-      { label: 'Present', value: present, trend: `${range.dates.length} day period` },
-      { label: 'Absent', value: absent, trend: 'Marked absent' },
-      { label: 'Short Hours Days', value: shortHoursCount, trend: 'Below 8h required' },
-      { label: 'Total Overtime', value: formatHours(totalOvertime), trend: 'Beyond 8h required' },
+      { label: 'Present', value: present, trend: `${range.dates.length} day period`, icon: IconUserCheck, tone: 'green' },
+      { label: 'Absent', value: absent, trend: 'Marked absent', icon: IconUserOff, tone: absent > 0 ? 'red' : 'slate' },
+      {
+        label: 'Short Hours Days',
+        value: shortHoursCount,
+        trend: 'Below 8h required',
+        icon: IconAlertTriangle,
+        tone: shortHoursCount > 0 ? 'amber' : 'slate',
+      },
+      { label: 'Total Overtime', value: formatHours(totalOvertime), trend: 'Beyond 8h required', icon: IconClock, tone: 'purple' },
     ]
   }, [records, range.dates.length])
 

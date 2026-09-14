@@ -5880,164 +5880,6 @@ textarea {
   border-color: var(--p);
 }
 
-/* ---- Monthly attendance calendar ---- */
-
-.cal-panel h3 {
-  color: var(--ink);
-  font-size: 16px;
-  font-weight: 740;
-}
-
-.cal-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin: 6px 0 14px;
-}
-
-.cal-nav strong {
-  color: var(--ink);
-  font-size: 13.5px;
-  font-weight: 700;
-}
-
-.cal-nav button {
-  width: 30px;
-  height: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  color: var(--ink-2);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background var(--ease);
-}
-
-.cal-nav button:hover {
-  background: var(--canvas);
-}
-
-.cal-grid {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 5px;
-}
-
-.cal-weekdays span {
-  padding-bottom: 6px;
-  color: var(--ink-4);
-  font-size: 10.5px;
-  font-weight: 650;
-  text-align: center;
-}
-
-.cal-day {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: var(--ink-2);
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 8px;
-
-  font-size: 12.5px;
-  font-weight: 620;
-  cursor: pointer;
-  transition: background var(--ease), color var(--ease);
-}
-
-.cal-day:hover:not(.cal-day--blank):not(.cal-day--selected) {
-  background: var(--canvas);
-}
-
-.cal-day--blank {
-  cursor: default;
-}
-
-.cal-day--present { color: var(--green); background: var(--green-bg); }
-.cal-day--absent  { color: var(--red);   background: var(--red-bg); }
-.cal-day--short   { color: var(--amber); background: var(--amber-bg); }
-
-.cal-day--selected {
-  color: #fff;
-  background: var(--p);
-  border-color: var(--p);
-}
-
-.cal-loading {
-  margin-top: 10px;
-  text-align: center;
-}
-
-.cal-legend {
-  display: flex;
-  align-items: center;
-  gap: 6px 14px;
-  flex-wrap: wrap;
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-}
-
-.cal-legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--ink-3);
-  font-size: 11.5px;
-  font-weight: 600;
-}
-
-.cal-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.cal-dot--present  { background: var(--green); }
-.cal-dot--absent   { background: var(--red); }
-.cal-dot--short    { background: var(--amber); }
-.cal-dot--selected { background: var(--p); }
-
-@media (max-width: 1100px) {
-  .emp-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 720px) {
-  .emp-details-page {
-    padding: 16px 14px 22px;
-  }
-
-  .emp-hero,
-  .emp-hero-facts {
-    width: 100%;
-  }
-
-  .emp-fact {
-    flex: 1 1 150px;
-  }
-
-  .emp-filter {
-    margin-left: 0;
-    width: 100%;
-  }
-}
-
-@media (max-width: 560px) {
-  .emp-stats {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* ==========================================================================
    Notifications — header bell, dropdown, and the full history page
    ========================================================================== */
@@ -6808,33 +6650,6 @@ body {
   color: var(--ink-4);
 }
 
-/* ⌘K hint — backed by a real shortcut in Header/index.jsx */
-.search-kbd {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-}
-
-.search-kbd kbd {
-  min-width: 22px;
-  height: 22px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 5px;
-
-  color: var(--ink-3);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 5px;
-
-  font-family: inherit;
-  font-size: 11.5px;
-  font-weight: 500;
-  line-height: 1;
-}
-
 .search-spinner {
   border-color: var(--line);
   border-top-color: var(--p);
@@ -7360,10 +7175,6 @@ body {
 
   .global-search-wrapper {
     flex: 1 1 auto;
-  }
-
-  .search-kbd {
-    display: none;
   }
 
   /* Avatar only — the name pushed the user chip past the viewport edge. */
@@ -13573,164 +13384,6 @@ textarea {
   border-color: var(--p);
 }
 
-/* ---- Monthly attendance calendar ---- */
-
-.cal-panel h3 {
-  color: var(--ink);
-  font-size: 16px;
-  font-weight: 740;
-}
-
-.cal-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin: 6px 0 14px;
-}
-
-.cal-nav strong {
-  color: var(--ink);
-  font-size: 13.5px;
-  font-weight: 700;
-}
-
-.cal-nav button {
-  width: 30px;
-  height: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  color: var(--ink-2);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background var(--ease);
-}
-
-.cal-nav button:hover {
-  background: var(--canvas);
-}
-
-.cal-grid {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 5px;
-}
-
-.cal-weekdays span {
-  padding-bottom: 6px;
-  color: var(--ink-4);
-  font-size: 10.5px;
-  font-weight: 650;
-  text-align: center;
-}
-
-.cal-day {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: var(--ink-2);
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 8px;
-
-  font-size: 12.5px;
-  font-weight: 620;
-  cursor: pointer;
-  transition: background var(--ease), color var(--ease);
-}
-
-.cal-day:hover:not(.cal-day--blank):not(.cal-day--selected) {
-  background: var(--canvas);
-}
-
-.cal-day--blank {
-  cursor: default;
-}
-
-.cal-day--present { color: var(--green); background: var(--green-bg); }
-.cal-day--absent  { color: var(--red);   background: var(--red-bg); }
-.cal-day--short   { color: var(--amber); background: var(--amber-bg); }
-
-.cal-day--selected {
-  color: #fff;
-  background: var(--p);
-  border-color: var(--p);
-}
-
-.cal-loading {
-  margin-top: 10px;
-  text-align: center;
-}
-
-.cal-legend {
-  display: flex;
-  align-items: center;
-  gap: 6px 14px;
-  flex-wrap: wrap;
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-}
-
-.cal-legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--ink-3);
-  font-size: 11.5px;
-  font-weight: 600;
-}
-
-.cal-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.cal-dot--present  { background: var(--green); }
-.cal-dot--absent   { background: var(--red); }
-.cal-dot--short    { background: var(--amber); }
-.cal-dot--selected { background: var(--p); }
-
-@media (max-width: 1100px) {
-  .emp-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 720px) {
-  .emp-details-page {
-    padding: 16px 14px 22px;
-  }
-
-  .emp-hero,
-  .emp-hero-facts {
-    width: 100%;
-  }
-
-  .emp-fact {
-    flex: 1 1 150px;
-  }
-
-  .emp-filter {
-    margin-left: 0;
-    width: 100%;
-  }
-}
-
-@media (max-width: 560px) {
-  .emp-stats {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* ==========================================================================
    Notifications — header bell, dropdown, and the full history page
    ========================================================================== */
@@ -14501,33 +14154,6 @@ body {
   color: var(--ink-4);
 }
 
-/* ⌘K hint — backed by a real shortcut in Header/index.jsx */
-.search-kbd {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-}
-
-.search-kbd kbd {
-  min-width: 22px;
-  height: 22px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 5px;
-
-  color: var(--ink-3);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 5px;
-
-  font-family: inherit;
-  font-size: 11.5px;
-  font-weight: 500;
-  line-height: 1;
-}
-
 .search-spinner {
   border-color: var(--line);
   border-top-color: var(--p);
@@ -15055,10 +14681,6 @@ body {
     flex: 1 1 auto;
   }
 
-  .search-kbd {
-    display: none;
-  }
-
   /* Avatar only — the name pushed the user chip past the viewport edge. */
   .header-user-name,
   .header-user-chevron {
@@ -15382,5 +15004,1175 @@ body {
 
   .sparkline {
     width: 100%;
+  }
+}
+
+/* ==========================================================================
+   TAILADMIN FLAT — final layer
+   Spec: page #F9FAFB, cards #FFFFFF, border #E5E7EB, accent #465FFF, radius 12px.
+   No card shadows, no pastel fills, no coloured icon circles, no gradients,
+   no uppercase kickers, no coloured focus/hover borders.
+   ========================================================================== */
+
+:root {
+  --p: #465fff;
+  --p-hover: #3641f5;
+  --p-50: #f4f6ff;
+  --p-100: #e8ecff;
+  --p-200: #e5e7eb;
+
+  --canvas: #f9fafb;
+  --surface: #ffffff;
+  --surface-2: #f9fafb;
+
+  --ink: #111827;
+  --ink-2: #374151;
+  --ink-3: #6b7280;
+  --ink-4: #9ca3af;
+
+  --line: #e5e7eb;
+  --line-strong: #d1d5db;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 12px;
+
+  /* Flat by design — kept as tokens so nothing downstream reads `none` wrong. */
+  --shadow-card: none;
+  --shadow-card-hover: none;
+  --shadow-popover: 0 8px 24px rgba(17, 24, 39, .1);
+}
+
+/* ---------- Flat surfaces ---------- */
+
+.stat-card,
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: none;
+}
+
+.panel:hover {
+  border-color: var(--line);
+  box-shadow: none;
+}
+
+/* ---------- Headings: sentence case, no kickers ---------- */
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.panel-heading h2,
+.panel-heading h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  text-transform: none;
+}
+
+.panel-heading .eyebrow,
+.chart-card-head .eyebrow {
+  display: none;
+}
+
+.table-dark thead th {
+  padding: 12px 16px;
+  color: var(--ink-3);
+  background: var(--surface);
+  border-color: var(--line);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.table-dark tbody td {
+  padding: 14px 16px;
+  color: var(--ink-2);
+  border-color: var(--line);
+  font-size: 14px;
+}
+
+.table-dark tbody tr:hover td {
+  background: var(--canvas);
+}
+
+/* ---------- Greeting: plain heading, no gradient, no clock ---------- */
+
+.dashboard-greeting {
+  display: block;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.dashboard-greeting h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -.02em;
+}
+
+.dashboard-greeting p {
+  margin: 4px 0 0;
+  color: var(--ink-3);
+  font-size: 14px;
+}
+
+/* ---------- KPI cards: neutral square icon, no arrow, no tint ---------- */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  min-height: auto;
+  padding: 20px;
+}
+
+.stat-card::before,
+.stat-card::after,
+.stat-card-arrow,
+.stat-card-head {
+  display: none;
+}
+
+.stat-card-icon,
+.stat-card-icon--primary,
+.stat-card-icon--green,
+.stat-card-icon--amber,
+.stat-card-icon--blue {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+
+  color: var(--ink-3);
+  background: var(--canvas);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  box-shadow: none;
+}
+
+.stat-card-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.stat-card p {
+  color: var(--ink-3);
+  font-size: 14px;
+  font-weight: 400;
+  text-transform: none;
+}
+
+.stat-card h2 {
+  margin: 6px 0 0;
+  color: var(--ink);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -.02em;
+}
+
+.stat-card-trend {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink-4);
+  font-size: 13px;
+}
+
+.stat-card--clickable:hover {
+  transform: none;
+  border-color: var(--line-strong);
+  box-shadow: none;
+}
+
+/* ---------- Chart: single accent hue, no green ---------- */
+
+.bar-chart-bar { fill: var(--p); }
+.bar-chart-bar.is-hovered { fill: var(--p-hover); }
+.bar-chart-baseline { stroke: var(--line); }
+
+.bar-chart-label {
+  fill: var(--ink-4);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.bar-chart-tooltip {
+  color: var(--surface);
+  background: var(--ink);
+  border: 0;
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-popover);
+  font-size: 12.5px;
+}
+
+.chart-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* ---------- Segmented control: flat, no gradient ---------- */
+
+.range-toggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--canvas);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+}
+
+.range-toggle button {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.range-toggle button.is-active {
+  color: var(--ink);
+  background: var(--surface);
+  box-shadow: none;
+}
+
+/* ---------- Buttons: flat fills only ---------- */
+
+.primary-btn,
+.secondary-btn,
+.action-btn {
+  min-height: 38px;
+  padding: 9px 16px;
+  border-radius: var(--r-sm);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: none;
+}
+
+.primary-btn {
+  color: #fff;
+  background: var(--p);
+  border: 1px solid var(--p);
+}
+
+.primary-btn:hover {
+  background: var(--p-hover);
+  border-color: var(--p-hover);
+  box-shadow: none;
+}
+
+.secondary-btn {
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.secondary-btn:hover {
+  color: var(--ink);
+  background: var(--canvas);
+  border-color: var(--line-strong);
+}
+
+/* ---------- Approval rows ---------- */
+
+.approval-item {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+.approval-item-body strong {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.approval-item-body span {
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+/* ---------- Sidebar: no blue pill, no gradient mark ---------- */
+
+.sidebar-card {
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  box-shadow: none;
+}
+
+.sidebar-brand-mark {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #fff;
+  background: var(--p);
+  border-radius: var(--r-sm);
+  box-shadow: none;
+
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+
+.sidebar-brand-text {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+}
+
+.sidebar-section-label {
+  color: var(--ink-4);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .04em;
+}
+
+.sidebar-links a,
+.sidebar-links .sidebar-nav-item {
+  color: var(--ink-3);
+  background: transparent;
+  border-radius: var(--r-sm);
+  font-weight: 400;
+}
+
+.sidebar-links a:hover,
+.sidebar-links .sidebar-nav-item:hover {
+  color: var(--ink);
+  background: var(--canvas);
+}
+
+/* Active = accent text only. No filled pill. */
+.sidebar-links .active-link,
+.sidebar-links .sidebar-nav-item.active-link,
+.sidebar-links .active-link:hover,
+.sidebar-links .sidebar-nav-item.active-link:hover {
+  color: var(--p);
+  background: transparent;
+  box-shadow: none;
+  font-weight: 500;
+}
+
+.sidebar-card.is-collapsed .sidebar-brand-text {
+  display: none;
+}
+
+/* ---------- Header: neutral focus, no coloured borders ---------- */
+
+.dashboard-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.global-search {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+}
+
+.global-search:hover {
+  background: var(--surface);
+  border-color: var(--line-strong);
+}
+
+.global-search:focus-within,
+.global-search.is-open {
+  background: var(--surface);
+  border-color: var(--line-strong);
+  box-shadow: none;
+}
+
+.global-search.is-open .search-icon,
+.global-search:focus-within .search-icon {
+  color: var(--ink-4);
+}
+
+.header-menu-toggle:hover {
+  color: var(--ink);
+  background: var(--canvas);
+  border-color: var(--line-strong);
+}
+
+.header-user-avatar {
+  background: var(--p);
+  box-shadow: none;
+}
+
+.notif-bell-trigger {
+  border-radius: var(--r-sm);
+}
+
+.notif-bell-trigger:hover,
+.notif-bell-trigger.is-open {
+  color: var(--ink);
+  background: var(--canvas);
+  border-color: var(--line-strong);
+}
+
+.notif-badge {
+  background: #ef4444;
+}
+
+/* ---------- Status pills stay meaningful, but flat ---------- */
+
+.pill {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.pill-success { color: #027a48; background: #ecfdf3; }
+.pill-warning { color: #b54708; background: #fffaeb; }
+.pill-danger,
+.pill-reject { color: #b42318; background: #fef3f2; }
+.pill-muted { color: var(--ink-2); background: #f3f4f6; }
+
+@media (max-width: 1200px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .stats-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The employee view keeps its Quick Actions row; its icon chips go neutral
+   too, so no coloured icon fills survive anywhere. */
+.quick-action-icon,
+.quick-action-icon--primary,
+.quick-action-icon--green,
+.quick-action-icon--amber,
+.quick-action-icon--blue,
+.quick-action-icon--indigo,
+.quick-action-icon--violet,
+.quick-action-icon--cyan,
+.quick-action-icon--teal,
+.quick-action-icon--slate {
+  color: var(--ink-3);
+  background: var(--canvas);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  box-shadow: none;
+}
+
+.quick-action-btn {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.quick-action-btn:hover {
+  transform: none;
+  background: var(--canvas);
+  border-color: var(--line-strong);
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   UI polish — value axis, loading skeletons, keyboard focus
+   ========================================================================== */
+
+/* ---------- Line / area chart ---------- */
+
+.line-chart {
+  position: relative;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.line-chart svg {
+  display: block;
+  overflow: visible;
+}
+
+.line-chart-gridline {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.line-chart-axis-label {
+  fill: var(--ink-4);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.line-chart-line {
+  stroke: var(--p);
+}
+
+.line-chart-stop-top { stop-color: var(--p); stop-opacity: .14; }
+.line-chart-stop-bottom { stop-color: var(--p); stop-opacity: 0; }
+
+.line-chart-crosshair {
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.line-chart-dot {
+  fill: var(--surface);
+  stroke: var(--p);
+  stroke-width: 2.5;
+}
+
+.line-chart rect[tabindex]:focus-visible {
+  outline: 2px solid var(--p);
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+
+.chart-tooltip {
+  position: absolute;
+  z-index: 5;
+  transform: translate(-50%, calc(-100% - 12px));
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 8px 11px;
+  white-space: nowrap;
+  pointer-events: none;
+
+  color: var(--surface);
+  background: var(--ink);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-popover);
+  font-size: 12.5px;
+}
+
+.chart-tooltip strong {
+  font-weight: 600;
+}
+
+.chart-tooltip span {
+  color: rgba(255, 255, 255, .65);
+  font-size: 11.5px;
+}
+
+/* ---------- Loading skeletons ---------- */
+
+@keyframes skeleton-sheen {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton {
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #eef0f4 25%, #f6f7f9 37%, #eef0f4 63%);
+  background-size: 200% 100%;
+  animation: skeleton-sheen 1.4s ease-in-out infinite;
+}
+
+.skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-row { height: 64px; border-radius: var(--r-md); }
+.skeleton-text { width: 60%; height: 14px; }
+.skeleton-text--sm { width: 40%; }
+.skeleton-pill { width: 62px; height: 22px; border-radius: 999px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+/* ---------- Keyboard focus ----------
+   Mouse users see nothing; keyboard users get a consistent ring on every
+   interactive element rather than the browser default (or, on the cards,
+   nothing at all). */
+.stat-card--clickable:focus-visible,
+.activity-row:focus-visible,
+.quick-action-btn:focus-visible,
+.range-toggle button:focus-visible,
+.primary-btn:focus-visible,
+.secondary-btn:focus-visible,
+.action-btn:focus-visible,
+.sidebar-links a:focus-visible,
+.sidebar-links .sidebar-nav-item:focus-visible,
+.header-menu-toggle:focus-visible,
+.notif-bell-trigger:focus-visible,
+.header-user-trigger:focus-visible {
+  outline: 2px solid var(--p);
+  outline-offset: 2px;
+}
+
+.global-search:focus-within {
+  outline: 2px solid var(--p);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+/* ---------- Table rows read as clickable ---------- */
+
+.activity-row {
+  cursor: pointer;
+}
+
+.activity-row-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ---------- Empty states ---------- */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 16px;
+  color: var(--ink-3);
+  font-size: 14px;
+  text-align: center;
+}
+
+.empty-state .perf-empty-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-4);
+  background: var(--canvas);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+
+.empty-state p {
+  margin: 0;
+}
+
+/* ==========================================================================
+   Dashboard — patterns borrowed from the Employee Details page
+   Same structures (page head, icon-beside-label stat tiles, dotted status
+   pills, paginated table footer) rendered flat, without that page's tinted
+   tone fills.
+   ========================================================================== */
+
+/* ---- Page head: title block left, action right (cf. .emp-details-head) ---- */
+
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.page-head .dashboard-greeting {
+  min-width: 0;
+}
+
+/* ---- Stat tiles: icon sits beside the label (cf. .emp-stat-head) ---- */
+
+.stat-card-head {
+  display: flex;
+  align-items: center;
+  /* Reset: an earlier layer spaced this apart for the icon + hover arrow. */
+  justify-content: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.stat-card-head p {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.stat-card .stat-card-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+.stat-card .stat-card-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.stat-card h2 {
+  margin: 0;
+  line-height: 1.1;
+}
+
+.stat-card-trend {
+  display: block;
+  margin-top: 6px;
+}
+
+/* ---- Dotted status pills (cf. .pill-dot in the records table) ---- */
+
+.pill-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pill-dot i {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ---- Paginated table footer (cf. .emp-pagination / .emp-pager) ---- */
+
+.emp-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.emp-pagination p {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.emp-pager {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.emp-pager button {
+  min-width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--ease), border-color var(--ease), color var(--ease);
+}
+
+.emp-pager button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.emp-pager button:hover:not(:disabled) {
+  background: var(--canvas);
+  border-color: var(--line-strong);
+}
+
+.emp-pager button.is-active {
+  color: #fff;
+  background: var(--p);
+  border-color: var(--p);
+}
+
+.emp-pager button:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+.emp-pager button:focus-visible {
+  outline: 2px solid var(--p);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Dashboard KPI tiles — colour borrowed from the Employee Details tiles:
+   tinted card, white icon chip, tone-coloured label and caption, neutral
+   number. Adds a purple tone the details page doesn't have, for the fourth
+   card, keyed to the app accent.
+   ========================================================================== */
+
+:root {
+  --purple: #6941c6;
+  --purple-bg: #f4f3ff;
+}
+
+.stat-card--blue,
+.stat-card--green,
+.stat-card--amber,
+.stat-card--red,
+.stat-card--purple {
+  border: 1px solid transparent;
+}
+
+.stat-card--blue   { background: var(--blue-bg);   border-color: #cfe7f7; }
+.stat-card--green  { background: var(--green-bg);  border-color: #c8ecd7; }
+.stat-card--amber  { background: var(--amber-bg);  border-color: #f5e3bd; }
+.stat-card--red    { background: var(--red-bg);    border-color: #f8d5d2; }
+.stat-card--purple { background: var(--purple-bg); border-color: #ddd6fe; }
+
+/* White chip lifts the icon off the tint, as on the details page. */
+.stat-card--blue .stat-card-icon,
+.stat-card--green .stat-card-icon,
+.stat-card--amber .stat-card-icon,
+.stat-card--red .stat-card-icon,
+.stat-card--purple .stat-card-icon {
+  background: var(--surface);
+  border-color: transparent;
+}
+
+.stat-card--blue   .stat-card-icon, .stat-card--blue   .stat-card-head p, .stat-card--blue   .stat-card-trend { color: var(--blue); }
+.stat-card--green  .stat-card-icon, .stat-card--green  .stat-card-head p, .stat-card--green  .stat-card-trend { color: var(--green); }
+.stat-card--amber  .stat-card-icon, .stat-card--amber  .stat-card-head p, .stat-card--amber  .stat-card-trend { color: var(--amber); }
+.stat-card--red    .stat-card-icon, .stat-card--red    .stat-card-head p, .stat-card--red    .stat-card-trend { color: var(--red); }
+.stat-card--purple .stat-card-icon, .stat-card--purple .stat-card-head p, .stat-card--purple .stat-card-trend { color: var(--purple); }
+
+.stat-card-head p {
+  font-weight: 600;
+}
+
+.stat-card-trend {
+  font-weight: 500;
+}
+
+/* The number stays neutral so the tint never fights it for legibility. */
+.stat-card h2 {
+  color: var(--ink);
+}
+
+.stat-card--clickable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(17, 24, 39, .06);
+}
+
+.stat-card--blue.stat-card--clickable:hover   { border-color: #a9d3f0; }
+.stat-card--green.stat-card--clickable:hover  { border-color: #a3dcc0; }
+.stat-card--amber.stat-card--clickable:hover  { border-color: #eccf96; }
+.stat-card--red.stat-card--clickable:hover    { border-color: #f2b4af; }
+.stat-card--purple.stat-card--clickable:hover { border-color: #c4b5fd; }
+
+/* ---- On-tint text contrast ----
+   The tone colours are tuned for white backgrounds; on their own pale tints
+   the label and caption measured 3.3–3.8:1, under the 4.5:1 AA floor for text
+   this size. These darker variants are used only for text sitting on a tint —
+   the icon keeps the brighter hue, since a 20px glyph is not body text.
+   (The Employee Details tiles share the original pairing and have the same
+   shortfall; worth fixing there too.) */
+:root {
+  --blue-ink: #026aa2;
+  --green-ink: #027a48;
+  --amber-ink: #b54708;
+  --red-ink: #b42318;
+  --purple-ink: #5b31b5;
+}
+
+.stat-card--blue   .stat-card-head p, .stat-card--blue   .stat-card-trend { color: var(--blue-ink); }
+.stat-card--green  .stat-card-head p, .stat-card--green  .stat-card-trend { color: var(--green-ink); }
+.stat-card--amber  .stat-card-head p, .stat-card--amber  .stat-card-trend { color: var(--amber-ink); }
+.stat-card--red    .stat-card-head p, .stat-card--red    .stat-card-trend { color: var(--red-ink); }
+.stat-card--purple .stat-card-head p, .stat-card--purple .stat-card-trend { color: var(--purple-ink); }
+
+/* ==========================================================================
+   Attendance — same tinted tile language as Employee Details / the dashboard
+   ========================================================================== */
+
+:root {
+  --slate: #475569;
+  --slate-bg: #f1f5f9;
+  --slate-ink: #334155;
+}
+
+.stat-card--slate { background: var(--slate-bg); border-color: #dbe3ec; }
+.stat-card--slate .stat-card-icon { color: var(--slate); background: var(--surface); border-color: transparent; }
+.stat-card--slate .stat-card-head p,
+.stat-card--slate .stat-card-trend { color: var(--slate-ink); }
+.stat-card--slate.stat-card--clickable:hover { border-color: #cbd5e1; }
+
+/* The attendance tiles carry no caption, so the number shouldn't leave a gap
+   where one would be. */
+.stat-card > h2:last-child {
+  margin-bottom: 2px;
+}
+
+/* Section heading above the status table, matching the details page rhythm. */
+.attendance-week-heading .eyebrow {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--ink-4);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  text-transform: none;
+}
+
+.attendance-week-heading h4 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+
+/* Status pills in the attendance table pick up the dotted treatment used on
+   the Employee Details records table. */
+.table-dark td .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* A two-line label ("Total Employees", "Currently Working") made its card
+   taller and knocked the numbers out of alignment across the row. Bottom-align
+   the value so wrapping never shifts it, and give the tracks room for a
+   single-line label at this type size. */
+.stat-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-card h2 {
+  margin-top: auto;
+}
+
+/* Six tiles don't divide into the four-column default. auto-fit gave either a
+   wrapped label or a 5 + 1 orphan depending on viewport, so the columns are
+   explicit: 3 x 2 at desktop, halving down from there. */
+.stats-grid--flow {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1100px) {
+  .stats-grid--flow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-grid--flow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ==========================================================================
+   Employee Details tiles — contrast fix
+   These are the tiles the rest of the app's colour language was borrowed from,
+   but they pair the bright tone straight onto its own tint: measured 3.3–3.8:1
+   for the label and caption, under the 4.5:1 AA floor at this size. Point the
+   text at the darker --*-ink variants; the icon keeps the bright hue.
+   ========================================================================== */
+
+.emp-stat--blue  .emp-stat-head p, .emp-stat--blue  > span { color: var(--blue-ink); }
+.emp-stat--green .emp-stat-head p, .emp-stat--green > span { color: var(--green-ink); }
+.emp-stat--red   .emp-stat-head p, .emp-stat--red   > span { color: var(--red-ink); }
+.emp-stat--amber .emp-stat-head p, .emp-stat--amber > span { color: var(--amber-ink); }
+
+/* Performance rows sit four-up like the others. */
+.perf-stats-row {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 1100px) {
+  .perf-stats-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .perf-stats-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ==========================================================================
+   Headcount combo chart — bars (hires) + line (running total)
+   ========================================================================== */
+
+.combo-chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.combo-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 2px;
+  border: none;
+  background: none;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.combo-legend-item.is-off {
+  color: var(--ink-4);
+}
+
+.combo-legend-item.is-off .combo-legend-swatch {
+  opacity: .3;
+}
+
+.combo-legend-item:focus-visible {
+  outline: 2px solid var(--p);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.combo-legend-swatch {
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* Bars read as a block, the line as a rule — the swatch mirrors the mark so
+   the legend is readable without relying on hue alone. */
+.combo-legend-swatch--bar {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  background: #b6c2ff;
+}
+
+.combo-legend-swatch--line {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--p);
+}
+
+.combo-chart-hint {
+  margin-left: auto;
+  color: var(--ink-4);
+  font-size: 12px;
+}
+
+.combo-chart-plot {
+  position: relative;
+}
+
+.combo-chart-plot svg {
+  display: block;
+  overflow: visible;
+}
+
+.combo-gridline {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.combo-axis-label {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Each axis is tinted to its own series, so there is no guessing which scale
+   belongs to which mark. */
+.combo-axis-label--bar { fill: #8798f0; }
+.combo-axis-label--line { fill: var(--p); }
+
+.combo-tick-label {
+  fill: var(--ink-4);
+  font-size: 11px;
+}
+
+.combo-bar {
+  fill: #ccd5ff;
+  transition: fill 140ms ease;
+}
+
+.combo-bar.is-hovered {
+  fill: #a9b8ff;
+}
+
+.combo-line { stroke: var(--p); }
+.combo-dot { fill: var(--surface); stroke: var(--p); stroke-width: 2.5; transition: r 120ms ease; }
+
+.combo-area-top { stop-color: var(--p); stop-opacity: .1; }
+.combo-area-bottom { stop-color: var(--p); stop-opacity: 0; }
+
+.combo-crosshair {
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.combo-chart-plot rect[tabindex]:focus-visible {
+  outline: 2px solid var(--p);
+  outline-offset: -2px;
+}
+
+.combo-tooltip {
+  gap: 5px;
+  padding: 10px 12px;
+}
+
+.combo-tooltip-title {
+  color: rgba(255, 255, 255, .65);
+  font-size: 11.5px;
+}
+
+.combo-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(255, 255, 255, .85);
+  font-size: 12.5px;
+}
+
+.combo-tooltip-row strong {
+  margin-left: auto;
+  padding-left: 10px;
+  color: #fff;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .combo-chart-hint {
+    display: none;
   }
 }

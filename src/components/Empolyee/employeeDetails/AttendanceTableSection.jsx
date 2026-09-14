@@ -16,7 +16,6 @@ import {
   monthValueOf,
   statusPillClass,
 } from '../../Attendance/attendanceStore'
-import AttendanceCalendar from './AttendanceCalendar'
 
 const PAGE_SIZE = 5
 
@@ -168,7 +167,7 @@ function AttendanceTableSection({ employeeId }) {
       </section>
 
       <div className="row g-3 emp-overview-row">
-        <div className="col-xl-8">
+        <div className="col-12">
           <div className="panel h-100">
             <div className="panel-heading emp-records-head">
               <h3>Attendance Records</h3>
@@ -268,10 +267,6 @@ function AttendanceTableSection({ employeeId }) {
               </div>
             ) : null}
           </div>
-        </div>
-
-        <div className="col-xl-4">
-          <AttendanceCalendar employeeId={employeeId} onSelectDay={(_, record) => record && setViewRecord(record)} />
         </div>
       </div>
 
