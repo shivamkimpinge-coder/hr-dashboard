@@ -1,6 +1,3 @@
-// Small gradient initials avatar shared by every Performance card/list so an
-// employee is always visually anchored, not just named in text — mirrors the
-// header's user avatar treatment.
 const initials = (name = '') => {
   const parts = name.trim().split(/\s+/).filter(Boolean)
   if (parts.length === 0) return '?'

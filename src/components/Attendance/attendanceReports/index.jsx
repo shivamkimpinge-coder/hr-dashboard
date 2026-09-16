@@ -17,7 +17,7 @@ import {
   hoursStatusPillClass,
   statusPillClass,
   summarizeByEmployee,
-} from '../attendanceStore'
+} from '../../../utils/AttendanceUtils/attendanceStore'
 
 const PERIODS = [
   { value: 'daily', label: 'Daily' },

@@ -11,10 +11,6 @@ export const clearToken = () => {
   localStorage.removeItem(AUTH_TOKEN_KEY)
 }
 
-// URLSearchParams stringifies `undefined`/`null` values as the literal text
-// "undefined"/"null" instead of dropping them, which the backend then reads
-// back as a real (bogus) filter value. Callers build param objects like
-// `{ employeeId: filter || undefined }`, so this strips those out first.
 const buildQuery = (params = {}) => {
   const query = new URLSearchParams()
   Object.entries(params).forEach(([key, value]) => {
@@ -151,7 +147,6 @@ export const attendanceApi = {
   mark: (payload) => request('/attendance/mark', { method: 'POST', body: payload }),
 }
 
-
 export const taskApi = {
   list: (params = {}) => {
     const query = buildQuery(params)
@@ -186,7 +181,6 @@ export const performanceReviewApi = {
   acknowledge: (id) => request(`/performance-reviews/${id}/acknowledge`, { method: 'PATCH' }),
   remove: (id) => request(`/performance-reviews/${id}`, { method: 'DELETE' }),
 }
-
 
 export const notificationApi = {
   list: (params = {}) => {

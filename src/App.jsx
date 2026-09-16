@@ -27,7 +27,7 @@ import ResetPass from './components/Auth/resetpass'
 
 import RequireManager from './utils/RequireManager'
 import { isManagerRole } from './utils/roles'
-import { clearToken, getToken, setToken } from './utils/api'
+import { clearToken, getToken, setToken } from './hooks/api'
 
 const CURRENT_USER_KEY = 'hrCurrentUser'
 
@@ -75,13 +75,12 @@ function AppRoutes() {
 
   return (
     <Routes>
-      {/* ---------- Public ---------- */}
+
       <Route path="/" element={<Login onLoginSuccess={handleAuthSuccess} onForgotPassword={() => navigate('/forgot-password')} />} />
       <Route path="/signup" element={<Signup onSignupSuccess={handleSignupSuccess} />} />
       <Route path="/forgot-password" element={<ForgetPass onBack={() => navigate('/')} />} />
       <Route path="/reset-password" element={<ResetPass onBack={() => navigate('/')} />} />
 
-      {/* ---------- Dashboard (layout route: shell renders once, pages swap in) ---------- */}
       <Route
         path="/dashboard"
         element={
@@ -94,7 +93,6 @@ function AppRoutes() {
       >
         <Route index element={<DashboardHome />} />
 
-        {/* Employees */}
         <Route
           path="employees"
           element={
@@ -105,7 +103,6 @@ function AppRoutes() {
         />
         <Route path="employees/:employeeId/*" element={<EmployeeDetails />} />
 
-        {/* Attendance */}
         <Route path="attendance" element={isManager ? <TeamAttendanceOverview /> : <CheckInOut currentUser={currentUser} />} />
         <Route
           path="attendance/mark"
@@ -117,11 +114,9 @@ function AppRoutes() {
         />
         <Route path="attendance/reports" element={<AttendanceReports currentUser={currentUser} />} />
 
-        {/* Leave */}
         <Route path="leave" element={<LeaveList currentUser={currentUser} />} />
         <Route path="leave/apply" element={<ApplyLeave currentUser={currentUser} />} />
 
-        {/* Payroll */}
         <Route path="payroll" element={<SalaryHistory currentUser={currentUser} />} />
         <Route
           path="payroll/structure"
@@ -140,11 +135,9 @@ function AppRoutes() {
           }
         />
 
-        {/* Performance */}
         <Route path="performance" element={<Goals currentUser={currentUser} />} />
         <Route path="performance/reviews" element={<PerformanceReview currentUser={currentUser} />} />
 
-        {/* Everything else */}
         <Route path="tasks" element={<TaskBoard currentUser={currentUser} />} />
         <Route path="notifications" element={<Notifications currentUser={currentUser} />} />
         <Route

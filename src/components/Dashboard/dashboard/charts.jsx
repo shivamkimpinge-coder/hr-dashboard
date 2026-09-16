@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 
-// Round a span to a 1/2/5/10 step so axis labels land on readable numbers.
 function niceStep(span, intervals) {
   const raw = Math.max(span, 1) / Math.max(intervals, 1)
   const magnitude = Math.pow(10, Math.floor(Math.log10(raw)))
@@ -9,8 +8,6 @@ function niceStep(span, intervals) {
   return Math.max(1, factor * magnitude)
 }
 
-// Both axes share one set of gridlines, so each needs the same tick count.
-// Each still rounds to its own step, so both columns read as whole numbers.
 function buildAxis(min, max, tickCount, { zeroBased = false } = {}) {
   const intervals = tickCount - 1
   const lo = zeroBased ? 0 : min
@@ -30,17 +27,6 @@ function buildAxis(min, max, tickCount, { zeroBased = false } = {}) {
 
 const TICKS = 5
 
-// Headcount over time, as a combo chart.
-//
-// A running total alone hides intake — a period with six joiners and six
-// leavers looks identical to a period where nothing happened. The bars carry
-// hires per period and the line carries the running total, so both the flow
-// and the level are visible at once.
-//
-// Dual axes are used because the two series differ by an order of magnitude
-// (single-digit hires against a headcount in the hundreds). To keep that
-// honest, each axis is tinted to match its own series, and the legend says
-// which is which.
 export function HeadcountChart({ data }) {
   const [hoverIndex, setHoverIndex] = useState(null)
   const [hidden, setHidden] = useState({})

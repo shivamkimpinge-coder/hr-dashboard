@@ -1,7 +1,3 @@
-// Shared Chart.js setup so every chart in the app looks like one system —
-// same palette as the CSS design tokens (src/styles/common.css :root),
-// same font, same muted grid/tooltip styling. Register once here; import
-// `registerCharts` before rendering any chart component.
 import {
   ArcElement,
   BarElement,
@@ -19,8 +15,7 @@ let registered = false
 export const registerCharts = () => {
   if (registered) return
   ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Tooltip, Legend, ChartDataLabels)
-  // Off by default everywhere (it would clutter bar/doughnut charts) — a
-  // chart opts in explicitly via its own options.plugins.datalabels.
+
   ChartJS.defaults.set('plugins.datalabels', { display: false })
   registered = true
 }
@@ -51,9 +46,6 @@ export const CHART_PALETTE = [
 
 const FONT_FAMILY = "Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
 
-// Sensible defaults for a small dashboard chart: no legend by default, thin
-// muted gridlines, dark tooltip matching the rest of the UI, no forced
-// aspect ratio so the chart fills whatever container height it's given.
 export const baseChartOptions = (overrides = {}) => ({
   responsive: true,
   maintainAspectRatio: false,

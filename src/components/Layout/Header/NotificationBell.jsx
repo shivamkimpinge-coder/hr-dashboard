@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import useApi from '../../../hooks/useApi'
 import { IconBell } from '../Sidebar/icons'
-import { timeAgo, typeTone } from '../../Notifications/notificationStore'
+import { timeAgo, typeTone } from '../../../utils/Notifictions/notificationStore'
 
 const POLL_MS = 60000
 
@@ -21,7 +21,7 @@ function NotificationBell() {
       setNotifications(data.notifications || [])
       setUnreadCount(data.unreadCount || 0)
     } catch {
-      // A failing bell must never break the page it sits in.
+
     }
   }, [listNotifications])
 

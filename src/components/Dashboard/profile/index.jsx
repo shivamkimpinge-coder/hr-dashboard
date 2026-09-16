@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import CommonForm from '../../../utils/Form/commonform'
 import useApi from '../../../hooks/useApi'
-import { getProfileImageUrl } from '../../../utils/api'
+import { getProfileImageUrl } from '../../../hooks/api'
 import { isValidPhoneNumber } from 'react-phone-number-input'
 
 const EMAIL_PATTERN = /\S+@\S+\.\S+/

@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import useApi from '../../../hooks/useApi'
-import EditEmployee from '../editEmployee'
+import EditEmployee from '../updateEmployee'
 import CreateEmployee from '../createEmployee'
 import { isAdminRole } from '../../../utils/roles'
-import { formatSalary } from '../employeeFormConfig'
+import { formatSalary } from '../../../utils/EmployeeUtils/employeeFormConfig'
 
 const formatDate = (value) => {
   if (!value) return '—'

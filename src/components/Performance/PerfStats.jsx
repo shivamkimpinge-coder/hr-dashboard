@@ -1,9 +1,3 @@
-// Shared stat-card row for Performance pages — same tinted tile language as
-// the Dashboard and Attendance rows, scoped to whatever's currently filtered.
-//
-// "primary" is the legacy name these pages pass for their "Total" tile. It maps
-// to purple rather than blue because every row already spends blue on a
-// different metric, and two identical hues in one row stop meaning anything.
 const PERF_TONE_ALIAS = { primary: 'purple' }
 
 function PerfStats({ items }) {

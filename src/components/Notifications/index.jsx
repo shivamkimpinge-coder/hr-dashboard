@@ -4,8 +4,8 @@ import toast from 'react-hot-toast'
 import Button from '../../utils/Button/button'
 import useApi from '../../hooks/useApi'
 import { isManagerRole } from '../../utils/roles'
-import useEmployeeDirectory from '../Performance/useEmployeeDirectory'
-import { timeAgo, typeTone } from './notificationStore'
+import useEmployeeDirectory from '../../utils/Performance/useEmployeeDirectory'
+import { timeAgo, typeTone } from '../../utils/Notifictions/notificationStore'
 
 const FILTERS = [
   { key: 'all', label: 'All' },
@@ -171,7 +171,7 @@ function Notifications({ currentUser }) {
       try {
         await markNotificationRead(notification._id)
       } catch {
-        // fall through — navigation still makes sense
+
       }
     }
     if (notification.link) navigate(notification.link)

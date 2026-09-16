@@ -47,8 +47,6 @@ function SalaryHistory({ currentUser }) {
     fetchPayrolls()
   }, [fetchPayrolls])
 
-  // GenerateSalary hands the newly created record over via navigation state
-  // so the payslip modal can open right here, on this same route.
   useEffect(() => {
     if (location.state?.payroll) {
       setSelectedPayroll(location.state.payroll)

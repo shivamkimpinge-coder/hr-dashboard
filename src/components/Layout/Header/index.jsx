@@ -38,7 +38,6 @@ function Header({
     setSearch(params.get('search') || '')
   }, [location.search])
 
-  // Close the results dropdown on outside click and on Escape
   useEffect(() => {
     if (!isOpen) return undefined
 
@@ -63,7 +62,6 @@ function Header({
     }
   }, [isOpen])
 
-  // Close the user menu on outside click and on Escape
   useEffect(() => {
     if (!isUserMenuOpen) return undefined
 
@@ -85,7 +83,6 @@ function Header({
     }
   }, [isUserMenuOpen])
 
-  // The ⌘K / Ctrl+K chip in the search field is a real shortcut, not decoration.
   useEffect(() => {
     const handleShortcut = (event) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
@@ -120,12 +117,10 @@ function Header({
     }
   }
 
-  // Calls the backend whenever the user searches for an employee
   useEffect(() => {
     const searchEmployees = async () => {
       const searchText = search.trim()
 
-      // If search box is empty, clear the results
       if (!searchText) {
         setSearchResults([])
         return
@@ -134,13 +129,11 @@ function Header({
       try {
         setSearching(true)
 
-        // Send search text to the backend
         const data = await listEmployees({
           search: searchText,
           limit: 10,
         })
 
-        // Store employees returned by backend
         setSearchResults(data.employees || [])
         setActiveIndex(-1)
       } catch (error) {
@@ -151,10 +144,8 @@ function Header({
       }
     }
 
-    // Wait 300ms after the user stops typing
     const timer = setTimeout(searchEmployees, 300)
 
-    // Cancel the previous timer if the user types again
     return () => clearTimeout(timer)
   }, [search, listEmployees])
 
@@ -197,7 +188,6 @@ function Header({
 
       <div className="header-actions">
 
-        {/* Global search connected to the employee backend */}
         <form
           className="global-search-wrapper"
           ref={wrapperRef}
@@ -252,7 +242,6 @@ function Header({
 
           </div>
 
-          {/* Search results */}
           {isOpen && search && (
             <div className="search-results" id="global-search-listbox" role="listbox">
 

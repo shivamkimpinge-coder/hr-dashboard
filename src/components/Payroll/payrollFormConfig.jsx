@@ -7,12 +7,12 @@ export const currentYear = new Date().getFullYear()
 
 export const emptyStructureForm = {
   basicSalary: '',
-  hra: 0,
-  allowance: 0,
-  bonus: 0,
-  pf: 0,
-  tax: 0,
-  deduction: 0,
+  hra: '',
+  allowance: '',
+  bonus: '',
+  pf: '',
+  tax: '',
+  deduction: '',
 }
 
 export const emptyGenerateForm = {
@@ -20,12 +20,12 @@ export const emptyGenerateForm = {
   month: MONTHS[new Date().getMonth()],
   year: currentYear,
   basicSalary: '',
-  hra: 0,
-  allowance: 0,
-  bonus: 0,
-  pf: 0,
-  tax: 0,
-  deduction: 0,
+  hra: '',
+  allowance: '',
+  bonus: '',
+  pf: '',
+  tax: '',
+  deduction: '',
 }
 
 export const formatCurrency = (value) => {
@@ -48,7 +48,6 @@ export const computeNetSalary = ({ basicSalary, hra, allowance, bonus, pf, tax, 
   toNumber(tax) -
   toNumber(deduction)
 
-// Shared field set for both the Salary Structure form and the Generate Salary override form.
 export const getSalaryComponentFields = ({ idPrefix = '' } = {}) => [
   {
     name: 'basicSalary',
@@ -117,5 +116,4 @@ export const getSalaryComponentFields = ({ idPrefix = '' } = {}) => [
     step: '0.01',
     rules: { valueAsNumber: true, min: { value: 0, message: 'Deduction cannot be negative' } },
   },
-]                                                                                                            
-                                                                                                                                                                                        
+]

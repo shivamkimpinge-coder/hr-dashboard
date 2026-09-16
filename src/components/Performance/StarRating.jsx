@@ -1,5 +1,3 @@
-// Small reusable star display/picker used by Reviews (editable) and Ratings
-// (read-only). Ratings are always on a 1-5 scale across Performance.
 function StarRating({ value = 0, onChange, readOnly = false, size = 18 }) {
   const stars = [1, 2, 3, 4, 5]
   const rounded = Math.round(value)

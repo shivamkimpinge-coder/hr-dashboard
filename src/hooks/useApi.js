@@ -1,11 +1,6 @@
 import { useCallback, useState } from 'react'
-import { api } from '../utils/api'
+import { api } from './api'
 
-/**
- * Central hook for calling the backend API from React components.
- * Tracks loading/error state per invocation and returns the resolved
- * data so callers can `await` it directly.
- */
 export default function useApi() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -66,7 +61,6 @@ export default function useApi() {
   const listAttendance = useCallback((params) => run(() => api.attendance.list(params)), [run])
   const markAttendance = useCallback((payload) => run(() => api.attendance.mark(payload)), [run])
 
-  // Tasks
   const listTasks = useCallback((params) => run(() => api.tasks.list(params)), [run])
   const getMyTasks = useCallback(() => run(() => api.tasks.my()), [run])
   const createTask = useCallback((payload) => run(() => api.tasks.create(payload)), [run])
@@ -74,14 +68,12 @@ export default function useApi() {
   const deleteTask = useCallback((id) => run(() => api.tasks.remove(id)), [run])
   const addTaskComment = useCallback((id, payload) => run(() => api.tasks.addComment(id, payload)), [run])
 
-  // Performance — Goals
   const listGoals = useCallback((params) => run(() => api.goals.list(params)), [run])
   const getMyGoals = useCallback(() => run(() => api.goals.my()), [run])
   const createGoal = useCallback((payload) => run(() => api.goals.create(payload)), [run])
   const updateGoal = useCallback((id, payload) => run(() => api.goals.update(id, payload)), [run])
   const deleteGoal = useCallback((id) => run(() => api.goals.remove(id)), [run])
 
-  // Performance — Reviews
   const listReviews = useCallback((params) => run(() => api.performanceReviews.list(params)), [run])
   const getMyReviews = useCallback(() => run(() => api.performanceReviews.my()), [run])
   const createReview = useCallback((payload) => run(() => api.performanceReviews.create(payload)), [run])
@@ -89,8 +81,6 @@ export default function useApi() {
   const acknowledgeReview = useCallback((id) => run(() => api.performanceReviews.acknowledge(id)), [run])
   const deleteReview = useCallback((id) => run(() => api.performanceReviews.remove(id)), [run])
 
-
-  // Notifications
   const listNotifications = useCallback((params) => run(() => api.notifications.list(params)), [run])
   const markNotificationRead = useCallback((id) => run(() => api.notifications.markRead(id)), [run])
   const markAllNotificationsRead = useCallback(() => run(() => api.notifications.markAllRead()), [run])
@@ -102,14 +92,12 @@ export default function useApi() {
     error,
     setError,
 
-    // Auth
     register,
     login,
     forgotPassword,
     resetPassword,
     getCurrentUser,
 
-    // Employees
     listEmployees,
     getEmployeeDirectory,
     getEmployeeStats,
@@ -118,13 +106,11 @@ export default function useApi() {
     updateEmployee,
     deleteEmployee,
 
-    // Profile
     getProfile,
     updateProfile,
     uploadProfileImage,
     changePassword,
 
-    // Payroll
     listPayroll,
     getMyPayroll,
     getSalaryStructure,
@@ -132,7 +118,6 @@ export default function useApi() {
     generateSalary,
     getPayslip,
 
-    // Leave
     applyLeave,
     listLeaves,
     getMyLeaves,
@@ -141,14 +126,12 @@ export default function useApi() {
     rejectLeave,
     cancelLeave,
 
-    // Attendance
     checkInAttendance,
     checkOutAttendance,
     getMyAttendance,
     listAttendance,
     markAttendance,
 
-    // Tasks
     listTasks,
     getMyTasks,
     createTask,
@@ -156,14 +139,12 @@ export default function useApi() {
     deleteTask,
     addTaskComment,
 
-    // Performance — Goals
     listGoals,
     getMyGoals,
     createGoal,
     updateGoal,
     deleteGoal,
 
-    // Performance — Reviews
     listReviews,
     getMyReviews,
     createReview,
@@ -171,8 +152,6 @@ export default function useApi() {
     acknowledgeReview,
     deleteReview,
 
-
-    // Notifications
     listNotifications,
     markNotificationRead,
     markAllNotificationsRead,

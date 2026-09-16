@@ -30,9 +30,6 @@ function IconEyeOff(props) {
   )
 }
 
-// Password input with a show/hide toggle button. Only used when a field
-// config sets `showToggle: true`, so existing password fields elsewhere
-// keep their current plain-input behavior unless opted in.
 function PasswordField({ id, registerProps, invalidProps, rest }) {
   const [visible, setVisible] = useState(false)
 
@@ -52,14 +49,6 @@ function PasswordField({ id, registerProps, invalidProps, rest }) {
   )
 }
 
-// Renders a list of field configs as a React Hook Form-registered form.
-// Each field: { name, label, type, options (for select), rules, wrapperClassName, static, value, ...inputProps }
-// Pass `register` and `errors` from useForm(); `rules` are React Hook Form validation rules.
-// A field with `static: true` renders a plain read-only input (not registered) for display-only values.
-// A field with `type: 'phone'` renders a react-phone-number-input field (country selector + national
-// number as one control, value stored as a single E.164 string) — pass `control` from useForm() for this
-// to work, since it's a controlled component wired up via React Hook Form's `Controller`.
-// A field with `type: 'password'` and `showToggle: true` renders a show/hide-password button.
 function CommonForm({
   fields,
   register,

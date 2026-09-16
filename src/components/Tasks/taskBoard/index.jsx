@@ -41,7 +41,7 @@ function TaskBoard({ currentUser }) {
   const [employees, setEmployees] = useState([])
   const [assigneeFilter, setAssigneeFilter] = useState('')
   const [draggingId, setDraggingId] = useState(null)
-  const [formTask, setFormTask] = useState(undefined) // undefined = closed, null = create, task = edit
+  const [formTask, setFormTask] = useState(undefined)
   const [openTaskId, setOpenTaskId] = useState(null)
 
   const refresh = useCallback(async () => {

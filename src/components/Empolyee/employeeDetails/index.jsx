@@ -12,8 +12,8 @@ import {
   IconMail,
   IconUser,
 } from '../../Layout/Sidebar/icons'
-import AttendanceTableSection from './AttendanceTableSection'
-import PerformanceTab from './PerformanceTab'
+import AttendanceTableSection from '../Attendance/AttendanceTableSection'
+import PerformanceTab from '../Performance.jsx/PerformanceTab'
 
 const formatJoinDate = (value) => {
   if (!value) return '—'
@@ -86,7 +86,7 @@ function EmployeeDetails() {
 
   const [employee, setEmployee] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [status, setStatus] = useState(null) // null | 'notFound' | 'forbidden' | 'error'
+  const [status, setStatus] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
 
   const refresh = useCallback(async () => {

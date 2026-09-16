@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Doughnut, Line } from 'react-chartjs-2'
 import useApi from '../../../hooks/useApi'
 import { CHART_COLORS, baseChartOptions, registerCharts } from '../../../utils/chartTheme'
-import { GOAL_STATUSES } from '../../Performance/performanceStore'
+import { GOAL_STATUSES } from '../../../utils/Performance/performanceStore'
 
 registerCharts()
 
@@ -104,8 +104,7 @@ function PerformanceTab({ employeeId }) {
   }
 
   const goalDoughnutOptions = baseChartOptions({
-    // Doughnut charts don't use cartesian axes — without this, the base
-    // x/y scale config still gets instantiated and draws a stray grid.
+
     scales: { x: { display: false }, y: { display: false } },
     plugins: {
       legend: {

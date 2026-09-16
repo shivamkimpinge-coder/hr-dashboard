@@ -24,7 +24,7 @@ import {
   monthValueOf,
   previousMonthValue,
   statusPillClass,
-} from '../attendanceStore'
+} from '../../../utils/AttendanceUtils/attendanceStore'
 
 const QUOTES = [
   'Discipline is the bridge between goals and accomplishment.',
@@ -54,8 +54,6 @@ const HISTORY_FILTERS = [
   { value: ATTENDANCE_STATUS.ON_LEAVE, label: 'On Leave' },
 ]
 
-// Greeting card: live clock, date, and a rotating daily quote — the
-// left-most panel of the "today" hero row.
 function GreetingCard() {
   const [now, setNow] = useState(() => new Date())
 
@@ -80,10 +78,6 @@ function GreetingCard() {
   )
 }
 
-// Ticks the current open session's elapsed hours forward every 30s, purely
-// for display — the backend recomputes the authoritative total once that
-// session is actually checked out. There is no fixed shift end time, so
-// this simply reflects elapsed time since the session's check-in.
 const useLiveElapsedHours = (openSessionCheckIn) => {
   const [elapsedHours, setElapsedHours] = useState(0)
 
@@ -106,8 +100,6 @@ const useLiveElapsedHours = (openSessionCheckIn) => {
   return elapsedHours
 }
 
-// Small ring showing hours worked so far against the 8h goal — reads at a
-// glance instead of making someone parse a "Xh Ym / 8h" line of text.
 function HoursGauge({ percent, label, sub }) {
   const clamped = Math.max(0, Math.min(100, Number.isFinite(percent) ? percent : 0))
   const size = 104
@@ -168,8 +160,6 @@ function DateNav({ selectedDate, todayKey, onChange, onShift, onToday }) {
   )
 }
 
-// Exported so the Employee Details > Attendance tab can reuse the exact
-// same per-session check-in/out breakdown instead of re-deriving it.
 export function SessionRows({ sessions }) {
   if (sessions.length === 0) {
     return (
@@ -255,8 +245,6 @@ function CheckInOut() {
   const todayKey = getDateKey()
   const isViewingToday = selectedDate === todayKey
 
-  // Covers the current month plus the previous one, in a single fetch, so
-  // the stat cards below can compare this month/week against the last.
   const [fetchRange] = useState(() => {
     const now = new Date()
     const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
@@ -334,9 +322,6 @@ function CheckInOut() {
     setSelectedDate(next)
   }
 
-  // Hours worked for the selected day — every closed session's duration
-  // (final, from the backend) plus a live estimate if today's session is
-  // still open. Required/short/overtime are always graded against this.
   const workingHours = (selectedRecord?.workingHours || 0) + elapsedHours
   const remainingHours = getRemainingHours(workingHours)
   const overtimeHours = getOvertimeHours(workingHours)
@@ -347,9 +332,6 @@ function CheckInOut() {
   const statusClass = hoursStatus ? hoursStatusPillClass(hoursStatus) : 'pill-muted'
   const heroTitle = isViewingToday ? "Today's Check-ins" : `${formatDateDisplay(selectedDate)} Check-ins`
 
-  // ---- Stat cards: this week's hours, this month's present days, average
-  // daily hours, and overtime — each compared against the prior period
-  // where that comparison makes sense, all derived from the one fetch.
   const stats = useMemo(() => {
     const byDate = new Map(history.map((item) => [item.date, item]))
     const hoursOn = (dateKey) => byDate.get(dateKey)?.workingHours || 0

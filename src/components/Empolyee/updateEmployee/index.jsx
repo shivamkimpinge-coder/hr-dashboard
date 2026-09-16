@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import CommonForm from '../../../utils/Form/commonform'
 import useApi from '../../../hooks/useApi'
-import { emptyForm, getEmployeeFields, toDateInput } from '../employeeFormConfig'
+import { emptyForm, getEmployeeFields, toDateInput } from '../../../utils/EmployeeUtils/employeeFormConfig'
 import { isAdminRole } from '../../../utils/roles'
 
 function EditEmployee({ employee, onClose, onUpdated, currentUser }) {
@@ -91,6 +91,7 @@ function EditEmployee({ employee, onClose, onUpdated, currentUser }) {
       </div>
     </div>
   )
+
 }
 
 export default EditEmployee

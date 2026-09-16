@@ -21,11 +21,8 @@ import {
   hoursStatusPillClass,
   MAX_SESSIONS_PER_DAY,
   statusPillClass,
-} from '../attendanceStore'
+} from '../../../utils/AttendanceUtils/attendanceStore'
 
-// Admin/HR land here instead of a personal check-in screen — this shows
-// what's actually useful to a manager: who's in, who isn't, and today's
-// status across the whole team, for any date they pick.
 function TeamAttendanceOverview() {
   const { listEmployees, listAttendance } = useApi()
 
@@ -137,8 +134,6 @@ function TeamAttendanceOverview() {
 
       {error ? <div className="feedback-banner feedback-banner-error">{error}</div> : null}
 
-      {/* Tone per meaning, matching the Employee Details tiles: a count is
-          blue, a healthy state green, a bad state red. */}
       <section className="stats-grid stats-grid--flow">
         {[
           { label: 'Total Employees', value: stats.total, icon: IconUsers, tone: 'blue' },

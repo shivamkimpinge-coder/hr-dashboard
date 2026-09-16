@@ -11,7 +11,7 @@ import {
   getAttendanceTabs,
   getDateKey,
   statusPillClass,
-} from '../attendanceStore'
+} from '../../../utils/AttendanceUtils/attendanceStore'
 
 const emptyForm = {
   employeeId: '',

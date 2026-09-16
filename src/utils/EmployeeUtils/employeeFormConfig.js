@@ -111,12 +111,7 @@ export const getEmployeeFields = ({ idPrefix = '', includePassword = false, canM
         { value: 'Intern', label: 'Intern' },
       ],
     },
-    {
-      name: 'reportingManager',
-      label: 'Reporting Manager',
-      id: `${idPrefix}reportingManager`,
-      placeholder: 'e.g. Priya Sharma',
-    },
+
     {
       name: 'salary',
       label: 'Salary',
@@ -157,9 +152,6 @@ export const getEmployeeFields = ({ idPrefix = '', includePassword = false, canM
     }
   )
 
-  // Only a true Admin can assign or change someone's role — HR (and
-  // everyone else) simply doesn't see this field, matching what the
-  // backend enforces (see empolyeeController.js's role-escalation guard).
   if (canManageRole) {
     fields.push({
       name: 'role',

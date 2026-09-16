@@ -6,17 +6,17 @@ import Header from '../../Layout/Header'
 import Sidebar from '../../Layout/Sidebar'
 import EmployeeList from '../../Empolyee/employeeList'
 import { formatDateDisplay, statusPillClass as leaveStatusPillClass } from '../../Leave/leaveFormConfig'
-import { MAX_SESSIONS_PER_DAY, canStartNewSession, formatTimeDisplay, getDateKey } from '../../Attendance/attendanceStore'
+import { MAX_SESSIONS_PER_DAY, canStartNewSession, formatTimeDisplay, getDateKey } from '../../../utils/AttendanceUtils/attendanceStore'
 import { TASK_STATUS, formatDateDisplay as taskFormatDate, priorityPillClass as taskPriorityPillClass } from '../../Tasks/taskStore'
 import PerfAvatar from '../../Performance/PerfAvatar'
 import useApi from '../../../hooks/useApi'
 import { isManagerRole } from '../../../utils/roles'
+import Pager from '../../../utils/Pagination/pager'
+import { usePagination } from '../../../utils/Pagination/usePagination'
 import { HeadcountChart } from './charts'
 import {
   IconAlertTriangle,
   IconCalendar,
-  IconChevronLeft,
-  IconChevronRight,
   IconClock,
   IconKanban,
   IconUserCheck,
@@ -35,9 +35,6 @@ const HEADCOUNT_RANGES = [
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-// The last N periods ending with the current one, for whichever range the
-// toggle is on. Shared by the stacked hiring chart so its columns line up with
-// the range the user picked.
 function buildRangeBuckets(range) {
   const now = new Date()
   const buckets = []
@@ -69,8 +66,6 @@ const joinedDate = (employee) => {
   return Number.isNaN(d.getTime()) ? null : d
 }
 
-// Cumulative headcount at the close of each period in the selected range —
-// everyone who had joined by then, not just that period's hires.
 function buildHeadcountTrend(employees, range) {
   const now = new Date()
   const buckets = buildRangeBuckets(range)
@@ -95,9 +90,7 @@ function buildHeadcountTrend(employees, range) {
 
     return { label: bucket.label, headcount }
   })
-    // Hires in a period is the rise in headcount over it. Deriving it from the
-    // running total keeps the two series consistent by construction — they can
-    // never disagree the way two independent counts could.
+
     .map((bucket, index, all) => ({
       ...bucket,
       hires: index === 0 ? 0 : Math.max(0, bucket.headcount - all[index - 1].headcount),
@@ -133,9 +126,6 @@ function DashboardGreeting({ currentUser, subtitle }) {
   )
 }
 
-// Eases a stat value from its previous displayed number up to the latest
-// fetched value instead of popping straight in, so refreshed numbers read as
-// "live" rather than a jump-cut.
 function useCountUp(value, duration = 700) {
   const target = Number(value) || 0
   const [display, setDisplay] = useState(target)
@@ -258,8 +248,6 @@ function PendingApprovals({ leaves, loading, onApprove, onReject }) {
   )
 }
 
-// Backend already rejects non-manager requests with 403 — this just avoids
-// flashing an Admin/HR-only page/API-error before the redirect happens.
 const EMPLOYEE_STAT_META = [
   { icon: IconKanban, tone: 'blue' },
   { icon: IconAlertTriangle, tone: 'amber' },
@@ -441,7 +429,6 @@ function EmployeeOverview({ currentUser }) {
       setTasks(taskData.tasks || [])
       setLeaves(leaveData.leaves || [])
     } catch {
-      // Individual widgets fall back to their own empty states below.
     } finally {
       setLoading(false)
     }
@@ -606,16 +593,6 @@ function StatCard({ item, icon: Icon, tone, onClick }) {
   )
 }
 
-// Employee Details paginates its records table; the activity table now does the
-// same. It renders a window of page numbers rather than all of them — the
-// dashboard can hold 200 employees, and 40 buttons would not fit.
-function pageWindow(current, total, span = 5) {
-  if (total <= span) return Array.from({ length: total }, (_, i) => i + 1)
-  const half = Math.floor(span / 2)
-  const start = Math.min(Math.max(1, current - half), total - span + 1)
-  return Array.from({ length: span }, (_, i) => start + i)
-}
-
 function OverviewContent({
   currentUser,
   employees,
@@ -630,13 +607,7 @@ function OverviewContent({
   onRejectLeave,
 }) {
   const navigate = useNavigate()
-  const [activityPage, setActivityPage] = useState(1)
-
-  const totalPages = Math.max(1, Math.ceil(employees.length / ACTIVITY_PAGE_SIZE))
-  const currentPage = Math.min(activityPage, totalPages)
-  const pageEmployees = employees.slice((currentPage - 1) * ACTIVITY_PAGE_SIZE, currentPage * ACTIVITY_PAGE_SIZE)
-  const firstShown = employees.length === 0 ? 0 : (currentPage - 1) * ACTIVITY_PAGE_SIZE + 1
-  const lastShown = Math.min(currentPage * ACTIVITY_PAGE_SIZE, employees.length)
+  const activity = usePagination(employees, ACTIVITY_PAGE_SIZE)
 
   return (
     <>
@@ -691,17 +662,6 @@ function OverviewContent({
 
       <section className="row g-3">
         <div className="col-lg-12">
-          <PendingApprovals
-            leaves={pendingLeaves}
-            loading={pendingLoading}
-            onApprove={onApproveLeave}
-            onReject={onRejectLeave}
-          />
-        </div>
-      </section>
-
-      <section className="row g-3">
-        <div className="col-lg-12">
           <div className="panel">
             <div className="panel-heading">
               <h3>Recent Activity</h3>
@@ -735,7 +695,7 @@ function OverviewContent({
                       <td colSpan={3}>No employees yet.</td>
                     </tr>
                   ) : (
-                    pageEmployees.map((employee) => (
+                    activity.pageItems.map((employee) => (
                       <tr
                         key={employee._id}
                         className="activity-row"
@@ -763,41 +723,15 @@ function OverviewContent({
               </table>
             </div>
 
-            {!loading && employees.length > 0 ? (
-              <div className="emp-pagination">
-                <p>
-                  Showing {firstShown} to {lastShown} of {employees.length} employees
-                </p>
-                <div className="emp-pager">
-                  <button
-                    type="button"
-                    onClick={() => setActivityPage((p) => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    aria-label="Previous page"
-                  >
-                    <IconChevronLeft />
-                  </button>
-                  {pageWindow(currentPage, totalPages).map((n) => (
-                    <button
-                      key={n}
-                      type="button"
-                      className={n === currentPage ? 'is-active' : ''}
-                      aria-current={n === currentPage ? 'page' : undefined}
-                      onClick={() => setActivityPage(n)}
-                    >
-                      {n}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => setActivityPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    aria-label="Next page"
-                  >
-                    <IconChevronRight />
-                  </button>
-                </div>
-              </div>
+            {!loading ? (
+              <Pager
+                page={activity.page}
+                pageSize={activity.pageSize}
+                totalItems={activity.totalItems}
+                totalPages={activity.totalPages}
+                onChange={activity.setPage}
+                label="employees"
+              />
             ) : null}
           </div>
         </div>
@@ -806,11 +740,6 @@ function OverviewContent({
   )
 }
 
-// ---------------------------------------------------------------------------
-// Layout route: renders the app shell once and owns the employee/stats/leave
-// data that both the overview and the employee list read, handing it to the
-// matched child route through the router's outlet context.
-// ---------------------------------------------------------------------------
 function DashboardLayout({ onLogout, currentUser, onProfileUpdate }) {
   const isManager = isManagerRole(currentUser)
   const [searchParams] = useSearchParams()
@@ -825,8 +754,6 @@ function DashboardLayout({ onLogout, currentUser, onProfileUpdate }) {
   const [pendingLoading, setPendingLoading] = useState(true)
   const [onLeaveToday, setOnLeaveToday] = useState(0)
 
-  // One toggle, two behaviours: narrow the rail to icons on desktop, slide the
-  // full panel in over the content on small screens.
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [sidebarMobileOpen, setSidebarMobileOpen] = useState(false)
 
@@ -884,8 +811,6 @@ function DashboardLayout({ onLogout, currentUser, onProfileUpdate }) {
     }
   }, [listLeaves, onLogout])
 
-  // "On Leave" means approved leave that covers today — a separate question
-  // from the pending queue, so it needs its own fetch.
   const fetchOnLeaveToday = useCallback(async () => {
     try {
       const data = await listLeaves({ status: 'Approved' })
@@ -990,7 +915,6 @@ function DashboardLayout({ onLogout, currentUser, onProfileUpdate }) {
   )
 }
 
-// Index route — managers get the team overview, everyone else their own.
 export function DashboardHome() {
   const ctx = useOutletContext()
 
@@ -1013,8 +937,6 @@ export function DashboardHome() {
   )
 }
 
-// The employee list reads the same fetched roster the overview does, so it
-// takes it from the layout instead of fetching a second copy.
 export function EmployeeListPage() {
   const ctx = useOutletContext()
 

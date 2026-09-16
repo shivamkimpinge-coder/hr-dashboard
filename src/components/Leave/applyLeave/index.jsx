@@ -35,8 +35,6 @@ function ApplyLeave({ currentUser }) {
     }
   }
 
-  // Admin oversees leave requests but doesn't file them — bounce them back to
-  // the list even if they reach this URL directly.
   if (isAdminRole(currentUser)) {
     return <Navigate to="/dashboard/leave" replace />
   }

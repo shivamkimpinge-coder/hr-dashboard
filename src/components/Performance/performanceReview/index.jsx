@@ -4,13 +4,13 @@ import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import { IconClock, IconUserCheck, IconUsers } from '../../Layout/Sidebar/icons'
-import { PERFORMANCE_TABS } from '../performanceTabs'
+import { PERFORMANCE_TABS } from '../../../utils/Performance/performanceTabs'
 import useApi from '../../../hooks/useApi'
-import useEmployeeDirectory from '../useEmployeeDirectory'
+import useEmployeeDirectory from '../../../utils/Performance/useEmployeeDirectory'
 import PerfAvatar from '../PerfAvatar'
 import PerfStats from '../PerfStats'
 import StarRating from '../StarRating'
-import { REVIEW_STATUS, REVIEW_STATUSES, formatDateDisplay, reviewStatusPillClass } from '../performanceStore'
+import { REVIEW_STATUS, REVIEW_STATUSES, formatDateDisplay, reviewStatusPillClass } from '../../../utils/Performance/performanceStore'
 
 function ReviewForm({ review, employees, currentUser, onClose, onSaved }) {
   const { createReview, updateReview } = useApi()
@@ -295,7 +295,7 @@ function PerformanceReview({ currentUser }) {
   const [error, setError] = useState('')
   const [employeeFilter, setEmployeeFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [formReview, setFormReview] = useState(undefined) // undefined = closed, null = create, review = edit
+  const [formReview, setFormReview] = useState(undefined)
   const [selectedReview, setSelectedReview] = useState(null)
 
   const refresh = useCallback(async () => {

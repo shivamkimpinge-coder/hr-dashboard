@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import CommonForm from '../../../utils/Form/commonform'
 import useApi from '../../../hooks/useApi'
-import { emptyForm, getEmployeeFields } from '../employeeFormConfig'
+import { emptyForm, getEmployeeFields } from '../../../utils/EmployeeUtils/employeeFormConfig'
 import { isAdminRole } from '../../../utils/roles'
 
 function CreateEmployee({ open, onClose, onCreated, currentUser }) {
@@ -37,7 +37,7 @@ function CreateEmployee({ open, onClose, onCreated, currentUser }) {
       toast.error(error.message)
     }
   }
-
+console.log('open', open)
   return (
     <div className="modal-backdrop" role="dialog" aria-modal="true">
       <div className="modal-card">

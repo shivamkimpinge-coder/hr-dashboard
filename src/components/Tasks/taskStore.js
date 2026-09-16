@@ -1,9 +1,3 @@
-// Shared constants + pure display helpers for the Tasks module. All CRUD
-// goes through the real API (see useApi.js — listTasks, createTask,
-// updateTask, deleteTask, addTaskComment) — this file only holds the
-// status/priority enums and formatting/derived logic reused across the
-// task board and task detail views.
-
 export const TASK_STATUS = {
   TODO: 'To Do',
   IN_PROGRESS: 'In Progress',
@@ -46,7 +40,7 @@ export const priorityPillClass = (priority) => {
     case TASK_PRIORITY.MEDIUM:
       return 'pill-warning'
     default:
-      return 'pill-muted' // Low
+      return 'pill-muted'
   }
 }
 
@@ -57,6 +51,6 @@ export const statusPillClass = (status) => {
     case TASK_STATUS.IN_PROGRESS:
       return 'pill-warning'
     default:
-      return 'pill-muted' // To Do
+      return 'pill-muted'
   }
 }

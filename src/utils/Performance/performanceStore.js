@@ -1,10 +1,3 @@
-// Shared constants + pure display helpers for the Performance module. All
-// CRUD now goes through the real API (see useApi.js — listGoals, createGoal,
-// etc.) — this file only holds category/status enums and formatting/derived
-// logic that's reused across the Goals/Reviews pages.
-
-// ---------- Goals ----------
-
 export const GOAL_CATEGORY = {
   PROFESSIONAL: 'Professional',
   TECHNICAL: 'Technical',
@@ -34,11 +27,9 @@ export const goalStatusPillClass = (status) => {
     case GOAL_STATUS.IN_PROGRESS:
       return 'pill-warning'
     default:
-      return 'pill-muted' // Not Started
+      return 'pill-muted'
   }
 }
-
-// ---------- Performance Reviews ----------
 
 export const REVIEW_STATUS = {
   DRAFT: 'Draft',
@@ -55,11 +46,9 @@ export const reviewStatusPillClass = (status) => {
     case REVIEW_STATUS.SUBMITTED:
       return 'pill-warning'
     default:
-      return 'pill-muted' // Draft
+      return 'pill-muted'
   }
 }
-
-// ---------- Shared helpers ----------
 
 export const formatDateDisplay = (value) => {
   if (!value) return '—'

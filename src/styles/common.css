@@ -1,4 +1,3 @@
-
 :root {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.5;
@@ -37,12 +36,6 @@ button {
 h1, h2, h3, h4, p {
   margin: 0;
 }
-
-/* ==========================================================================
-   Auth pages: shared structure (login, signup, forgot password, reset password)
-   Theme colors (dark/light) are scoped under .auth-page--dark / .auth-page--light
-   so they never collide with each other or with dashboard styles.
-   ========================================================================== */
 
 .auth-page {
   min-height: 100vh;
@@ -173,11 +166,8 @@ h1, h2, h3, h4, p {
   gap: 12px;
 }
 
-/* --- Dark theme: login, signup --- */
-
 .auth-page--dark {
-  /* background: linear-gradient(135deg, #07111f 0%, #14243d 100%); */
-    /* background: #ffffff; */
+
     background: #f8f9fb;
 }
 
@@ -230,12 +220,6 @@ h1, h2, h3, h4, p {
 .auth-page--dark .auth-footer a {
   color: #5b3df5;
 }
-
-/* --- Light theme: forgot password, reset password --- */
-
-/* .auth-page--light {
-  background: linear-gradient(135deg, #0f172a, #1d4ed8, #3b82f6);
-} */
 
 .auth-page--light .auth-card {
   max-width: 420px;
@@ -298,11 +282,6 @@ h1, h2, h3, h4, p {
   font-weight: 600;
 }
 
-/* ==========================================================================
- /* ==========================================================================
-   Dashboard
-   ========================================================================== */
-
 .dashboard-page {
   width: 100%;
   min-height: 100vh;
@@ -322,11 +301,6 @@ h1, h2, h3, h4, p {
   align-items: start;
 }
 
-
-/* ==========================================================================
-   Dashboard Main
-   ========================================================================== */
-
 .dashboard-main {
   display: flex;
 
@@ -336,11 +310,6 @@ h1, h2, h3, h4, p {
 
   min-width: 0;
 }
-
-
-/* ==========================================================================
-   Dashboard Header
-   ========================================================================== */
 
 .dashboard-header {
   display: flex;
@@ -368,11 +337,6 @@ h1, h2, h3, h4, p {
   color: #111827;
 }
 
-
-/* ==========================================================================
-   Header Actions
-   ========================================================================== */
-
 .header-actions {
   display: flex;
 
@@ -388,11 +352,6 @@ h1, h2, h3, h4, p {
 
   margin-right: 4px;
 }
-
-
-/* ==========================================================================
-   Buttons
-   ========================================================================== */
 
 .primary-btn,
 .secondary-btn,
@@ -418,9 +377,6 @@ h1, h2, h3, h4, p {
   cursor: pointer;
 }
 
-
-/* Main purple button */
-
 .primary-btn {
   background: #5b3df5;
 
@@ -433,9 +389,6 @@ h1, h2, h3, h4, p {
   background: #4c2ee5;
 }
 
-
-/* Secondary button */
-
 .secondary-btn {
   background: #f1efff;
 
@@ -447,9 +400,6 @@ h1, h2, h3, h4, p {
 .secondary-btn:hover {
   background: #e8e3ff;
 }
-
-
-/* Close button */
 
 .close-btn {
   color: #475569;
@@ -483,11 +433,6 @@ h1, h2, h3, h4, p {
   color: #111827;
 }
 
-
-/* ==========================================================================
-   Statistics
-   ========================================================================== */
-
 .stats-grid {
   display: grid;
 
@@ -497,9 +442,6 @@ h1, h2, h3, h4, p {
 
   margin-bottom: 4px;
 }
-
-
-/* Stat Card + Panel */
 
 .stat-card,
 .panel {
@@ -514,9 +456,6 @@ h1, h2, h3, h4, p {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-
-/* Stat title */
-
 .stat-card p {
   color: #6d5ce7;
 
@@ -524,9 +463,6 @@ h1, h2, h3, h4, p {
 
   font-weight: 500;
 }
-
-
-/* Number */
 
 .stat-card h2 {
   margin: 8px 0 6px;
@@ -536,19 +472,11 @@ h1, h2, h3, h4, p {
   color: #111827;
 }
 
-
-/* Description */
-
 .stat-card span {
   color: #22a06b;
 
   font-size: 0.9rem;
 }
-
-
-/* ==========================================================================
-   Panel Heading
-   ========================================================================== */
 
 .panel-heading {
   display: flex;
@@ -563,11 +491,6 @@ h1, h2, h3, h4, p {
 .panel-heading h2 {
   color: #111827;
 }
-
-
-/* ==========================================================================
-   Table
-   ========================================================================== */
 
 .table-responsive {
   overflow-x: auto;
@@ -586,9 +509,6 @@ h1, h2, h3, h4, p {
 
   --bs-table-hover-color: #111827;
 }
-
-
-/* Table */
 
 .table-dark thead th {
   background: #f5f3ff;
@@ -610,11 +530,6 @@ h1, h2, h3, h4, p {
   background: #faf9ff;
 }
 
-
-/* ==========================================================================
-   Table Actions
-   ========================================================================== */
-
 .table-actions {
   display: flex;
 
@@ -629,9 +544,6 @@ h1, h2, h3, h4, p {
   font-size: 0.85rem;
 }
 
-
-/* View */
-
 .action-btn-view {
   background: #eef2ff;
 
@@ -641,9 +553,6 @@ h1, h2, h3, h4, p {
 .action-btn-view:hover {
   background: #e0e7ff;
 }
-
-
-/* Edit */
 
 .action-btn-edit {
   background: #ecfdf3;
@@ -655,9 +564,6 @@ h1, h2, h3, h4, p {
   background: #dcfce7;
 }
 
-
-/* Delete */
-
 .action-btn-delete {
   background: #fef2f2;
 
@@ -668,9 +574,6 @@ h1, h2, h3, h4, p {
   background: #fee2e2;
 }
 
-
-/* Warn (e.g. Cancel) */
-
 .action-btn-warn {
   background: #fffbeb;
 
@@ -680,11 +583,6 @@ h1, h2, h3, h4, p {
 .action-btn-warn:hover {
   background: #fef3c7;
 }
-
-
-/* ==========================================================================
-   Status Pills
-   ========================================================================== */
 
 .pill {
   display: inline-flex;
@@ -698,17 +596,11 @@ h1, h2, h3, h4, p {
   font-size: 0.85rem;
 }
 
-
-/* Active / Approved */
-
 .pill-success {
   background: #ecfdf3;
 
   color: #16803c;
 }
-
-
-/* Inactive / Cancelled */
 
 .pill-muted {
   background: #eff6ff;
@@ -716,28 +608,17 @@ h1, h2, h3, h4, p {
   color: #2563eb;
 }
 
-
-/* Pending */
-
 .pill-warning {
   background: #fffbeb;
 
   color: #b45309;
 }
 
-
-/* Rejected */
-
 .pill-danger {
   background: #fef2f2;
 
   color: #dc2626;
 }
-
-
-/* ==========================================================================
-   Forms
-   ========================================================================== */
 
 .form-grid {
   display: grid;
@@ -763,9 +644,6 @@ h1, h2, h3, h4, p {
   font-weight: 500;
 }
 
-
-/* Inputs */
-
 .form-field input,
 .form-field select,
 .form-field textarea {
@@ -786,9 +664,6 @@ h1, h2, h3, h4, p {
     box-shadow 0.2s ease;
 }
 
-
-/* Input focus */
-
 .form-field input:focus,
 .form-field select:focus,
 .form-field textarea:focus {
@@ -796,9 +671,6 @@ h1, h2, h3, h4, p {
 
   box-shadow: 0 0 0 3px rgba(91, 61, 245, 0.1);
 }
-
-
-/* Invalid (react-hook-form) */
 
 .form-field input[aria-invalid='true'],
 .form-field select[aria-invalid='true'],
@@ -827,14 +699,10 @@ h1, h2, h3, h4, p {
   margin-bottom: 18px;
 }
 
-
-/* Placeholder */
-
 .form-field input::placeholder,
 .form-field textarea::placeholder {
   color: #9ca3af;
 }
-
 
 .form-field textarea {
   min-height: 100px;
@@ -846,11 +714,6 @@ h1, h2, h3, h4, p {
   grid-column: 1 / -1;
 }
 
-
-/* ==========================================================================
-   Action Row
-   ========================================================================== */
-
 .action-row {
   display: flex;
 
@@ -859,16 +722,9 @@ h1, h2, h3, h4, p {
   margin-top: 10px;
 }
 
-/* Form submit rows (Save/Update/Generate/Apply ...) are centered under the
-   form fields, distinct from header/table action rows which stay left. */
 .employee-form .action-row {
   justify-content: center;
 }
-
-
-/* ==========================================================================
-   Feedback
-   ========================================================================== */
 
 .feedback-banner {
   background: #ecfdf3;
@@ -884,7 +740,6 @@ h1, h2, h3, h4, p {
   margin-bottom: 12px;
 }
 
-
 .feedback-banner-error {
   background: #fef2f2;
 
@@ -892,11 +747,6 @@ h1, h2, h3, h4, p {
 
   color: #991b1b;
 }
-
-
-/* ==========================================================================
-   Overview Cards
-   ========================================================================== */
 
 .overview-card {
   background: #ffffff;
@@ -920,11 +770,6 @@ h1, h2, h3, h4, p {
   margin-top: 6px;
 }
 
-
-/* ==========================================================================
-   Detail Panel
-   ========================================================================== */
-
 .detail-panel {
   display: flex;
 
@@ -932,11 +777,6 @@ h1, h2, h3, h4, p {
 
   gap: 16px;
 }
-
-
-/* ==========================================================================
-   Modal
-   ========================================================================== */
 
 .modal-backdrop {
   position: fixed;
@@ -956,7 +796,6 @@ h1, h2, h3, h4, p {
   z-index: 1000;
 }
 
-
 .modal-card {
   width: min(720px, 100%);
 
@@ -973,7 +812,6 @@ h1, h2, h3, h4, p {
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15);
 }
 
-
 .confirm-card {
   width: min(480px, 100%);
 
@@ -984,11 +822,6 @@ h1, h2, h3, h4, p {
   gap: 12px;
 }
 
-
-/* ==========================================================================
-   Detail Grid
-   ========================================================================== */
-
 .detail-grid {
   display: grid;
 
@@ -996,7 +829,6 @@ h1, h2, h3, h4, p {
 
   gap: 12px;
 }
-
 
 .detail-card {
   background: #ffffff;
@@ -1020,11 +852,6 @@ h1, h2, h3, h4, p {
   color: #111827;
 }
 
-
-/* ==========================================================================
-   RESPONSIVE
-   ========================================================================== */
-
 @media (max-width: 1100px) {
 
   .stats-grid {
@@ -1032,7 +859,6 @@ h1, h2, h3, h4, p {
   }
 
 }
-
 
 @media (max-width: 960px) {
 
@@ -1052,7 +878,6 @@ h1, h2, h3, h4, p {
   }
 
 }
-
 
 @media (max-width: 640px) {
 
@@ -1080,11 +905,6 @@ h1, h2, h3, h4, p {
 
 }
 
-
-/* =========================================
-   SIDEBAR
-========================================= */
-
 .sidebar-card {
   background: #ffffff;
 
@@ -1108,11 +928,6 @@ h1, h2, h3, h4, p {
 
   color: #111827;
 }
-
-
-/* =========================================
-   SIDEBAR BRAND
-========================================= */
 
 .sidebar-card .eyebrow {
   margin: 0 14px 8px;
@@ -1140,11 +955,6 @@ h1, h2, h3, h4, p {
   line-height: 1.2;
 }
 
-
-/* =========================================
-   SIDEBAR LINKS
-========================================= */
-
 .sidebar-links {
   display: flex;
 
@@ -1154,9 +964,6 @@ h1, h2, h3, h4, p {
 
   margin-top: 28px;
 }
-
-
-/* Normal links */
 
 .sidebar-links a {
   width: 100%;
@@ -1182,17 +989,11 @@ h1, h2, h3, h4, p {
     color 0.2s ease;
 }
 
-
-/* Hover */
-
 .sidebar-links a:hover {
   background: #f3f0ff;
 
   color: #5b3df5;
 }
-
-
-/* Active link */
 
 .sidebar-links .active-link {
   background: #5b3df5;
@@ -1202,19 +1003,11 @@ h1, h2, h3, h4, p {
   box-shadow: 0 4px 10px rgba(91, 61, 245, 0.2);
 }
 
-
-/* Active hover */
-
 .sidebar-links .active-link:hover {
   background: #4c2ee5;
 
   color: #ffffff;
 }
-
-
-/* =========================================
-   LOGOUT BUTTON
-========================================= */
 
 .sidebar-links .sidebar-logout {
   width: 100%;
@@ -1242,19 +1035,11 @@ h1, h2, h3, h4, p {
     color 0.2s ease;
 }
 
-
-/* Logout hover */
-
 .sidebar-links .sidebar-logout:hover {
   background: #fef2f2;
 
   color: #dc2626;
 }
-
-
-/* =========================================
-   RESPONSIVE
-========================================= */
 
 @media (max-width: 1100px) {
 
@@ -1263,7 +1048,6 @@ h1, h2, h3, h4, p {
   }
 
 }
-
 
 @media (max-width: 960px) {
 
@@ -1283,7 +1067,6 @@ h1, h2, h3, h4, p {
   }
 
 }
-
 
 @media (max-width: 640px) {
 
@@ -1550,10 +1333,6 @@ h1, h2, h3, h4, p {
   }
 }
 
-/* ==========================================================================
-   Payroll
-   ========================================================================== */
-
 .form-hint {
   color: #6b7280;
   font-size: 0.9rem;
@@ -1648,11 +1427,6 @@ h1, h2, h3, h4, p {
   }
 }
 
-
-/* ==========================================================================
-   Attendance
-   ========================================================================== */
-
 .attendance-today {
   display: flex;
   flex-direction: column;
@@ -1668,7 +1442,7 @@ h1, h2, h3, h4, p {
 }
 
 .attendance-clock-time {
-  /* font-size: 2rem; */
+
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -1709,11 +1483,6 @@ h1, h2, h3, h4, p {
   color: #5b3df5;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);
 }
-
-
-/* ==========================================================================
-   Tasks
-   ========================================================================== */
 
 .kanban-board {
   display: grid;
@@ -1840,10 +1609,6 @@ h1, h2, h3, h4, p {
   padding: 10px 12px;
   resize: vertical;
 }
-/* ==========================================================================
-   FINAL UI OVERRIDES
-   Reference style: compact, professional admin/reporting dashboard
-   ========================================================================== */
 
 :root {
   --primary: #5b3df5;
@@ -1865,7 +1630,6 @@ h1, h2, h3, h4, p {
   --warning-bg: #fff8e9;
 }
 
-/* Page shell */
 .dashboard-page {
   min-height: 100vh;
   padding: 0;
@@ -1876,7 +1640,6 @@ h1, h2, h3, h4, p {
   background: #f7f7f5;
 }
 
-/* Left navigation */
 .sidebar-card {
   width: 190px;
   min-height: 100vh;
@@ -1945,7 +1708,6 @@ h1, h2, h3, h4, p {
   color: #d13e3e;
 }
 
-/* Main area */
 .dashboard-main {
   min-width: 0;
   min-height: 100vh;
@@ -1953,7 +1715,6 @@ h1, h2, h3, h4, p {
   background: #f7f7f5;
 }
 
-/* Top application bar */
 .dashboard-header,
 .dashboard-header h1 {
   font-size: 18px;
@@ -1975,7 +1736,6 @@ h1, h2, h3, h4, p {
   color: #5f6368;
 }
 
-/* Search */
 .global-search {
   width: 250px;
   height: 34px;
@@ -2000,7 +1760,6 @@ h1, h2, h3, h4, p {
   font-size: 12px;
 }
 
-/* Buttons */
 .primary-btn,
 .secondary-btn,
 .action-btn {
@@ -2021,7 +1780,6 @@ h1, h2, h3, h4, p {
   color: #5b3df5;
 }
 
-/* Dashboard content spacing */
 .dashboard-main > .stats-grid,
 .dashboard-main > .panel,
 .dashboard-main > .attendance-today,
@@ -2036,7 +1794,6 @@ h1, h2, h3, h4, p {
   gap: 10px;
 }
 
-/* Statistics cards */
 .stat-card,
 .panel {
   border: 1px solid #e7e5e1;
@@ -2072,7 +1829,6 @@ h1, h2, h3, h4, p {
   font-size: 11px;
 }
 
-/* Panels / reports */
 .panel-heading {
   margin-bottom: 10px;
 }
@@ -2109,7 +1865,6 @@ h1, h2, h3, h4, p {
   background: #faf9ff;
 }
 
-/* Report/filter pills */
 .report-tabs {
   gap: 3px;
   padding: 3px;
@@ -2138,7 +1893,6 @@ h1, h2, h3, h4, p {
   box-shadow: none;
 }
 
-/* Status pills */
 .pill {
   min-height: 22px;
   padding: 3px 8px;
@@ -2166,7 +1920,6 @@ h1, h2, h3, h4, p {
   color: #cc4a4a;
 }
 
-/* Overview / HR focus */
 .overview-card,
 .detail-card {
   border: 1px solid #eceae6;
@@ -2189,7 +1942,6 @@ h1, h2, h3, h4, p {
   font-size: 11px;
 }
 
-/* Forms */
 .form-grid {
   gap: 14px;
 }
@@ -2217,7 +1969,6 @@ h1, h2, h3, h4, p {
   min-height: 90px;
 }
 
-/* Tasks */
 .kanban-board {
   gap: 10px;
   margin-top: 14px;
@@ -2261,7 +2012,6 @@ h1, h2, h3, h4, p {
   font-size: 10px;
 }
 
-/* Modal */
 .modal-backdrop {
   background: rgba(20, 20, 20, 0.38);
 }
@@ -2272,7 +2022,6 @@ h1, h2, h3, h4, p {
   box-shadow: 0 18px 45px rgba(20, 20, 20, 0.16);
 }
 
-/* Attendance */
 .attendance-today {
   gap: 12px;
   margin-bottom: 18px;
@@ -2294,20 +2043,17 @@ h1, h2, h3, h4, p {
   font-size: 11px;
 }
 
-/* Search result dropdown */
 .search-results {
   border-radius: 9px;
   box-shadow: 0 14px 35px rgba(20, 20, 20, 0.12);
 }
 
-/* Desktop report-like content width */
 @media (min-width: 1200px) {
   .dashboard-main > .panel {
     max-width: none;
   }
 }
 
-/* Tablet */
 @media (max-width: 960px) {
   .dashboard-page {
     grid-template-columns: 1fr;
@@ -2339,7 +2085,6 @@ h1, h2, h3, h4, p {
   }
 }
 
-/* Mobile */
 @media (max-width: 640px) {
   .dashboard-header {
     min-height: auto;
@@ -2371,11 +2116,6 @@ h1, h2, h3, h4, p {
     margin-right: 10px;
   }
 }
-/* ==========================================================================
-   PREMIUM HRMS POLISH — V2
-   Designed from the supplied admin/report reference.
-   Keeps existing React class names intact.
-   ========================================================================== */
 
 :root {
   --hr-primary: #6046e8;
@@ -2398,8 +2138,6 @@ h1, h2, h3, h4, p {
   --hr-blue-bg: #edf4ff;
 }
 
-/* ---------- Application shell ---------- */
-
 .dashboard-page {
   min-height: 100vh;
   display: grid;
@@ -2418,8 +2156,6 @@ h1, h2, h3, h4, p {
   gap: 0;
   background: var(--hr-bg);
 }
-
-/* ---------- Sidebar ---------- */
 
 .sidebar-card {
   width: 218px;
@@ -2502,8 +2238,6 @@ h1, h2, h3, h4, p {
   background: var(--hr-red-bg);
 }
 
-/* ---------- Top header ---------- */
-
 .dashboard-header,
 .dashboard-header h1 {
   color: var(--hr-text);
@@ -2525,8 +2259,6 @@ h1, h2, h3, h4, p {
   color: #5e6570;
   font-size: 12px;
 }
-
-/* ---------- Search ---------- */
 
 .global-search {
   width: 260px;
@@ -2551,8 +2283,6 @@ h1, h2, h3, h4, p {
 .global-search input {
   font-size: 12px;
 }
-
-/* ---------- Header buttons ---------- */
 
 .primary-btn,
 .secondary-btn,
@@ -2585,8 +2315,6 @@ h1, h2, h3, h4, p {
   background: #eae5ff;
 }
 
-/* ---------- Main content spacing ---------- */
-
 .dashboard-main > .stats-grid,
 .dashboard-main > .panel,
 .dashboard-main > .attendance-today,
@@ -2601,8 +2329,6 @@ h1, h2, h3, h4, p {
   margin-top: 18px;
   margin-bottom: 14px;
 }
-
-/* ---------- Stat cards ---------- */
 
 .stat-card,
 .panel {
@@ -2659,8 +2385,6 @@ h1, h2, h3, h4, p {
   font-weight: 600;
 }
 
-/* ---------- Content panels ---------- */
-
 .panel {
   padding: 15px;
 }
@@ -2680,8 +2404,6 @@ h1, h2, h3, h4, p {
 .panel-heading .action-row {
   gap: 7px;
 }
-
-/* ---------- Tables ---------- */
 
 .table-responsive {
   overflow-x: auto;
@@ -2722,8 +2444,6 @@ h1, h2, h3, h4, p {
   background: #fbfaff;
 }
 
-/* ---------- Status ---------- */
-
 .pill {
   min-height: 22px;
   padding: 3px 8px;
@@ -2751,8 +2471,6 @@ h1, h2, h3, h4, p {
   color: #bd4545;
   background: var(--hr-red-bg);
 }
-
-/* ---------- Action buttons ---------- */
 
 .table-actions {
   gap: 5px;
@@ -2783,8 +2501,6 @@ h1, h2, h3, h4, p {
   color: #9b6915;
   background: #fff7e7;
 }
-
-/* ---------- Forms ---------- */
 
 .form-grid {
   gap: 13px;
@@ -2819,8 +2535,6 @@ h1, h2, h3, h4, p {
   box-shadow: 0 0 0 3px rgba(96,70,232,.08);
 }
 
-/* ---------- Search dropdown ---------- */
-
 .search-results {
   width: min(390px, 90vw);
   padding: 5px;
@@ -2846,8 +2560,6 @@ h1, h2, h3, h4, p {
   background: linear-gradient(135deg,#725cf0,#5b3df5);
   font-size: 10px;
 }
-
-/* ---------- Overview / focus cards ---------- */
 
 .overview-card {
   padding: 13px;
@@ -2875,8 +2587,6 @@ h1, h2, h3, h4, p {
   line-height: 1.45;
 }
 
-/* ---------- Attendance ---------- */
-
 .attendance-today {
   gap: 12px;
   margin-bottom: 18px;
@@ -2899,8 +2609,6 @@ h1, h2, h3, h4, p {
   color: #777c84;
   font-size: 11px;
 }
-
-/* ---------- Tasks / Kanban ---------- */
 
 .kanban-board {
   gap: 11px;
@@ -2945,8 +2653,6 @@ h1, h2, h3, h4, p {
   color: #747983;
 }
 
-/* ---------- Modal ---------- */
-
 .modal-backdrop {
   background: rgba(17,18,21,.42);
   backdrop-filter: blur(2px);
@@ -2958,8 +2664,6 @@ h1, h2, h3, h4, p {
   padding: 18px;
   box-shadow: 0 24px 65px rgba(20,21,25,.17);
 }
-
-/* ---------- Responsive ---------- */
 
 @media (max-width: 1100px) {
   .dashboard-page {
@@ -3043,16 +2747,6 @@ h1, h2, h3, h4, p {
     margin-right: 10px;
   }
 }
-/* ==========================================================================
-   HRMS — PREMIUM PRODUCT DESIGN V3
-   Design direction:
-   - Refined B2B SaaS / HR administration product
-   - Quiet neutral canvas
-   - Strong typography hierarchy
-   - Purple used only as an interaction/accent color
-   - Dense but breathable data layouts
-   - Minimal decoration, maximum clarity
-   ========================================================================== */
 
 :root {
   --p: #5f43e8;
@@ -3097,8 +2791,6 @@ h1, h2, h3, h4, p {
   --ease: 160ms cubic-bezier(.2,.7,.2,1);
 }
 
-/* ---------- Base ---------- */
-
 body {
   background: var(--canvas);
   color: var(--ink);
@@ -3118,8 +2810,6 @@ textarea {
   font-family: inherit;
 }
 
-/* ---------- Shell ---------- */
-
 .dashboard-page {
   display: grid;
   grid-template-columns: 224px minmax(0, 1fr);
@@ -3134,8 +2824,6 @@ textarea {
   min-height: 100vh;
   background: var(--canvas);
 }
-
-/* ---------- Sidebar ---------- */
 
 .sidebar-card {
   width: 224px;
@@ -3224,8 +2912,6 @@ textarea {
   background: var(--red-bg);
 }
 
-/* ---------- Header ---------- */
-
 .dashboard-header,
 .dashboard-header h1 {
   color: var(--ink);
@@ -3250,8 +2936,6 @@ textarea {
   font-size: 12px;
   font-weight: 520;
 }
-
-/* ---------- Search ---------- */
 
 .global-search {
   width: 270px;
@@ -3291,8 +2975,6 @@ textarea {
 .global-search input::placeholder {
   color: #a0a5ad;
 }
-
-/* ---------- Buttons ---------- */
 
 .primary-btn,
 .secondary-btn,
@@ -3343,8 +3025,6 @@ textarea {
   border-color: #d3cbff;
 }
 
-/* ---------- Content spacing ---------- */
-
 .dashboard-main > .stats-grid,
 .dashboard-main > .panel,
 .dashboard-main > .attendance-today,
@@ -3358,8 +3038,6 @@ textarea {
   margin-bottom: 14px;
   gap: 12px;
 }
-
-/* ---------- Cards ---------- */
 
 .stat-card,
 .panel {
@@ -3415,8 +3093,6 @@ textarea {
   font-weight: 600;
 }
 
-/* ---------- Panel headings ---------- */
-
 .panel {
   padding: 16px;
 }
@@ -3436,8 +3112,6 @@ textarea {
 .panel-heading .action-row {
   margin-top: 0;
 }
-
-/* ---------- Tables: product-grade ---------- */
 
 .table-responsive {
   width: 100%;
@@ -3486,8 +3160,6 @@ textarea {
   border-bottom: 0;
 }
 
-/* ---------- Status ---------- */
-
 .pill {
   min-height: 22px;
   padding: 3px 8px;
@@ -3518,8 +3190,6 @@ textarea {
   color: #bd4747;
   background: var(--red-bg);
 }
-
-/* ---------- Forms ---------- */
 
 .form-grid {
   gap: 15px;
@@ -3571,10 +3241,6 @@ textarea {
   min-height: 100px;
 }
 
-/* react-phone-number-input: render the country selector and the number as
-   two separate boxed controls side by side — same look as the plain
-   `.form-field select` (Role/Status/etc.) and `.form-field input` fields
-   elsewhere in this form, rather than one merged pill. */
 .form-field .PhoneInput {
   align-items: center;
   gap: 8px;
@@ -3645,8 +3311,6 @@ textarea {
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
-/* ---------- Focus / overview ---------- */
-
 .overview-card {
   padding: 14px;
   background: #fff;
@@ -3673,8 +3337,6 @@ textarea {
   font-size: 11px;
   line-height: 1.5;
 }
-
-/* ---------- Profile — avatar sidebar + compact form ---------- */
 
 .profile-layout {
   display: grid;
@@ -3802,8 +3464,6 @@ textarea {
   }
 }
 
-/* ---------- Tasks ---------- */
-
 .kanban-board {
   gap: 12px;
   margin-top: 14px;
@@ -3853,8 +3513,6 @@ textarea {
   font-size: 10px;
 }
 
-/* ---------- Attendance ---------- */
-
 .attendance-clock-time {
   color: var(--ink);
   font-size: 23px;
@@ -3866,8 +3524,6 @@ textarea {
   color: var(--ink-3);
   font-size: 11px;
 }
-
-/* ---- Page nav: section tabs + date navigator ---- */
 
 .attendance-page-nav {
   display: flex;
@@ -3963,8 +3619,6 @@ textarea {
     margin-right: 14px;
   }
 }
-
-/* ---- Hero row: greeting / today's check-ins / goal gauge ---- */
 
 .attendance-hero {
   display: grid;
@@ -4234,8 +3888,6 @@ textarea {
   transform: rotate(-2deg);
 }
 
-/* ---- Stat cards ---- */
-
 .attendance-stats-grid {
   margin-top: 4px;
 }
@@ -4270,8 +3922,6 @@ textarea {
   font-weight: 550;
 }
 
-/* ---- History table heading + filters ---- */
-
 .attendance-week-heading {
   align-items: flex-start;
   flex-wrap: wrap;
@@ -4299,8 +3949,6 @@ textarea {
   }
 }
 
-/* ---------- Search results ---------- */
-
 .search-results {
   width: min(390px, 90vw);
   padding: 5px;
@@ -4321,8 +3969,6 @@ textarea {
   background: var(--p-50);
 }
 
-/* ---------- Modal ---------- */
-
 .modal-backdrop {
   background: rgba(17,18,21,.40);
   backdrop-filter: blur(3px);
@@ -4335,16 +3981,12 @@ textarea {
   box-shadow: 0 24px 70px rgba(17,18,21,.17);
 }
 
-/* ---------- Empty/loading states ---------- */
-
 .empty-state {
   padding: 34px 18px;
   text-align: center;
   color: var(--ink-4);
   font-size: 12px;
 }
-
-/* ---------- Responsive ---------- */
 
 @media (max-width: 1100px) {
   .dashboard-page {
@@ -4447,10 +4089,6 @@ textarea {
   }
 }
 
-/* ==========================================================================
-   Sidebar — grouped / collapsible navigation
-   ========================================================================== */
-
 .sidebar-brand {
   display: flex;
   align-items: center;
@@ -4540,10 +4178,6 @@ textarea {
     align-items: flex-start;
   }
 }
-
-/* ==========================================================================
-   Header — user menu dropdown
-   ========================================================================== */
 
 .header-user-menu {
   position: relative;
@@ -4658,10 +4292,6 @@ textarea {
   margin: 4px 2px;
   background: var(--line);
 }
-
-/* ==========================================================================
-   Dashboard — stat icons, gauge, bar chart, ranked bars
-   ========================================================================== */
 
 .stat-card-head {
   display: flex;
@@ -4904,10 +4534,6 @@ textarea {
   background: var(--p-hover);
 }
 
-/* ==========================================================================
-   Dashboard — greeting bar, clickable stats, quick actions, approvals
-   ========================================================================== */
-
 .dashboard-greeting {
   display: flex;
   align-items: center;
@@ -5146,10 +4772,6 @@ textarea {
   }
 }
 
-/* ==========================================================================
-   Section tabs — in-page navigation for a sidebar section's sub-pages
-   ========================================================================== */
-
 .section-tabs {
   display: flex;
   align-items: center;
@@ -5196,10 +4818,6 @@ textarea {
   }
 }
 
-/* ==========================================================================
-   Performance Management — progress bars, star ratings
-   ========================================================================== */
-
 .progress-track {
   display: inline-block;
   width: 120px;
@@ -5240,8 +4858,6 @@ textarea {
   color: var(--amber);
 }
 
-/* ---------- Avatars ---------- */
-
 .perf-avatar {
   width: 34px;
   height: 34px;
@@ -5271,11 +4887,7 @@ textarea {
   font-size: 19px;
 }
 
-/* ---------- Stat card icon, red tone ---------- */
-
 .stat-card-icon--red { color: var(--red); background: var(--red-bg); }
-
-/* ---------- Card grid (Goals / Reviews / Promotions) ---------- */
 
 .perf-card-grid {
   display: grid;
@@ -5377,8 +4989,6 @@ textarea {
   justify-content: space-between;
 }
 
-/* ---------- Progress tone modifiers ---------- */
-
 .progress-track--wide {
   display: block;
   width: 100%;
@@ -5386,8 +4996,6 @@ textarea {
 
 .progress-fill--success { background: var(--green); }
 .progress-fill--danger { background: var(--red); }
-
-/* ---------- Promotions: title transition ---------- */
 
 .promo-transition {
   display: flex;
@@ -5424,10 +5032,6 @@ textarea {
   border: 1px solid var(--line);
   border-radius: 50%;
 }
-
-/* ==========================================================================
-   Employee Details — header card + shared date-range filter
-   ========================================================================== */
 
 .employee-header-card {
   display: flex;
@@ -5523,18 +5127,11 @@ textarea {
   }
 }
 
-/* ---- Chart.js containers (Employee Details sections) ---- */
-
 .chart-container {
   position: relative;
   height: 260px;
   margin-top: 10px;
 }
-
-
-/* ==========================================================================
-   Employee Details — breadcrumb, hero card, stat tiles, records + calendar
-   ========================================================================== */
 
 .emp-details-page {
   display: flex;
@@ -5582,8 +5179,6 @@ textarea {
   color: var(--ink-3);
   font-size: 13px;
 }
-
-/* ---- Hero card ---- */
 
 .emp-hero {
   display: flex;
@@ -5702,8 +5297,6 @@ textarea {
   white-space: nowrap;
 }
 
-/* ---- Tinted stat tiles ---- */
-
 .emp-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -5768,8 +5361,6 @@ textarea {
 .emp-stat--green .emp-stat-head p, .emp-stat--green > span, .emp-stat--green .emp-stat-icon { color: var(--green); }
 .emp-stat--red   .emp-stat-head p, .emp-stat--red   > span, .emp-stat--red   .emp-stat-icon { color: var(--red); }
 .emp-stat--amber .emp-stat-head p, .emp-stat--amber > span, .emp-stat--amber .emp-stat-icon { color: var(--amber); }
-
-/* ---- Records panel: inline filter + pagination ---- */
 
 .emp-overview-row {
   align-items: stretch;
@@ -5843,46 +5434,6 @@ textarea {
   align-items: center;
   gap: 6px;
 }
-
-.emp-pager button {
-  min-width: 32px;
-  height: 32px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 8px;
-
-  color: var(--ink-2);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-
-  font-size: 12.5px;
-  font-weight: 650;
-  cursor: pointer;
-  transition: background var(--ease), border-color var(--ease);
-}
-
-.emp-pager button:hover:not(:disabled) {
-  background: var(--canvas);
-  border-color: var(--line-strong);
-}
-
-.emp-pager button:disabled {
-  color: var(--ink-4);
-  cursor: not-allowed;
-  opacity: .55;
-}
-
-.emp-pager button.is-active {
-  color: #fff;
-  background: var(--p);
-  border-color: var(--p);
-}
-
-/* ==========================================================================
-   Notifications — header bell, dropdown, and the full history page
-   ========================================================================== */
 
 .notif-bell {
   position: relative;
@@ -6073,8 +5624,6 @@ textarea {
   background: var(--canvas);
 }
 
-/* ---- Full notifications page ---- */
-
 .notif-filters {
   margin: 14px 0 16px;
   flex-wrap: wrap;
@@ -6164,27 +5713,14 @@ textarea {
   }
 }
 
-/* ==========================================================================
-   HRMS — ADMIN CONSOLE V4
-   Reference: the supplied TailAdmin-style SaaS dashboard.
-   Direction:
-   - Indigo brand accent on a cool neutral canvas (was warm grey + violet)
-   - Larger 16px card radius, hairline borders, one very soft shadow
-   - 14px base type with a clearer size ramp
-   - Roomier 290px navigation rail that collapses to icons
-   - Full-bleed sticky application bar
-   Only tokens and existing class names are touched — no markup was renamed.
-   ========================================================================== */
-
 :root {
-  /* Brand */
+
   --p: #465fff;
   --p-hover: #3641f5;
   --p-50: #ecf3ff;
   --p-100: #dde9ff;
   --p-200: #c2d6ff;
 
-  /* Neutrals */
   --canvas: #f9fafb;
   --surface: #ffffff;
   --surface-2: #f9fafb;
@@ -6197,7 +5733,6 @@ textarea {
   --line: #e4e7ec;
   --line-strong: #d0d5dd;
 
-  /* Status */
   --green: #039855;
   --green-bg: #ecfdf3;
   --red: #d92d20;
@@ -6207,7 +5742,6 @@ textarea {
   --blue: #0086c9;
   --blue-bg: #f0f9ff;
 
-  /* Elevation — one resting shadow, one lifted */
   --shadow-card: 0 1px 2px 0 rgba(16, 24, 40, .05);
   --shadow-card-hover: 0 4px 8px -2px rgba(16, 24, 40, .1),
                        0 2px 4px -2px rgba(16, 24, 40, .06);
@@ -6224,8 +5758,6 @@ textarea {
 
   --ease: 200ms cubic-bezier(.4, 0, .2, 1);
 }
-
-/* ---------- Base ---------- */
 
 body {
   background: var(--canvas);
@@ -6249,10 +5781,6 @@ body {
   text-transform: uppercase;
 }
 
-/* ==========================================================================
-   Shell
-   ========================================================================== */
-
 .dashboard-page {
   display: grid;
   grid-template-columns: var(--rail) minmax(0, 1fr);
@@ -6265,9 +5793,6 @@ body {
   grid-template-columns: var(--rail-collapsed) minmax(0, 1fr);
 }
 
-/* Vertical rhythm for every page rendered into the outlet. Bootstrap rows
-   carry their own negative gutter margins, so they are inset by a half-gutter
-   less to keep every card's outer edge on the same 24px line. */
 .dashboard-main {
   display: flex;
   flex-direction: column;
@@ -6299,10 +5824,6 @@ body {
   margin-top: 0;
   margin-bottom: 0;
 }
-
-/* ==========================================================================
-   Sidebar
-   ========================================================================== */
 
 .sidebar-card {
   width: var(--rail);
@@ -6455,7 +5976,6 @@ body {
   background: var(--red-bg);
 }
 
-/* Collapsed rail — icons only, labels folded away */
 .sidebar-card.is-collapsed {
   width: var(--rail-collapsed);
   padding-left: 14px;
@@ -6505,10 +6025,6 @@ body {
   background: rgba(16, 24, 40, .45);
   cursor: pointer;
 }
-
-/* ==========================================================================
-   Application bar
-   ========================================================================== */
 
 .dashboard-header {
   position: sticky;
@@ -6593,8 +6109,6 @@ body {
   font-weight: 500;
 }
 
-/* ---------- Search ---------- */
-
 .global-search-wrapper {
   position: relative;
   flex: 1 1 300px;
@@ -6661,8 +6175,6 @@ body {
   box-shadow: var(--shadow-popover);
 }
 
-/* ---------- Header icon buttons & user chip ---------- */
-
 .notif-bell-trigger {
   width: 44px;
   height: 44px;
@@ -6720,10 +6232,6 @@ body {
   box-shadow: var(--shadow-popover);
 }
 
-/* ==========================================================================
-   Surfaces
-   ========================================================================== */
-
 .stat-card,
 .panel {
   padding: 20px;
@@ -6750,8 +6258,6 @@ body {
   margin-bottom: 3px;
   font-size: 11px;
 }
-
-/* ---------- Stat cards ---------- */
 
 .stats-grid {
   display: grid;
@@ -6807,8 +6313,6 @@ body {
   font-size: 16px;
 }
 
-/* ---------- Greeting ---------- */
-
 .dashboard-greeting {
   padding: 22px 24px;
   border-radius: var(--r-lg);
@@ -6841,10 +6345,6 @@ body {
   font-size: 18px;
   font-weight: 700;
 }
-
-/* ==========================================================================
-   Controls
-   ========================================================================== */
 
 .primary-btn,
 .secondary-btn,
@@ -6880,7 +6380,6 @@ body {
   border-color: var(--line-strong);
 }
 
-/* Segmented control — pill track, raised active segment */
 .range-toggle,
 .report-tabs {
   display: inline-flex;
@@ -6916,8 +6415,6 @@ body {
   box-shadow: var(--shadow-card);
 }
 
-/* ---------- Pills ---------- */
-
 .pill {
   padding: 3px 10px;
   border-radius: 999px;
@@ -6931,10 +6428,6 @@ body {
 .pill-reject { color: var(--red); background: var(--red-bg); }
 .pill-warning { color: var(--amber); background: var(--amber-bg); }
 .pill-muted { color: var(--ink-3); background: var(--canvas); }
-
-/* ==========================================================================
-   Tables
-   ========================================================================== */
 
 .table-responsive {
   border: 1px solid var(--line);
@@ -6962,10 +6455,6 @@ body {
 .table-dark tbody tr:hover td {
   background: var(--canvas);
 }
-
-/* ==========================================================================
-   Data visuals
-   ========================================================================== */
 
 .bar-chart-bar { fill: var(--p); }
 .bar-chart-bar.is-hovered { fill: var(--p-hover); }
@@ -7028,10 +6517,6 @@ body {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   Quick actions & approval rows
-   ========================================================================== */
-
 .quick-actions {
   gap: 12px;
 }
@@ -7087,10 +6572,6 @@ body {
   font-size: 13.5px;
 }
 
-/* ==========================================================================
-   Responsive
-   ========================================================================== */
-
 @media (max-width: 1200px) {
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -7103,7 +6584,6 @@ body {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* Off-canvas drawer instead of a rail */
   .sidebar-card,
   .sidebar-card.is-collapsed {
     position: fixed;
@@ -7177,7 +6657,6 @@ body {
     flex: 1 1 auto;
   }
 
-  /* Avatar only — the name pushed the user chip past the viewport edge. */
   .header-user-name,
   .header-user-chevron {
     display: none;
@@ -7196,19 +6675,10 @@ body {
   }
 }
 
-/* ---------- V4 fixes found while checking the rendered layout ---------- */
-
-/* `.ranked-bar-fill` is a <span>, so it stayed display:inline and the inline
-   width % (and height:100%) never applied — the department bars rendered as
-   empty tracks. */
 .ranked-bar-fill {
   display: block;
 }
 
-/* `repeat(2, 1fr)` floors each track at min-content, which pushed the two
-   columns to 240px + 210px inside a 365px panel and spilled the cards out of
-   the card. One readable column per row keeps every label and description
-   intact in the narrow column this panel lives in. */
 .quick-actions {
   grid-template-columns: minmax(0, 1fr);
 }
@@ -7229,25 +6699,14 @@ body {
   text-overflow: ellipsis;
 }
 
-/* Chart cards are stretched by h-100 to match the tallest card in their row;
-   centre the plot in the spare height instead of pinning it to the top. */
 .chart-card .bar-chart {
   margin-top: auto;
   margin-bottom: auto;
 }
 
-/* The 3px accent bar on the left of every stat card fought the new 16px
-   radius (it clipped into a sliver) and duplicated the tone already carried by
-   the icon tile. The reference cards are plain. */
 .stat-card::before {
   display: none;
 }
-
-/* ==========================================================================
-   Reference layout — sparkline tiles, stacked chart, workforce panel
-   ========================================================================== */
-
-/* ---------- Mini metric tiles (reference: Churn Rate / User Growth) ------- */
 
 .mini-metric {
   display: flex;
@@ -7303,8 +6762,6 @@ body {
 .mini-metric-delta--negative span { color: #f04438; }
 .mini-metric-delta--flat span { color: var(--ink-3); }
 
-/* ---------- Sparkline ---------- */
-
 .sparkline {
   flex-shrink: 0;
   width: 132px;
@@ -7332,8 +6789,6 @@ body {
 .sparkline--flat .sparkline-stop-top { stop-color: var(--ink-4); stop-opacity: .18; }
 .sparkline--flat .sparkline-stop-bottom { stop-color: var(--ink-4); stop-opacity: 0; }
 
-/* ---------- Stacked chart (reference: Conversion Funnel) ---------- */
-
 .stacked-chart {
   margin-top: 8px;
 }
@@ -7349,8 +6804,6 @@ body {
   font-weight: 500;
 }
 
-/* Full-height invisible target so the whole column is hoverable, not just the
-   part the bars happen to reach. */
 .stacked-hit {
   fill: transparent;
   transition: fill var(--ease);
@@ -7397,8 +6850,6 @@ body {
 .chart-legend-dot--2 { background: #7b8bff; }
 .chart-legend-dot--3 { background: #aab5ff; }
 .chart-legend-dot--4 { background: #d7ddff; }
-
-/* ---------- Workforce panel (reference: Product Performance) ---------- */
 
 .workforce-panel {
   display: flex;
@@ -7542,12 +6993,6 @@ h1, h2, h3, h4, p {
   margin: 0;
 }
 
-/* ==========================================================================
-   Auth pages: shared structure (login, signup, forgot password, reset password)
-   Theme colors (dark/light) are scoped under .auth-page--dark / .auth-page--light
-   so they never collide with each other or with dashboard styles.
-   ========================================================================== */
-
 .auth-page {
   min-height: 100vh;
   display: flex;
@@ -7677,11 +7122,8 @@ h1, h2, h3, h4, p {
   gap: 12px;
 }
 
-/* --- Dark theme: login, signup --- */
-
 .auth-page--dark {
-  /* background: linear-gradient(135deg, #07111f 0%, #14243d 100%); */
-    /* background: #ffffff; */
+
     background: #f8f9fb;
 }
 
@@ -7734,12 +7176,6 @@ h1, h2, h3, h4, p {
 .auth-page--dark .auth-footer a {
   color: #5b3df5;
 }
-
-/* --- Light theme: forgot password, reset password --- */
-
-/* .auth-page--light {
-  background: linear-gradient(135deg, #0f172a, #1d4ed8, #3b82f6);
-} */
 
 .auth-page--light .auth-card {
   max-width: 420px;
@@ -7802,11 +7238,6 @@ h1, h2, h3, h4, p {
   font-weight: 600;
 }
 
-/* ==========================================================================
- /* ==========================================================================
-   Dashboard
-   ========================================================================== */
-
 .dashboard-page {
   width: 100%;
   min-height: 100vh;
@@ -7826,11 +7257,6 @@ h1, h2, h3, h4, p {
   align-items: start;
 }
 
-
-/* ==========================================================================
-   Dashboard Main
-   ========================================================================== */
-
 .dashboard-main {
   display: flex;
 
@@ -7840,11 +7266,6 @@ h1, h2, h3, h4, p {
 
   min-width: 0;
 }
-
-
-/* ==========================================================================
-   Dashboard Header
-   ========================================================================== */
 
 .dashboard-header {
   display: flex;
@@ -7872,11 +7293,6 @@ h1, h2, h3, h4, p {
   color: #111827;
 }
 
-
-/* ==========================================================================
-   Header Actions
-   ========================================================================== */
-
 .header-actions {
   display: flex;
 
@@ -7892,11 +7308,6 @@ h1, h2, h3, h4, p {
 
   margin-right: 4px;
 }
-
-
-/* ==========================================================================
-   Buttons
-   ========================================================================== */
 
 .primary-btn,
 .secondary-btn,
@@ -7922,9 +7333,6 @@ h1, h2, h3, h4, p {
   cursor: pointer;
 }
 
-
-/* Main purple button */
-
 .primary-btn {
   background: #5b3df5;
 
@@ -7937,9 +7345,6 @@ h1, h2, h3, h4, p {
   background: #4c2ee5;
 }
 
-
-/* Secondary button */
-
 .secondary-btn {
   background: #f1efff;
 
@@ -7951,9 +7356,6 @@ h1, h2, h3, h4, p {
 .secondary-btn:hover {
   background: #e8e3ff;
 }
-
-
-/* Close button */
 
 .close-btn {
   color: #475569;
@@ -7987,11 +7389,6 @@ h1, h2, h3, h4, p {
   color: #111827;
 }
 
-
-/* ==========================================================================
-   Statistics
-   ========================================================================== */
-
 .stats-grid {
   display: grid;
 
@@ -8001,9 +7398,6 @@ h1, h2, h3, h4, p {
 
   margin-bottom: 4px;
 }
-
-
-/* Stat Card + Panel */
 
 .stat-card,
 .panel {
@@ -8018,9 +7412,6 @@ h1, h2, h3, h4, p {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-
-/* Stat title */
-
 .stat-card p {
   color: #6d5ce7;
 
@@ -8028,9 +7419,6 @@ h1, h2, h3, h4, p {
 
   font-weight: 500;
 }
-
-
-/* Number */
 
 .stat-card h2 {
   margin: 8px 0 6px;
@@ -8040,19 +7428,11 @@ h1, h2, h3, h4, p {
   color: #111827;
 }
 
-
-/* Description */
-
 .stat-card span {
   color: #22a06b;
 
   font-size: 0.9rem;
 }
-
-
-/* ==========================================================================
-   Panel Heading
-   ========================================================================== */
 
 .panel-heading {
   display: flex;
@@ -8067,11 +7447,6 @@ h1, h2, h3, h4, p {
 .panel-heading h2 {
   color: #111827;
 }
-
-
-/* ==========================================================================
-   Table
-   ========================================================================== */
 
 .table-responsive {
   overflow-x: auto;
@@ -8090,9 +7465,6 @@ h1, h2, h3, h4, p {
 
   --bs-table-hover-color: #111827;
 }
-
-
-/* Table */
 
 .table-dark thead th {
   background: #f5f3ff;
@@ -8114,11 +7486,6 @@ h1, h2, h3, h4, p {
   background: #faf9ff;
 }
 
-
-/* ==========================================================================
-   Table Actions
-   ========================================================================== */
-
 .table-actions {
   display: flex;
 
@@ -8133,9 +7500,6 @@ h1, h2, h3, h4, p {
   font-size: 0.85rem;
 }
 
-
-/* View */
-
 .action-btn-view {
   background: #eef2ff;
 
@@ -8145,9 +7509,6 @@ h1, h2, h3, h4, p {
 .action-btn-view:hover {
   background: #e0e7ff;
 }
-
-
-/* Edit */
 
 .action-btn-edit {
   background: #ecfdf3;
@@ -8159,9 +7520,6 @@ h1, h2, h3, h4, p {
   background: #dcfce7;
 }
 
-
-/* Delete */
-
 .action-btn-delete {
   background: #fef2f2;
 
@@ -8172,9 +7530,6 @@ h1, h2, h3, h4, p {
   background: #fee2e2;
 }
 
-
-/* Warn (e.g. Cancel) */
-
 .action-btn-warn {
   background: #fffbeb;
 
@@ -8184,11 +7539,6 @@ h1, h2, h3, h4, p {
 .action-btn-warn:hover {
   background: #fef3c7;
 }
-
-
-/* ==========================================================================
-   Status Pills
-   ========================================================================== */
 
 .pill {
   display: inline-flex;
@@ -8202,17 +7552,11 @@ h1, h2, h3, h4, p {
   font-size: 0.85rem;
 }
 
-
-/* Active / Approved */
-
 .pill-success {
   background: #ecfdf3;
 
   color: #16803c;
 }
-
-
-/* Inactive / Cancelled */
 
 .pill-muted {
   background: #eff6ff;
@@ -8220,28 +7564,17 @@ h1, h2, h3, h4, p {
   color: #2563eb;
 }
 
-
-/* Pending */
-
 .pill-warning {
   background: #fffbeb;
 
   color: #b45309;
 }
 
-
-/* Rejected */
-
 .pill-danger {
   background: #fef2f2;
 
   color: #dc2626;
 }
-
-
-/* ==========================================================================
-   Forms
-   ========================================================================== */
 
 .form-grid {
   display: grid;
@@ -8267,9 +7600,6 @@ h1, h2, h3, h4, p {
   font-weight: 500;
 }
 
-
-/* Inputs */
-
 .form-field input,
 .form-field select,
 .form-field textarea {
@@ -8290,9 +7620,6 @@ h1, h2, h3, h4, p {
     box-shadow 0.2s ease;
 }
 
-
-/* Input focus */
-
 .form-field input:focus,
 .form-field select:focus,
 .form-field textarea:focus {
@@ -8300,9 +7627,6 @@ h1, h2, h3, h4, p {
 
   box-shadow: 0 0 0 3px rgba(91, 61, 245, 0.1);
 }
-
-
-/* Invalid (react-hook-form) */
 
 .form-field input[aria-invalid='true'],
 .form-field select[aria-invalid='true'],
@@ -8331,14 +7655,10 @@ h1, h2, h3, h4, p {
   margin-bottom: 18px;
 }
 
-
-/* Placeholder */
-
 .form-field input::placeholder,
 .form-field textarea::placeholder {
   color: #9ca3af;
 }
-
 
 .form-field textarea {
   min-height: 100px;
@@ -8350,11 +7670,6 @@ h1, h2, h3, h4, p {
   grid-column: 1 / -1;
 }
 
-
-/* ==========================================================================
-   Action Row
-   ========================================================================== */
-
 .action-row {
   display: flex;
 
@@ -8363,16 +7678,9 @@ h1, h2, h3, h4, p {
   margin-top: 10px;
 }
 
-/* Form submit rows (Save/Update/Generate/Apply ...) are centered under the
-   form fields, distinct from header/table action rows which stay left. */
 .employee-form .action-row {
   justify-content: center;
 }
-
-
-/* ==========================================================================
-   Feedback
-   ========================================================================== */
 
 .feedback-banner {
   background: #ecfdf3;
@@ -8388,7 +7696,6 @@ h1, h2, h3, h4, p {
   margin-bottom: 12px;
 }
 
-
 .feedback-banner-error {
   background: #fef2f2;
 
@@ -8396,11 +7703,6 @@ h1, h2, h3, h4, p {
 
   color: #991b1b;
 }
-
-
-/* ==========================================================================
-   Overview Cards
-   ========================================================================== */
 
 .overview-card {
   background: #ffffff;
@@ -8424,11 +7726,6 @@ h1, h2, h3, h4, p {
   margin-top: 6px;
 }
 
-
-/* ==========================================================================
-   Detail Panel
-   ========================================================================== */
-
 .detail-panel {
   display: flex;
 
@@ -8436,11 +7733,6 @@ h1, h2, h3, h4, p {
 
   gap: 16px;
 }
-
-
-/* ==========================================================================
-   Modal
-   ========================================================================== */
 
 .modal-backdrop {
   position: fixed;
@@ -8460,7 +7752,6 @@ h1, h2, h3, h4, p {
   z-index: 1000;
 }
 
-
 .modal-card {
   width: min(720px, 100%);
 
@@ -8477,7 +7768,6 @@ h1, h2, h3, h4, p {
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15);
 }
 
-
 .confirm-card {
   width: min(480px, 100%);
 
@@ -8488,11 +7778,6 @@ h1, h2, h3, h4, p {
   gap: 12px;
 }
 
-
-/* ==========================================================================
-   Detail Grid
-   ========================================================================== */
-
 .detail-grid {
   display: grid;
 
@@ -8500,7 +7785,6 @@ h1, h2, h3, h4, p {
 
   gap: 12px;
 }
-
 
 .detail-card {
   background: #ffffff;
@@ -8524,11 +7808,6 @@ h1, h2, h3, h4, p {
   color: #111827;
 }
 
-
-/* ==========================================================================
-   RESPONSIVE
-   ========================================================================== */
-
 @media (max-width: 1100px) {
 
   .stats-grid {
@@ -8536,7 +7815,6 @@ h1, h2, h3, h4, p {
   }
 
 }
-
 
 @media (max-width: 960px) {
 
@@ -8556,7 +7834,6 @@ h1, h2, h3, h4, p {
   }
 
 }
-
 
 @media (max-width: 640px) {
 
@@ -8584,11 +7861,6 @@ h1, h2, h3, h4, p {
 
 }
 
-
-/* =========================================
-   SIDEBAR
-========================================= */
-
 .sidebar-card {
   background: #ffffff;
 
@@ -8612,11 +7884,6 @@ h1, h2, h3, h4, p {
 
   color: #111827;
 }
-
-
-/* =========================================
-   SIDEBAR BRAND
-========================================= */
 
 .sidebar-card .eyebrow {
   margin: 0 14px 8px;
@@ -8644,11 +7911,6 @@ h1, h2, h3, h4, p {
   line-height: 1.2;
 }
 
-
-/* =========================================
-   SIDEBAR LINKS
-========================================= */
-
 .sidebar-links {
   display: flex;
 
@@ -8658,9 +7920,6 @@ h1, h2, h3, h4, p {
 
   margin-top: 28px;
 }
-
-
-/* Normal links */
 
 .sidebar-links a {
   width: 100%;
@@ -8686,17 +7945,11 @@ h1, h2, h3, h4, p {
     color 0.2s ease;
 }
 
-
-/* Hover */
-
 .sidebar-links a:hover {
   background: #f3f0ff;
 
   color: #5b3df5;
 }
-
-
-/* Active link */
 
 .sidebar-links .active-link {
   background: #5b3df5;
@@ -8706,19 +7959,11 @@ h1, h2, h3, h4, p {
   box-shadow: 0 4px 10px rgba(91, 61, 245, 0.2);
 }
 
-
-/* Active hover */
-
 .sidebar-links .active-link:hover {
   background: #4c2ee5;
 
   color: #ffffff;
 }
-
-
-/* =========================================
-   LOGOUT BUTTON
-========================================= */
 
 .sidebar-links .sidebar-logout {
   width: 100%;
@@ -8746,19 +7991,11 @@ h1, h2, h3, h4, p {
     color 0.2s ease;
 }
 
-
-/* Logout hover */
-
 .sidebar-links .sidebar-logout:hover {
   background: #fef2f2;
 
   color: #dc2626;
 }
-
-
-/* =========================================
-   RESPONSIVE
-========================================= */
 
 @media (max-width: 1100px) {
 
@@ -8767,7 +8004,6 @@ h1, h2, h3, h4, p {
   }
 
 }
-
 
 @media (max-width: 960px) {
 
@@ -8787,7 +8023,6 @@ h1, h2, h3, h4, p {
   }
 
 }
-
 
 @media (max-width: 640px) {
 
@@ -9054,10 +8289,6 @@ h1, h2, h3, h4, p {
   }
 }
 
-/* ==========================================================================
-   Payroll
-   ========================================================================== */
-
 .form-hint {
   color: #6b7280;
   font-size: 0.9rem;
@@ -9152,11 +8383,6 @@ h1, h2, h3, h4, p {
   }
 }
 
-
-/* ==========================================================================
-   Attendance
-   ========================================================================== */
-
 .attendance-today {
   display: flex;
   flex-direction: column;
@@ -9172,7 +8398,7 @@ h1, h2, h3, h4, p {
 }
 
 .attendance-clock-time {
-  /* font-size: 2rem; */
+
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -9213,11 +8439,6 @@ h1, h2, h3, h4, p {
   color: #5b3df5;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);
 }
-
-
-/* ==========================================================================
-   Tasks
-   ========================================================================== */
 
 .kanban-board {
   display: grid;
@@ -9344,10 +8565,6 @@ h1, h2, h3, h4, p {
   padding: 10px 12px;
   resize: vertical;
 }
-/* ==========================================================================
-   FINAL UI OVERRIDES
-   Reference style: compact, professional admin/reporting dashboard
-   ========================================================================== */
 
 :root {
   --primary: #5b3df5;
@@ -9369,7 +8586,6 @@ h1, h2, h3, h4, p {
   --warning-bg: #fff8e9;
 }
 
-/* Page shell */
 .dashboard-page {
   min-height: 100vh;
   padding: 0;
@@ -9380,7 +8596,6 @@ h1, h2, h3, h4, p {
   background: #f7f7f5;
 }
 
-/* Left navigation */
 .sidebar-card {
   width: 190px;
   min-height: 100vh;
@@ -9449,7 +8664,6 @@ h1, h2, h3, h4, p {
   color: #d13e3e;
 }
 
-/* Main area */
 .dashboard-main {
   min-width: 0;
   min-height: 100vh;
@@ -9457,7 +8671,6 @@ h1, h2, h3, h4, p {
   background: #f7f7f5;
 }
 
-/* Top application bar */
 .dashboard-header,
 .dashboard-header h1 {
   font-size: 18px;
@@ -9479,7 +8692,6 @@ h1, h2, h3, h4, p {
   color: #5f6368;
 }
 
-/* Search */
 .global-search {
   width: 250px;
   height: 34px;
@@ -9504,7 +8716,6 @@ h1, h2, h3, h4, p {
   font-size: 12px;
 }
 
-/* Buttons */
 .primary-btn,
 .secondary-btn,
 .action-btn {
@@ -9525,7 +8736,6 @@ h1, h2, h3, h4, p {
   color: #5b3df5;
 }
 
-/* Dashboard content spacing */
 .dashboard-main > .stats-grid,
 .dashboard-main > .panel,
 .dashboard-main > .attendance-today,
@@ -9540,7 +8750,6 @@ h1, h2, h3, h4, p {
   gap: 10px;
 }
 
-/* Statistics cards */
 .stat-card,
 .panel {
   border: 1px solid #e7e5e1;
@@ -9576,7 +8785,6 @@ h1, h2, h3, h4, p {
   font-size: 11px;
 }
 
-/* Panels / reports */
 .panel-heading {
   margin-bottom: 10px;
 }
@@ -9613,7 +8821,6 @@ h1, h2, h3, h4, p {
   background: #faf9ff;
 }
 
-/* Report/filter pills */
 .report-tabs {
   gap: 3px;
   padding: 3px;
@@ -9642,7 +8849,6 @@ h1, h2, h3, h4, p {
   box-shadow: none;
 }
 
-/* Status pills */
 .pill {
   min-height: 22px;
   padding: 3px 8px;
@@ -9670,7 +8876,6 @@ h1, h2, h3, h4, p {
   color: #cc4a4a;
 }
 
-/* Overview / HR focus */
 .overview-card,
 .detail-card {
   border: 1px solid #eceae6;
@@ -9693,7 +8898,6 @@ h1, h2, h3, h4, p {
   font-size: 11px;
 }
 
-/* Forms */
 .form-grid {
   gap: 14px;
 }
@@ -9721,7 +8925,6 @@ h1, h2, h3, h4, p {
   min-height: 90px;
 }
 
-/* Tasks */
 .kanban-board {
   gap: 10px;
   margin-top: 14px;
@@ -9765,7 +8968,6 @@ h1, h2, h3, h4, p {
   font-size: 10px;
 }
 
-/* Modal */
 .modal-backdrop {
   background: rgba(20, 20, 20, 0.38);
 }
@@ -9776,7 +8978,6 @@ h1, h2, h3, h4, p {
   box-shadow: 0 18px 45px rgba(20, 20, 20, 0.16);
 }
 
-/* Attendance */
 .attendance-today {
   gap: 12px;
   margin-bottom: 18px;
@@ -9798,20 +8999,17 @@ h1, h2, h3, h4, p {
   font-size: 11px;
 }
 
-/* Search result dropdown */
 .search-results {
   border-radius: 9px;
   box-shadow: 0 14px 35px rgba(20, 20, 20, 0.12);
 }
 
-/* Desktop report-like content width */
 @media (min-width: 1200px) {
   .dashboard-main > .panel {
     max-width: none;
   }
 }
 
-/* Tablet */
 @media (max-width: 960px) {
   .dashboard-page {
     grid-template-columns: 1fr;
@@ -9843,7 +9041,6 @@ h1, h2, h3, h4, p {
   }
 }
 
-/* Mobile */
 @media (max-width: 640px) {
   .dashboard-header {
     min-height: auto;
@@ -9875,11 +9072,6 @@ h1, h2, h3, h4, p {
     margin-right: 10px;
   }
 }
-/* ==========================================================================
-   PREMIUM HRMS POLISH — V2
-   Designed from the supplied admin/report reference.
-   Keeps existing React class names intact.
-   ========================================================================== */
 
 :root {
   --hr-primary: #6046e8;
@@ -9902,8 +9094,6 @@ h1, h2, h3, h4, p {
   --hr-blue-bg: #edf4ff;
 }
 
-/* ---------- Application shell ---------- */
-
 .dashboard-page {
   min-height: 100vh;
   display: grid;
@@ -9922,8 +9112,6 @@ h1, h2, h3, h4, p {
   gap: 0;
   background: var(--hr-bg);
 }
-
-/* ---------- Sidebar ---------- */
 
 .sidebar-card {
   width: 218px;
@@ -10006,8 +9194,6 @@ h1, h2, h3, h4, p {
   background: var(--hr-red-bg);
 }
 
-/* ---------- Top header ---------- */
-
 .dashboard-header,
 .dashboard-header h1 {
   color: var(--hr-text);
@@ -10029,8 +9215,6 @@ h1, h2, h3, h4, p {
   color: #5e6570;
   font-size: 12px;
 }
-
-/* ---------- Search ---------- */
 
 .global-search {
   width: 260px;
@@ -10055,8 +9239,6 @@ h1, h2, h3, h4, p {
 .global-search input {
   font-size: 12px;
 }
-
-/* ---------- Header buttons ---------- */
 
 .primary-btn,
 .secondary-btn,
@@ -10089,8 +9271,6 @@ h1, h2, h3, h4, p {
   background: #eae5ff;
 }
 
-/* ---------- Main content spacing ---------- */
-
 .dashboard-main > .stats-grid,
 .dashboard-main > .panel,
 .dashboard-main > .attendance-today,
@@ -10105,8 +9285,6 @@ h1, h2, h3, h4, p {
   margin-top: 18px;
   margin-bottom: 14px;
 }
-
-/* ---------- Stat cards ---------- */
 
 .stat-card,
 .panel {
@@ -10163,8 +9341,6 @@ h1, h2, h3, h4, p {
   font-weight: 600;
 }
 
-/* ---------- Content panels ---------- */
-
 .panel {
   padding: 15px;
 }
@@ -10184,8 +9360,6 @@ h1, h2, h3, h4, p {
 .panel-heading .action-row {
   gap: 7px;
 }
-
-/* ---------- Tables ---------- */
 
 .table-responsive {
   overflow-x: auto;
@@ -10226,8 +9400,6 @@ h1, h2, h3, h4, p {
   background: #fbfaff;
 }
 
-/* ---------- Status ---------- */
-
 .pill {
   min-height: 22px;
   padding: 3px 8px;
@@ -10255,8 +9427,6 @@ h1, h2, h3, h4, p {
   color: #bd4545;
   background: var(--hr-red-bg);
 }
-
-/* ---------- Action buttons ---------- */
 
 .table-actions {
   gap: 5px;
@@ -10287,8 +9457,6 @@ h1, h2, h3, h4, p {
   color: #9b6915;
   background: #fff7e7;
 }
-
-/* ---------- Forms ---------- */
 
 .form-grid {
   gap: 13px;
@@ -10323,8 +9491,6 @@ h1, h2, h3, h4, p {
   box-shadow: 0 0 0 3px rgba(96,70,232,.08);
 }
 
-/* ---------- Search dropdown ---------- */
-
 .search-results {
   width: min(390px, 90vw);
   padding: 5px;
@@ -10350,8 +9516,6 @@ h1, h2, h3, h4, p {
   background: linear-gradient(135deg,#725cf0,#5b3df5);
   font-size: 10px;
 }
-
-/* ---------- Overview / focus cards ---------- */
 
 .overview-card {
   padding: 13px;
@@ -10379,8 +9543,6 @@ h1, h2, h3, h4, p {
   line-height: 1.45;
 }
 
-/* ---------- Attendance ---------- */
-
 .attendance-today {
   gap: 12px;
   margin-bottom: 18px;
@@ -10403,8 +9565,6 @@ h1, h2, h3, h4, p {
   color: #777c84;
   font-size: 11px;
 }
-
-/* ---------- Tasks / Kanban ---------- */
 
 .kanban-board {
   gap: 11px;
@@ -10449,8 +9609,6 @@ h1, h2, h3, h4, p {
   color: #747983;
 }
 
-/* ---------- Modal ---------- */
-
 .modal-backdrop {
   background: rgba(17,18,21,.42);
   backdrop-filter: blur(2px);
@@ -10462,8 +9620,6 @@ h1, h2, h3, h4, p {
   padding: 18px;
   box-shadow: 0 24px 65px rgba(20,21,25,.17);
 }
-
-/* ---------- Responsive ---------- */
 
 @media (max-width: 1100px) {
   .dashboard-page {
@@ -10547,16 +9703,6 @@ h1, h2, h3, h4, p {
     margin-right: 10px;
   }
 }
-/* ==========================================================================
-   HRMS — PREMIUM PRODUCT DESIGN V3
-   Design direction:
-   - Refined B2B SaaS / HR administration product
-   - Quiet neutral canvas
-   - Strong typography hierarchy
-   - Purple used only as an interaction/accent color
-   - Dense but breathable data layouts
-   - Minimal decoration, maximum clarity
-   ========================================================================== */
 
 :root {
   --p: #5f43e8;
@@ -10601,8 +9747,6 @@ h1, h2, h3, h4, p {
   --ease: 160ms cubic-bezier(.2,.7,.2,1);
 }
 
-/* ---------- Base ---------- */
-
 body {
   background: var(--canvas);
   color: var(--ink);
@@ -10622,8 +9766,6 @@ textarea {
   font-family: inherit;
 }
 
-/* ---------- Shell ---------- */
-
 .dashboard-page {
   display: grid;
   grid-template-columns: 224px minmax(0, 1fr);
@@ -10638,8 +9780,6 @@ textarea {
   min-height: 100vh;
   background: var(--canvas);
 }
-
-/* ---------- Sidebar ---------- */
 
 .sidebar-card {
   width: 224px;
@@ -10728,8 +9868,6 @@ textarea {
   background: var(--red-bg);
 }
 
-/* ---------- Header ---------- */
-
 .dashboard-header,
 .dashboard-header h1 {
   color: var(--ink);
@@ -10754,8 +9892,6 @@ textarea {
   font-size: 12px;
   font-weight: 520;
 }
-
-/* ---------- Search ---------- */
 
 .global-search {
   width: 270px;
@@ -10795,8 +9931,6 @@ textarea {
 .global-search input::placeholder {
   color: #a0a5ad;
 }
-
-/* ---------- Buttons ---------- */
 
 .primary-btn,
 .secondary-btn,
@@ -10847,8 +9981,6 @@ textarea {
   border-color: #d3cbff;
 }
 
-/* ---------- Content spacing ---------- */
-
 .dashboard-main > .stats-grid,
 .dashboard-main > .panel,
 .dashboard-main > .attendance-today,
@@ -10862,8 +9994,6 @@ textarea {
   margin-bottom: 14px;
   gap: 12px;
 }
-
-/* ---------- Cards ---------- */
 
 .stat-card,
 .panel {
@@ -10919,8 +10049,6 @@ textarea {
   font-weight: 600;
 }
 
-/* ---------- Panel headings ---------- */
-
 .panel {
   padding: 16px;
 }
@@ -10940,8 +10068,6 @@ textarea {
 .panel-heading .action-row {
   margin-top: 0;
 }
-
-/* ---------- Tables: product-grade ---------- */
 
 .table-responsive {
   width: 100%;
@@ -10990,8 +10116,6 @@ textarea {
   border-bottom: 0;
 }
 
-/* ---------- Status ---------- */
-
 .pill {
   min-height: 22px;
   padding: 3px 8px;
@@ -11022,8 +10146,6 @@ textarea {
   color: #bd4747;
   background: var(--red-bg);
 }
-
-/* ---------- Forms ---------- */
 
 .form-grid {
   gap: 15px;
@@ -11075,10 +10197,6 @@ textarea {
   min-height: 100px;
 }
 
-/* react-phone-number-input: render the country selector and the number as
-   two separate boxed controls side by side — same look as the plain
-   `.form-field select` (Role/Status/etc.) and `.form-field input` fields
-   elsewhere in this form, rather than one merged pill. */
 .form-field .PhoneInput {
   align-items: center;
   gap: 8px;
@@ -11149,8 +10267,6 @@ textarea {
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
-/* ---------- Focus / overview ---------- */
-
 .overview-card {
   padding: 14px;
   background: #fff;
@@ -11177,8 +10293,6 @@ textarea {
   font-size: 11px;
   line-height: 1.5;
 }
-
-/* ---------- Profile — avatar sidebar + compact form ---------- */
 
 .profile-layout {
   display: grid;
@@ -11306,8 +10420,6 @@ textarea {
   }
 }
 
-/* ---------- Tasks ---------- */
-
 .kanban-board {
   gap: 12px;
   margin-top: 14px;
@@ -11357,8 +10469,6 @@ textarea {
   font-size: 10px;
 }
 
-/* ---------- Attendance ---------- */
-
 .attendance-clock-time {
   color: var(--ink);
   font-size: 23px;
@@ -11370,8 +10480,6 @@ textarea {
   color: var(--ink-3);
   font-size: 11px;
 }
-
-/* ---- Page nav: section tabs + date navigator ---- */
 
 .attendance-page-nav {
   display: flex;
@@ -11467,8 +10575,6 @@ textarea {
     margin-right: 14px;
   }
 }
-
-/* ---- Hero row: greeting / today's check-ins / goal gauge ---- */
 
 .attendance-hero {
   display: grid;
@@ -11738,8 +10844,6 @@ textarea {
   transform: rotate(-2deg);
 }
 
-/* ---- Stat cards ---- */
-
 .attendance-stats-grid {
   margin-top: 4px;
 }
@@ -11774,8 +10878,6 @@ textarea {
   font-weight: 550;
 }
 
-/* ---- History table heading + filters ---- */
-
 .attendance-week-heading {
   align-items: flex-start;
   flex-wrap: wrap;
@@ -11803,8 +10905,6 @@ textarea {
   }
 }
 
-/* ---------- Search results ---------- */
-
 .search-results {
   width: min(390px, 90vw);
   padding: 5px;
@@ -11825,8 +10925,6 @@ textarea {
   background: var(--p-50);
 }
 
-/* ---------- Modal ---------- */
-
 .modal-backdrop {
   background: rgba(17,18,21,.40);
   backdrop-filter: blur(3px);
@@ -11839,16 +10937,12 @@ textarea {
   box-shadow: 0 24px 70px rgba(17,18,21,.17);
 }
 
-/* ---------- Empty/loading states ---------- */
-
 .empty-state {
   padding: 34px 18px;
   text-align: center;
   color: var(--ink-4);
   font-size: 12px;
 }
-
-/* ---------- Responsive ---------- */
 
 @media (max-width: 1100px) {
   .dashboard-page {
@@ -11951,10 +11045,6 @@ textarea {
   }
 }
 
-/* ==========================================================================
-   Sidebar — grouped / collapsible navigation
-   ========================================================================== */
-
 .sidebar-brand {
   display: flex;
   align-items: center;
@@ -12044,10 +11134,6 @@ textarea {
     align-items: flex-start;
   }
 }
-
-/* ==========================================================================
-   Header — user menu dropdown
-   ========================================================================== */
 
 .header-user-menu {
   position: relative;
@@ -12162,10 +11248,6 @@ textarea {
   margin: 4px 2px;
   background: var(--line);
 }
-
-/* ==========================================================================
-   Dashboard — stat icons, gauge, bar chart, ranked bars
-   ========================================================================== */
 
 .stat-card-head {
   display: flex;
@@ -12408,10 +11490,6 @@ textarea {
   background: var(--p-hover);
 }
 
-/* ==========================================================================
-   Dashboard — greeting bar, clickable stats, quick actions, approvals
-   ========================================================================== */
-
 .dashboard-greeting {
   display: flex;
   align-items: center;
@@ -12650,10 +11728,6 @@ textarea {
   }
 }
 
-/* ==========================================================================
-   Section tabs — in-page navigation for a sidebar section's sub-pages
-   ========================================================================== */
-
 .section-tabs {
   display: flex;
   align-items: center;
@@ -12700,10 +11774,6 @@ textarea {
   }
 }
 
-/* ==========================================================================
-   Performance Management — progress bars, star ratings
-   ========================================================================== */
-
 .progress-track {
   display: inline-block;
   width: 120px;
@@ -12744,8 +11814,6 @@ textarea {
   color: var(--amber);
 }
 
-/* ---------- Avatars ---------- */
-
 .perf-avatar {
   width: 34px;
   height: 34px;
@@ -12775,11 +11843,7 @@ textarea {
   font-size: 19px;
 }
 
-/* ---------- Stat card icon, red tone ---------- */
-
 .stat-card-icon--red { color: var(--red); background: var(--red-bg); }
-
-/* ---------- Card grid (Goals / Reviews / Promotions) ---------- */
 
 .perf-card-grid {
   display: grid;
@@ -12881,8 +11945,6 @@ textarea {
   justify-content: space-between;
 }
 
-/* ---------- Progress tone modifiers ---------- */
-
 .progress-track--wide {
   display: block;
   width: 100%;
@@ -12890,8 +11952,6 @@ textarea {
 
 .progress-fill--success { background: var(--green); }
 .progress-fill--danger { background: var(--red); }
-
-/* ---------- Promotions: title transition ---------- */
 
 .promo-transition {
   display: flex;
@@ -12928,10 +11988,6 @@ textarea {
   border: 1px solid var(--line);
   border-radius: 50%;
 }
-
-/* ==========================================================================
-   Employee Details — header card + shared date-range filter
-   ========================================================================== */
 
 .employee-header-card {
   display: flex;
@@ -13027,18 +12083,11 @@ textarea {
   }
 }
 
-/* ---- Chart.js containers (Employee Details sections) ---- */
-
 .chart-container {
   position: relative;
   height: 260px;
   margin-top: 10px;
 }
-
-
-/* ==========================================================================
-   Employee Details — breadcrumb, hero card, stat tiles, records + calendar
-   ========================================================================== */
 
 .emp-details-page {
   display: flex;
@@ -13086,8 +12135,6 @@ textarea {
   color: var(--ink-3);
   font-size: 13px;
 }
-
-/* ---- Hero card ---- */
 
 .emp-hero {
   display: flex;
@@ -13206,8 +12253,6 @@ textarea {
   white-space: nowrap;
 }
 
-/* ---- Tinted stat tiles ---- */
-
 .emp-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -13272,8 +12317,6 @@ textarea {
 .emp-stat--green .emp-stat-head p, .emp-stat--green > span, .emp-stat--green .emp-stat-icon { color: var(--green); }
 .emp-stat--red   .emp-stat-head p, .emp-stat--red   > span, .emp-stat--red   .emp-stat-icon { color: var(--red); }
 .emp-stat--amber .emp-stat-head p, .emp-stat--amber > span, .emp-stat--amber .emp-stat-icon { color: var(--amber); }
-
-/* ---- Records panel: inline filter + pagination ---- */
 
 .emp-overview-row {
   align-items: stretch;
@@ -13347,46 +12390,6 @@ textarea {
   align-items: center;
   gap: 6px;
 }
-
-.emp-pager button {
-  min-width: 32px;
-  height: 32px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 8px;
-
-  color: var(--ink-2);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-
-  font-size: 12.5px;
-  font-weight: 650;
-  cursor: pointer;
-  transition: background var(--ease), border-color var(--ease);
-}
-
-.emp-pager button:hover:not(:disabled) {
-  background: var(--canvas);
-  border-color: var(--line-strong);
-}
-
-.emp-pager button:disabled {
-  color: var(--ink-4);
-  cursor: not-allowed;
-  opacity: .55;
-}
-
-.emp-pager button.is-active {
-  color: #fff;
-  background: var(--p);
-  border-color: var(--p);
-}
-
-/* ==========================================================================
-   Notifications — header bell, dropdown, and the full history page
-   ========================================================================== */
 
 .notif-bell {
   position: relative;
@@ -13577,8 +12580,6 @@ textarea {
   background: var(--canvas);
 }
 
-/* ---- Full notifications page ---- */
-
 .notif-filters {
   margin: 14px 0 16px;
   flex-wrap: wrap;
@@ -13668,27 +12669,14 @@ textarea {
   }
 }
 
-/* ==========================================================================
-   HRMS — ADMIN CONSOLE V4
-   Reference: the supplied TailAdmin-style SaaS dashboard.
-   Direction:
-   - Indigo brand accent on a cool neutral canvas (was warm grey + violet)
-   - Larger 16px card radius, hairline borders, one very soft shadow
-   - 14px base type with a clearer size ramp
-   - Roomier 290px navigation rail that collapses to icons
-   - Full-bleed sticky application bar
-   Only tokens and existing class names are touched — no markup was renamed.
-   ========================================================================== */
-
 :root {
-  /* Brand */
+
   --p: #465fff;
   --p-hover: #3641f5;
   --p-50: #ecf3ff;
   --p-100: #dde9ff;
   --p-200: #c2d6ff;
 
-  /* Neutrals */
   --canvas: #f9fafb;
   --surface: #ffffff;
   --surface-2: #f9fafb;
@@ -13701,7 +12689,6 @@ textarea {
   --line: #e4e7ec;
   --line-strong: #d0d5dd;
 
-  /* Status */
   --green: #039855;
   --green-bg: #ecfdf3;
   --red: #d92d20;
@@ -13711,7 +12698,6 @@ textarea {
   --blue: #0086c9;
   --blue-bg: #f0f9ff;
 
-  /* Elevation — one resting shadow, one lifted */
   --shadow-card: 0 1px 2px 0 rgba(16, 24, 40, .05);
   --shadow-card-hover: 0 4px 8px -2px rgba(16, 24, 40, .1),
                        0 2px 4px -2px rgba(16, 24, 40, .06);
@@ -13728,8 +12714,6 @@ textarea {
 
   --ease: 200ms cubic-bezier(.4, 0, .2, 1);
 }
-
-/* ---------- Base ---------- */
 
 body {
   background: var(--canvas);
@@ -13753,10 +12737,6 @@ body {
   text-transform: uppercase;
 }
 
-/* ==========================================================================
-   Shell
-   ========================================================================== */
-
 .dashboard-page {
   display: grid;
   grid-template-columns: var(--rail) minmax(0, 1fr);
@@ -13769,9 +12749,6 @@ body {
   grid-template-columns: var(--rail-collapsed) minmax(0, 1fr);
 }
 
-/* Vertical rhythm for every page rendered into the outlet. Bootstrap rows
-   carry their own negative gutter margins, so they are inset by a half-gutter
-   less to keep every card's outer edge on the same 24px line. */
 .dashboard-main {
   display: flex;
   flex-direction: column;
@@ -13803,10 +12780,6 @@ body {
   margin-top: 0;
   margin-bottom: 0;
 }
-
-/* ==========================================================================
-   Sidebar
-   ========================================================================== */
 
 .sidebar-card {
   width: var(--rail);
@@ -13959,7 +12932,6 @@ body {
   background: var(--red-bg);
 }
 
-/* Collapsed rail — icons only, labels folded away */
 .sidebar-card.is-collapsed {
   width: var(--rail-collapsed);
   padding-left: 14px;
@@ -14009,10 +12981,6 @@ body {
   background: rgba(16, 24, 40, .45);
   cursor: pointer;
 }
-
-/* ==========================================================================
-   Application bar
-   ========================================================================== */
 
 .dashboard-header {
   position: sticky;
@@ -14097,8 +13065,6 @@ body {
   font-weight: 500;
 }
 
-/* ---------- Search ---------- */
-
 .global-search-wrapper {
   position: relative;
   flex: 1 1 300px;
@@ -14165,8 +13131,6 @@ body {
   box-shadow: var(--shadow-popover);
 }
 
-/* ---------- Header icon buttons & user chip ---------- */
-
 .notif-bell-trigger {
   width: 44px;
   height: 44px;
@@ -14224,10 +13188,6 @@ body {
   box-shadow: var(--shadow-popover);
 }
 
-/* ==========================================================================
-   Surfaces
-   ========================================================================== */
-
 .stat-card,
 .panel {
   padding: 20px;
@@ -14254,8 +13214,6 @@ body {
   margin-bottom: 3px;
   font-size: 11px;
 }
-
-/* ---------- Stat cards ---------- */
 
 .stats-grid {
   display: grid;
@@ -14311,8 +13269,6 @@ body {
   font-size: 16px;
 }
 
-/* ---------- Greeting ---------- */
-
 .dashboard-greeting {
   padding: 22px 24px;
   border-radius: var(--r-lg);
@@ -14345,10 +13301,6 @@ body {
   font-size: 18px;
   font-weight: 700;
 }
-
-/* ==========================================================================
-   Controls
-   ========================================================================== */
 
 .primary-btn,
 .secondary-btn,
@@ -14384,7 +13336,6 @@ body {
   border-color: var(--line-strong);
 }
 
-/* Segmented control — pill track, raised active segment */
 .range-toggle,
 .report-tabs {
   display: inline-flex;
@@ -14420,8 +13371,6 @@ body {
   box-shadow: var(--shadow-card);
 }
 
-/* ---------- Pills ---------- */
-
 .pill {
   padding: 3px 10px;
   border-radius: 999px;
@@ -14435,10 +13384,6 @@ body {
 .pill-reject { color: var(--red); background: var(--red-bg); }
 .pill-warning { color: var(--amber); background: var(--amber-bg); }
 .pill-muted { color: var(--ink-3); background: var(--canvas); }
-
-/* ==========================================================================
-   Tables
-   ========================================================================== */
 
 .table-responsive {
   border: 1px solid var(--line);
@@ -14466,10 +13411,6 @@ body {
 .table-dark tbody tr:hover td {
   background: var(--canvas);
 }
-
-/* ==========================================================================
-   Data visuals
-   ========================================================================== */
 
 .bar-chart-bar { fill: var(--p); }
 .bar-chart-bar.is-hovered { fill: var(--p-hover); }
@@ -14532,10 +13473,6 @@ body {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   Quick actions & approval rows
-   ========================================================================== */
-
 .quick-actions {
   gap: 12px;
 }
@@ -14591,10 +13528,6 @@ body {
   font-size: 13.5px;
 }
 
-/* ==========================================================================
-   Responsive
-   ========================================================================== */
-
 @media (max-width: 1200px) {
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -14607,7 +13540,6 @@ body {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* Off-canvas drawer instead of a rail */
   .sidebar-card,
   .sidebar-card.is-collapsed {
     position: fixed;
@@ -14681,7 +13613,6 @@ body {
     flex: 1 1 auto;
   }
 
-  /* Avatar only — the name pushed the user chip past the viewport edge. */
   .header-user-name,
   .header-user-chevron {
     display: none;
@@ -14700,19 +13631,10 @@ body {
   }
 }
 
-/* ---------- V4 fixes found while checking the rendered layout ---------- */
-
-/* `.ranked-bar-fill` is a <span>, so it stayed display:inline and the inline
-   width % (and height:100%) never applied — the department bars rendered as
-   empty tracks. */
 .ranked-bar-fill {
   display: block;
 }
 
-/* `repeat(2, 1fr)` floors each track at min-content, which pushed the two
-   columns to 240px + 210px inside a 365px panel and spilled the cards out of
-   the card. One readable column per row keeps every label and description
-   intact in the narrow column this panel lives in. */
 .quick-actions {
   grid-template-columns: minmax(0, 1fr);
 }
@@ -14733,25 +13655,14 @@ body {
   text-overflow: ellipsis;
 }
 
-/* Chart cards are stretched by h-100 to match the tallest card in their row;
-   centre the plot in the spare height instead of pinning it to the top. */
 .chart-card .bar-chart {
   margin-top: auto;
   margin-bottom: auto;
 }
 
-/* The 3px accent bar on the left of every stat card fought the new 16px
-   radius (it clipped into a sliver) and duplicated the tone already carried by
-   the icon tile. The reference cards are plain. */
 .stat-card::before {
   display: none;
 }
-
-/* ==========================================================================
-   Reference layout — sparkline tiles, stacked chart, workforce panel
-   ========================================================================== */
-
-/* ---------- Mini metric tiles (reference: Churn Rate / User Growth) ------- */
 
 .mini-metric {
   display: flex;
@@ -14807,8 +13718,6 @@ body {
 .mini-metric-delta--negative span { color: #f04438; }
 .mini-metric-delta--flat span { color: var(--ink-3); }
 
-/* ---------- Sparkline ---------- */
-
 .sparkline {
   flex-shrink: 0;
   width: 132px;
@@ -14836,8 +13745,6 @@ body {
 .sparkline--flat .sparkline-stop-top { stop-color: var(--ink-4); stop-opacity: .18; }
 .sparkline--flat .sparkline-stop-bottom { stop-color: var(--ink-4); stop-opacity: 0; }
 
-/* ---------- Stacked chart (reference: Conversion Funnel) ---------- */
-
 .stacked-chart {
   margin-top: 8px;
 }
@@ -14853,8 +13760,6 @@ body {
   font-weight: 500;
 }
 
-/* Full-height invisible target so the whole column is hoverable, not just the
-   part the bars happen to reach. */
 .stacked-hit {
   fill: transparent;
   transition: fill var(--ease);
@@ -14901,8 +13806,6 @@ body {
 .chart-legend-dot--2 { background: #7b8bff; }
 .chart-legend-dot--3 { background: #aab5ff; }
 .chart-legend-dot--4 { background: #d7ddff; }
-
-/* ---------- Workforce panel (reference: Product Performance) ---------- */
 
 .workforce-panel {
   display: flex;
@@ -15006,13 +13909,6 @@ body {
     width: 100%;
   }
 }
-
-/* ==========================================================================
-   TAILADMIN FLAT — final layer
-   Spec: page #F9FAFB, cards #FFFFFF, border #E5E7EB, accent #465FFF, radius 12px.
-   No card shadows, no pastel fills, no coloured icon circles, no gradients,
-   no uppercase kickers, no coloured focus/hover borders.
-   ========================================================================== */
 
 :root {
   --p: #465fff;
@@ -15037,13 +13933,10 @@ body {
   --r-md: 12px;
   --r-lg: 12px;
 
-  /* Flat by design — kept as tokens so nothing downstream reads `none` wrong. */
   --shadow-card: none;
   --shadow-card-hover: none;
   --shadow-popover: 0 8px 24px rgba(17, 24, 39, .1);
 }
-
-/* ---------- Flat surfaces ---------- */
 
 .stat-card,
 .panel {
@@ -15057,8 +13950,6 @@ body {
   border-color: var(--line);
   box-shadow: none;
 }
-
-/* ---------- Headings: sentence case, no kickers ---------- */
 
 .panel-heading {
   display: flex;
@@ -15105,8 +13996,6 @@ body {
   background: var(--canvas);
 }
 
-/* ---------- Greeting: plain heading, no gradient, no clock ---------- */
-
 .dashboard-greeting {
   display: block;
   padding: 0;
@@ -15129,8 +14018,6 @@ body {
   color: var(--ink-3);
   font-size: 14px;
 }
-
-/* ---------- KPI cards: neutral square icon, no arrow, no tint ---------- */
 
 .stats-grid {
   display: grid;
@@ -15202,8 +14089,6 @@ body {
   box-shadow: none;
 }
 
-/* ---------- Chart: single accent hue, no green ---------- */
-
 .bar-chart-bar { fill: var(--p); }
 .bar-chart-bar.is-hovered { fill: var(--p-hover); }
 .bar-chart-baseline { stroke: var(--line); }
@@ -15230,8 +14115,6 @@ body {
   gap: 12px;
 }
 
-/* ---------- Segmented control: flat, no gradient ---------- */
-
 .range-toggle {
   display: inline-flex;
   gap: 2px;
@@ -15256,8 +14139,6 @@ body {
   background: var(--surface);
   box-shadow: none;
 }
-
-/* ---------- Buttons: flat fills only ---------- */
 
 .primary-btn,
 .secondary-btn,
@@ -15294,8 +14175,6 @@ body {
   border-color: var(--line-strong);
 }
 
-/* ---------- Approval rows ---------- */
-
 .approval-item {
   padding: 14px 16px;
   border: 1px solid var(--line);
@@ -15313,8 +14192,6 @@ body {
   color: var(--ink-3);
   font-size: 13px;
 }
-
-/* ---------- Sidebar: no blue pill, no gradient mark ---------- */
 
 .sidebar-card {
   background: var(--surface);
@@ -15368,7 +14245,6 @@ body {
   background: var(--canvas);
 }
 
-/* Active = accent text only. No filled pill. */
 .sidebar-links .active-link,
 .sidebar-links .sidebar-nav-item.active-link,
 .sidebar-links .active-link:hover,
@@ -15382,8 +14258,6 @@ body {
 .sidebar-card.is-collapsed .sidebar-brand-text {
   display: none;
 }
-
-/* ---------- Header: neutral focus, no coloured borders ---------- */
 
 .dashboard-header {
   background: var(--surface);
@@ -15439,8 +14313,6 @@ body {
   background: #ef4444;
 }
 
-/* ---------- Status pills stay meaningful, but flat ---------- */
-
 .pill {
   padding: 3px 10px;
   border-radius: 999px;
@@ -15466,8 +14338,6 @@ body {
   }
 }
 
-/* The employee view keeps its Quick Actions row; its icon chips go neutral
-   too, so no coloured icon fills survive anywhere. */
 .quick-action-icon,
 .quick-action-icon--primary,
 .quick-action-icon--green,
@@ -15498,12 +14368,6 @@ body {
   border-color: var(--line-strong);
   box-shadow: none;
 }
-
-/* ==========================================================================
-   UI polish — value axis, loading skeletons, keyboard focus
-   ========================================================================== */
-
-/* ---------- Line / area chart ---------- */
 
 .line-chart {
   position: relative;
@@ -15579,8 +14443,6 @@ body {
   font-size: 11.5px;
 }
 
-/* ---------- Loading skeletons ---------- */
-
 @keyframes skeleton-sheen {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
@@ -15611,10 +14473,6 @@ body {
   }
 }
 
-/* ---------- Keyboard focus ----------
-   Mouse users see nothing; keyboard users get a consistent ring on every
-   interactive element rather than the browser default (or, on the cards,
-   nothing at all). */
 .stat-card--clickable:focus-visible,
 .activity-row:focus-visible,
 .quick-action-btn:focus-visible,
@@ -15637,8 +14495,6 @@ body {
   border-color: transparent;
 }
 
-/* ---------- Table rows read as clickable ---------- */
-
 .activity-row {
   cursor: pointer;
 }
@@ -15650,8 +14506,6 @@ body {
   color: var(--ink);
   font-weight: 500;
 }
-
-/* ---------- Empty states ---------- */
 
 .empty-state {
   display: flex;
@@ -15680,15 +14534,6 @@ body {
   margin: 0;
 }
 
-/* ==========================================================================
-   Dashboard — patterns borrowed from the Employee Details page
-   Same structures (page head, icon-beside-label stat tiles, dotted status
-   pills, paginated table footer) rendered flat, without that page's tinted
-   tone fills.
-   ========================================================================== */
-
-/* ---- Page head: title block left, action right (cf. .emp-details-head) ---- */
-
 .page-head {
   display: flex;
   align-items: flex-start;
@@ -15701,12 +14546,10 @@ body {
   min-width: 0;
 }
 
-/* ---- Stat tiles: icon sits beside the label (cf. .emp-stat-head) ---- */
-
 .stat-card-head {
   display: flex;
   align-items: center;
-  /* Reset: an earlier layer spaced this apart for the icon + hover arrow. */
+
   justify-content: flex-start;
   gap: 10px;
   margin-bottom: 14px;
@@ -15741,8 +14584,6 @@ body {
   margin-top: 6px;
 }
 
-/* ---- Dotted status pills (cf. .pill-dot in the records table) ---- */
-
 .pill-dot {
   display: inline-flex;
   align-items: center;
@@ -15756,8 +14597,6 @@ body {
   border-radius: 50%;
   background: currentColor;
 }
-
-/* ---- Paginated table footer (cf. .emp-pagination / .emp-pager) ---- */
 
 .emp-pagination {
   display: flex;
@@ -15782,58 +14621,6 @@ body {
   gap: 4px;
 }
 
-.emp-pager button {
-  min-width: 34px;
-  height: 34px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 8px;
-
-  color: var(--ink-2);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm);
-
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background var(--ease), border-color var(--ease), color var(--ease);
-}
-
-.emp-pager button svg {
-  width: 15px;
-  height: 15px;
-}
-
-.emp-pager button:hover:not(:disabled) {
-  background: var(--canvas);
-  border-color: var(--line-strong);
-}
-
-.emp-pager button.is-active {
-  color: #fff;
-  background: var(--p);
-  border-color: var(--p);
-}
-
-.emp-pager button:disabled {
-  opacity: .45;
-  cursor: default;
-}
-
-.emp-pager button:focus-visible {
-  outline: 2px solid var(--p);
-  outline-offset: 2px;
-}
-
-/* ==========================================================================
-   Dashboard KPI tiles — colour borrowed from the Employee Details tiles:
-   tinted card, white icon chip, tone-coloured label and caption, neutral
-   number. Adds a purple tone the details page doesn't have, for the fourth
-   card, keyed to the app accent.
-   ========================================================================== */
-
 :root {
   --purple: #6941c6;
   --purple-bg: #f4f3ff;
@@ -15853,7 +14640,6 @@ body {
 .stat-card--red    { background: var(--red-bg);    border-color: #f8d5d2; }
 .stat-card--purple { background: var(--purple-bg); border-color: #ddd6fe; }
 
-/* White chip lifts the icon off the tint, as on the details page. */
 .stat-card--blue .stat-card-icon,
 .stat-card--green .stat-card-icon,
 .stat-card--amber .stat-card-icon,
@@ -15877,7 +14663,6 @@ body {
   font-weight: 500;
 }
 
-/* The number stays neutral so the tint never fights it for legibility. */
 .stat-card h2 {
   color: var(--ink);
 }
@@ -15893,13 +14678,6 @@ body {
 .stat-card--red.stat-card--clickable:hover    { border-color: #f2b4af; }
 .stat-card--purple.stat-card--clickable:hover { border-color: #c4b5fd; }
 
-/* ---- On-tint text contrast ----
-   The tone colours are tuned for white backgrounds; on their own pale tints
-   the label and caption measured 3.3–3.8:1, under the 4.5:1 AA floor for text
-   this size. These darker variants are used only for text sitting on a tint —
-   the icon keeps the brighter hue, since a 20px glyph is not body text.
-   (The Employee Details tiles share the original pairing and have the same
-   shortfall; worth fixing there too.) */
 :root {
   --blue-ink: #026aa2;
   --green-ink: #027a48;
@@ -15914,10 +14692,6 @@ body {
 .stat-card--red    .stat-card-head p, .stat-card--red    .stat-card-trend { color: var(--red-ink); }
 .stat-card--purple .stat-card-head p, .stat-card--purple .stat-card-trend { color: var(--purple-ink); }
 
-/* ==========================================================================
-   Attendance — same tinted tile language as Employee Details / the dashboard
-   ========================================================================== */
-
 :root {
   --slate: #475569;
   --slate-bg: #f1f5f9;
@@ -15930,13 +14704,10 @@ body {
 .stat-card--slate .stat-card-trend { color: var(--slate-ink); }
 .stat-card--slate.stat-card--clickable:hover { border-color: #cbd5e1; }
 
-/* The attendance tiles carry no caption, so the number shouldn't leave a gap
-   where one would be. */
 .stat-card > h2:last-child {
   margin-bottom: 2px;
 }
 
-/* Section heading above the status table, matching the details page rhythm. */
 .attendance-week-heading .eyebrow {
   display: block;
   margin-bottom: 2px;
@@ -15955,18 +14726,12 @@ body {
   letter-spacing: -.01em;
 }
 
-/* Status pills in the attendance table pick up the dotted treatment used on
-   the Employee Details records table. */
 .table-dark td .pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
-/* A two-line label ("Total Employees", "Currently Working") made its card
-   taller and knocked the numbers out of alignment across the row. Bottom-align
-   the value so wrapping never shifts it, and give the tracks room for a
-   single-line label at this type size. */
 .stat-card {
   display: flex;
   flex-direction: column;
@@ -15976,9 +14741,6 @@ body {
   margin-top: auto;
 }
 
-/* Six tiles don't divide into the four-column default. auto-fit gave either a
-   wrapped label or a 5 + 1 orphan depending on viewport, so the columns are
-   explicit: 3 x 2 at desktop, halving down from there. */
 .stats-grid--flow {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -15995,20 +14757,11 @@ body {
   }
 }
 
-/* ==========================================================================
-   Employee Details tiles — contrast fix
-   These are the tiles the rest of the app's colour language was borrowed from,
-   but they pair the bright tone straight onto its own tint: measured 3.3–3.8:1
-   for the label and caption, under the 4.5:1 AA floor at this size. Point the
-   text at the darker --*-ink variants; the icon keeps the bright hue.
-   ========================================================================== */
-
 .emp-stat--blue  .emp-stat-head p, .emp-stat--blue  > span { color: var(--blue-ink); }
 .emp-stat--green .emp-stat-head p, .emp-stat--green > span { color: var(--green-ink); }
 .emp-stat--red   .emp-stat-head p, .emp-stat--red   > span { color: var(--red-ink); }
 .emp-stat--amber .emp-stat-head p, .emp-stat--amber > span { color: var(--amber-ink); }
 
-/* Performance rows sit four-up like the others. */
 .perf-stats-row {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -16024,10 +14777,6 @@ body {
     grid-template-columns: minmax(0, 1fr);
   }
 }
-
-/* ==========================================================================
-   Headcount combo chart — bars (hires) + line (running total)
-   ========================================================================== */
 
 .combo-chart-legend {
   display: flex;
@@ -16069,8 +14818,6 @@ body {
   flex-shrink: 0;
 }
 
-/* Bars read as a block, the line as a rule — the swatch mirrors the mark so
-   the legend is readable without relying on hue alone. */
 .combo-legend-swatch--bar {
   width: 11px;
   height: 11px;
@@ -16110,8 +14857,6 @@ body {
   font-weight: 500;
 }
 
-/* Each axis is tinted to its own series, so there is no guessing which scale
-   belongs to which mark. */
 .combo-axis-label--bar { fill: #8798f0; }
 .combo-axis-label--line { fill: var(--p); }
 
@@ -16175,4 +14920,75 @@ body {
   .combo-chart-hint {
     display: none;
   }
+}
+
+.emp-pager {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.emp-pager-item {
+  display: inline-flex;
+}
+
+.emp-pager-link {
+  min-width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--ease), border-color var(--ease), color var(--ease);
+}
+
+.emp-pager-link svg {
+  width: 15px;
+  height: 15px;
+}
+
+.emp-pager-link:hover {
+  background: var(--canvas);
+  border-color: var(--line-strong);
+}
+
+.emp-pager-item.is-active .emp-pager-link {
+  color: #fff;
+  background: var(--p);
+  border-color: var(--p);
+}
+
+.emp-pager-item.is-disabled .emp-pager-link {
+  opacity: .45;
+  pointer-events: none;
+}
+
+.emp-pager-link--break {
+  border-color: transparent;
+  background: transparent;
+  cursor: default;
+}
+
+.emp-pager-link--break:hover {
+  background: transparent;
+  border-color: transparent;
+}
+
+.emp-pager-link:focus-visible {
+  outline: 2px solid var(--p);
+  outline-offset: 2px;
 }

@@ -4,9 +4,9 @@ import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import { IconAlertTriangle, IconClock, IconTarget, IconUserCheck } from '../../Layout/Sidebar/icons'
-import { PERFORMANCE_TABS } from '../performanceTabs'
+import { PERFORMANCE_TABS } from '../../../utils/Performance/performanceTabs'
 import useApi from '../../../hooks/useApi'
-import useEmployeeDirectory from '../useEmployeeDirectory'
+import useEmployeeDirectory from '../../../utils/Performance/useEmployeeDirectory'
 import PerfAvatar from '../PerfAvatar'
 import PerfStats from '../PerfStats'
 import {
@@ -17,7 +17,7 @@ import {
   formatDateDisplay,
   goalStatusPillClass,
   isGoalOverdue,
-} from '../performanceStore'
+} from '../../../utils/Performance/performanceStore'
 
 function GoalForm({ goal, employees, isManager, onClose, onSaved }) {
   const { createGoal, updateGoal } = useApi()
@@ -236,7 +236,7 @@ function GoalsList({ currentUser }) {
   const [error, setError] = useState('')
   const [employeeFilter, setEmployeeFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [formGoal, setFormGoal] = useState(undefined) // undefined = closed, null = create, goal = edit
+  const [formGoal, setFormGoal] = useState(undefined)
 
   const refresh = useCallback(async () => {
     setLoading(true)

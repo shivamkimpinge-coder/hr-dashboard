@@ -38,21 +38,16 @@ export const statusPillClass = (status) => {
     case LEAVE_STATUS.REJECTED:
       return 'pill-danger'
     default:
-      return 'pill-muted' // Cancelled
+      return 'pill-muted'
   }
 }
 
-// Admin oversees leave but never applies for it themselves — HR and
-// Employees do. Enforced for real in backend/controllers/leaveController.js;
-// this just keeps the tab out of Admin's way.
 export const getLeaveTabs = (currentUser) =>
   [
     { label: 'Requests', to: '/dashboard/leave', end: true },
     !isAdminRole(currentUser) && { label: 'Apply Leave', to: '/dashboard/leave/apply' },
   ].filter(Boolean)
 
-// Apply Leave always applies for the logged-in user themselves — no employee
-// picker. The backend resolves "who" from the JWT, not from the request body.
 export const getApplyLeaveFields = ({ idPrefix = '' } = {}) => [
   {
     name: 'leaveType',

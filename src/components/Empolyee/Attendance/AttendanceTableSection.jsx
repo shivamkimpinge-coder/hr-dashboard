@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import useApi from '../../../hooks/useApi'
 import Button from '../../../utils/Button/button'
+import Pager from '../../../utils/Pagination/pager'
+import { usePagination } from '../../../utils/Pagination/usePagination'
 import { SessionRows } from '../../Attendance/checkInOut'
-import { IconCalendar, IconChevronLeft, IconChevronRight, IconClock, IconTrendingUp, IconUserOff } from '../../Layout/Sidebar/icons'
+import { IconCalendar, IconClock, IconTrendingUp, IconUserOff } from '../../Layout/Sidebar/icons'
 import {
   ATTENDANCE_STATUS,
   formatDateDisplay,
@@ -15,7 +17,7 @@ import {
   hoursStatusPillClass,
   monthValueOf,
   statusPillClass,
-} from '../../Attendance/attendanceStore'
+} from '../../../utils/AttendanceUtils/attendanceStore'
 
 const PAGE_SIZE = 5
 
@@ -34,8 +36,6 @@ function StatCard({ icon: Icon, tone, label, value, sub }) {
   )
 }
 
-// A finished full-length day just reads as its plain status ("Present") —
-// only an open session or an under-hours day gets the hours-based wording.
 function StatusPill({ record }) {
   const hoursStatus = getHoursStatus(record)
   const useHoursLabel = hoursStatus === 'in-progress' || hoursStatus === 'short'
@@ -92,7 +92,7 @@ function AttendanceTableSection({ employeeId }) {
     const month = getMonthDates(monthValueOf())
     return { from: month[0], to: getDateKey() }
   }, [])
-
+console.log('defaultRange:', defaultRange);
   const [draftFrom, setDraftFrom] = useState(defaultRange.from)
   const [draftTo, setDraftTo] = useState(defaultRange.to)
   const [appliedRange, setAppliedRange] = useState(defaultRange)
@@ -101,16 +101,16 @@ function AttendanceTableSection({ employeeId }) {
   const [records, setRecords] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [page, setPage] = useState(1)
   const [viewRecord, setViewRecord] = useState(null)
 
   const refresh = useCallback(async () => {
+    debugger;
     setLoading(true)
     setError('')
     try {
       const data = await listAttendance({ employeeId, from: appliedRange.from, to: appliedRange.to })
+      console.log('Attendance data:', data);
       setRecords(data.attendance || [])
-      setPage(1)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -145,11 +145,7 @@ function AttendanceTableSection({ employeeId }) {
     return { total, present, absent, short, pct }
   }, [sortedRecords])
 
-  const totalPages = Math.max(1, Math.ceil(sortedRecords.length / PAGE_SIZE))
-  const currentPage = Math.min(page, totalPages)
-  const pageRecords = sortedRecords.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-  const firstShown = sortedRecords.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1
-  const lastShown = Math.min(currentPage * PAGE_SIZE, sortedRecords.length)
+  const paged = usePagination(sortedRecords, PAGE_SIZE)
 
   return (
     <>
@@ -205,12 +201,12 @@ function AttendanceTableSection({ employeeId }) {
                     <tr>
                       <td colSpan={6}>Loading attendance...</td>
                     </tr>
-                  ) : pageRecords.length === 0 ? (
+                  ) : paged.totalItems === 0 ? (
                     <tr>
                       <td colSpan={6}>No attendance records found for the selected date range.</td>
                     </tr>
                   ) : (
-                    pageRecords.map((record) => (
+                    paged.pageItems.map((record) => (
                       <tr key={record._id || record.date}>
                         <td>{formatDateDisplay(record.date)}</td>
                         <td>{formatTimeDisplay(record.checkIn)}</td>
@@ -231,41 +227,13 @@ function AttendanceTableSection({ employeeId }) {
               </table>
             </div>
 
-            {sortedRecords.length > 0 ? (
-              <div className="emp-pagination">
-                <p>
-                  Showing {firstShown} to {lastShown} of {sortedRecords.length} records
-                </p>
-                <div className="emp-pager">
-                  <button
-                    type="button"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    aria-label="Previous page"
-                  >
-                    <IconChevronLeft />
-                  </button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-                    <button
-                      key={n}
-                      type="button"
-                      className={n === currentPage ? 'is-active' : ''}
-                      onClick={() => setPage(n)}
-                    >
-                      {n}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    aria-label="Next page"
-                  >
-                    <IconChevronRight />
-                  </button>
-                </div>
-              </div>
-            ) : null}
+            <Pager
+              page={paged.page}
+              pageSize={paged.pageSize}
+              totalItems={paged.totalItems}
+              totalPages={paged.totalPages}
+              onChange={paged.setPage}
+            />
           </div>
         </div>
       </div>
