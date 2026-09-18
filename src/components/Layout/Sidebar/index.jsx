@@ -8,6 +8,7 @@ import {
   IconWallet,
   IconCalendar,
   IconTrendingUp,
+  IconUserCheck,
 } from './icons'
 
 function buildNavItems(canManageEmployees) {
@@ -20,6 +21,13 @@ function buildNavItems(canManageEmployees) {
   icon: IconUsers,
   to: '/dashboard/employees'
 },
+
+    canManageEmployees && {
+      key: 'approvals',
+      label: 'Approvals',
+      icon: IconUserCheck,
+      to: '/dashboard/approvals',
+    },
 
     { key: 'attendance', label: 'Attendance', icon: IconClock, to: '/dashboard/attendance' },
     { key: 'leaves', label: 'Leaves', icon: IconCalendar, to: '/dashboard/leave' },

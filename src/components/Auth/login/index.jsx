@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useLocation } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import { takeSessionEndedMessage } from '../../../hooks/api'
 import CommonForm from '../../../utils/Form/commonform'
 import useApi from '../../../hooks/useApi'
 
@@ -9,6 +10,7 @@ const EMAIL_PATTERN = /\S+@\S+\.\S+/
 
 function Login({ onLoginSuccess, onForgotPassword }) {
   const location = useLocation()
+  const [token1,setToken1] = useState(null)
   const { login, loading } = useApi()
 
   const {
@@ -22,17 +24,34 @@ function Login({ onLoginSuccess, onForgotPassword }) {
 
   useEffect(() => {
     if (location.state?.signupSuccess) {
-      toast.success('Account created! Please sign in.', { id: 'signup-success' })
+      toast.success(
+        location.state.message || 'Account created. An Admin or HR must approve it before you can sign in.',
+        { id: 'signup-success', duration: 6000 }
+      )
     }
   }, [location.state])
+
+  useEffect(() => {
+    const endedMessage = takeSessionEndedMessage()
+    if (endedMessage) {
+      toast.error(endedMessage, { id: 'session-ended', duration: 6000 })
+    }
+  }, [])
 
   const onSubmit = async ({ email, password }) => {
     try {
       const data = await login({ email, password })
+      console.log('Login successful:', data)
       toast.success('Welcome back!')
       onLoginSuccess?.(data.user, data.token)
+      setToken1(data.token)
     } catch (err) {
-      toast.error(err.message || 'Invalid email or password.')
+      // A pending or deactivated account is a longer explanation than a simple
+      // credential error, so it gets more time on screen.
+      const isStatusBlock = err.status === 403
+      toast.error(err.message || 'Invalid email or password.', {
+        duration: isStatusBlock ? 6000 : 4000,
+      })
     }
   }
 

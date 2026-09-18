@@ -1,3 +1,22 @@
+// function LeaveDetails({  }) {
+//   return(
+//     <div className="panel detail-panel">
+//       <SectionTabs tabs={getLeaveTabs()} />
+
+//       <div className="panel-heading">
+//         <div>
+//           <h2>Leave Details</h2>
+//         </div>
+//       </div>
+
+//       <div className="panel-body">
+//         <p>Leave details content goes here.</p>
+//       </div>
+//     </div>
+//   )
+// }
+
+// export default LeaveDetails
 import Button from '../../../utils/Button/button'
 import { formatDateDisplay, statusPillClass } from '../leaveFormConfig'
 

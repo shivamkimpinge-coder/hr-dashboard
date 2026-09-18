@@ -11,6 +11,7 @@ const variantClass = {
   warn: 'action-btn action-btn-warn',
   logout: 'sidebar-logout',
   close: 'close-btn',
+  // danger: 'btn btn-danger',
 }
 
 function Button({ variant = 'primary', to, type = 'button', onClick, children, className = '', ...rest }) {

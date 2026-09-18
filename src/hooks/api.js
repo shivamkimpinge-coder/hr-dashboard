@@ -1,5 +1,5 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api'
-const AUTH_TOKEN_KEY = 'hrAuthToken'
+const AUTH_TOKEN_KEY = 'Token'
 
 export const getToken = () => localStorage.getItem(AUTH_TOKEN_KEY)
 
@@ -17,6 +17,39 @@ const buildQuery = (params = {}) => {
     if (value !== undefined && value !== null && value !== '') query.set(key, value)
   })
   return query.toString()
+}
+
+const SESSION_ENDED_KEY = 'hrSessionEndedMessage'
+
+// A 403 that names an account status came from the auth layer rejecting the
+// account itself, not from an ordinary permission check, so the stored token is
+// now worthless and the session has to end.
+const handleDeadSession = (status, data) => {
+  const accountRejected = status === 403 && Boolean(data?.status)
+  if (status !== 401 && !accountRejected) return
+  if (!getToken()) return
+
+  clearToken()
+  localStorage.removeItem('hrCurrentUser')
+  try {
+    localStorage.setItem(
+      SESSION_ENDED_KEY,
+      data?.message || 'Your session has ended. Please sign in again.'
+    )
+  } catch {
+    // storage is best-effort here; the redirect still signs the user out
+  }
+  if (window.location.pathname !== '/') window.location.replace('/')
+}
+
+export const takeSessionEndedMessage = () => {
+  try {
+    const message = localStorage.getItem(SESSION_ENDED_KEY)
+    if (message) localStorage.removeItem(SESSION_ENDED_KEY)
+    return message
+  } catch {
+    return null
+  }
 }
 
 async function request(path, { method = 'GET', body } = {}) {
@@ -38,6 +71,7 @@ async function request(path, { method = 'GET', body } = {}) {
   const data = await response.json().catch(() => ({}))
 
   if (!response.ok) {
+    handleDeadSession(response.status, data)
     const error = new Error(data.message || 'Something went wrong. Please try again.')
     error.status = response.status
     throw error
@@ -63,8 +97,10 @@ async function requestWithFile(path, formData) {
   }
 
   const data = await response.json().catch(() => ({}))
+  console.log('requestWithFile response:', response)
 
   if (!response.ok) {
+    handleDeadSession(response.status, data)
     const error = new Error(data.message || 'Something went wrong. Please try again.')
     error.status = response.status
     throw error
@@ -95,6 +131,12 @@ export const employeeApi = {
   create: (payload) => request('/employees', { method: 'POST', body: payload }),
   update: (id, payload) => request(`/employees/${id}`, { method: 'PUT', body: payload }),
   remove: (id) => request(`/employees/${id}`, { method: 'DELETE' }),
+}
+
+export const approvalApi = {
+  pending: () => request('/approvals/pending'),
+  approve: (id, payload = {}) => request(`/approvals/${id}/approve`, { method: 'PATCH', body: payload }),
+  reject: (id, payload = {}) => request(`/approvals/${id}/reject`, { method: 'PATCH', body: payload }),
 }
 
 export const profileApi = {
@@ -204,4 +246,5 @@ export const api = {
   goals: goalApi,
   performanceReviews: performanceReviewApi,
   notifications: notificationApi,
+  approvals: approvalApi,
 }

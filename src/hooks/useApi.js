@@ -32,6 +32,10 @@ export default function useApi() {
   const updateEmployee = useCallback((id, payload) => run(() => api.employees.update(id, payload)), [run])
   const deleteEmployee = useCallback((id) => run(() => api.employees.remove(id)), [run])
 
+  const listPendingApprovals = useCallback(() => run(() => api.approvals.pending()), [run])
+  const approveSignup = useCallback((id, payload) => run(() => api.approvals.approve(id, payload)), [run])
+  const rejectSignup = useCallback((id, payload) => run(() => api.approvals.reject(id, payload)), [run])
+
   const getProfile = useCallback(() => run(() => api.profile.get()), [run])
   const updateProfile = useCallback((payload) => run(() => api.profile.update(payload)), [run])
   const uploadProfileImage = useCallback((file) => run(() => api.profile.uploadImage(file)), [run])
@@ -97,6 +101,10 @@ export default function useApi() {
     forgotPassword,
     resetPassword,
     getCurrentUser,
+
+    listPendingApprovals,
+    approveSignup,
+    rejectSignup,
 
     listEmployees,
     getEmployeeDirectory,

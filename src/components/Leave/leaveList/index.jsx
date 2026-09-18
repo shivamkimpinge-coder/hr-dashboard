@@ -175,7 +175,7 @@ function LeaveList({ currentUser }) {
 
       <LeaveDetails leave={selectedLeave} onClose={() => setSelectedLeave(null)} />
     </div>
-  )
+  ) 
 }
 
 export default LeaveList

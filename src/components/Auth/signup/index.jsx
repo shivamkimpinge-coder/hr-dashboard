@@ -21,8 +21,8 @@ function Signup({ onSignupSuccess }) {
 
   const onSubmit = async ({ name, email, password }) => {
     try {
-      await registerUser({ name, email, password })
-      onSignupSuccess?.()
+      const data = await registerUser({ name, email, password })
+      onSignupSuccess?.(data?.message)
     } catch (err) {
       toast.error(err.message || 'Registration failed.')
     }

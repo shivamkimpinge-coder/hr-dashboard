@@ -19,6 +19,7 @@ import TaskBoard from './components/Tasks/taskBoard'
 import Goals from './components/Performance/goals'
 import PerformanceReview from './components/Performance/performanceReview'
 import Notifications from './components/Notifications'
+import PendingApprovals from './components/Approvals'
 
 import ForgetPass from './components/Auth/forgotpass'
 import Login from './components/Auth/login'
@@ -43,6 +44,14 @@ function AppRoutes() {
   const navigate = useNavigate()
 
   const handleAuthSuccess = (user, token) => {
+    // Without a user object there is no role to enforce against, so signing in
+    // would land on a dashboard with every manager route silently redirecting.
+    // Fail loudly here instead of writing "undefined" into localStorage.
+    if (!user || !token) {
+      toast.error('Sign-in response was incomplete. Please try again.')
+      return
+    }
+
     setToken(token)
     setCurrentUser(user)
     localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user))
@@ -58,8 +67,8 @@ function AppRoutes() {
     })
   }
 
-  const handleSignupSuccess = () => {
-    navigate('/', { replace: true, state: { signupSuccess: true } })
+  const handleSignupSuccess = (message) => {
+    navigate('/', { replace: true, state: { signupSuccess: true, message } })
   }
 
   const handleLogout = () => {
@@ -102,6 +111,15 @@ function AppRoutes() {
           }
         />
         <Route path="employees/:employeeId/*" element={<EmployeeDetails />} />
+
+        <Route
+          path="approvals"
+          element={
+            <RequireManager currentUser={currentUser}>
+              <PendingApprovals currentUser={currentUser} />
+            </RequireManager>
+          }
+        />
 
         <Route path="attendance" element={isManager ? <TeamAttendanceOverview /> : <CheckInOut currentUser={currentUser} />} />
         <Route
