@@ -12,7 +12,7 @@ import GenerateSalary from './components/Payroll/generateSalary'
 import LeaveList from './components/Leave/leaveList'
 import ApplyLeave from './components/Leave/applyLeave'
 import CheckInOut from './components/Attendance/checkInOut'
-import TeamAttendanceOverview from './components/Attendance/teamOverview'
+import TeamAttendanceOverview from './components/Attendance/teamOverview'find src -iname '*api*' -o -iname '*session*'
 import MarkAttendance from './components/Attendance/markAttendance'
 import AttendanceReports from './components/Attendance/attendanceReports'
 import TaskBoard from './components/Tasks/taskBoard'
@@ -20,6 +20,10 @@ import Goals from './components/Performance/goals'
 import PerformanceReview from './components/Performance/performanceReview'
 import Notifications from './components/Notifications'
 import PendingApprovals from './components/Approvals'
+import SuperAdminLayout from './components/SuperAdmin/layout'
+import SuperAdminDashboard from './components/SuperAdmin'
+import SuperAdminCompanyDetail from './components/SuperAdmin/companyDetail'
+import SuperAdminEmployeeDetail from './components/SuperAdmin/employeeDetail'
 
 import ForgetPass from './components/Auth/forgotpass'
 import Login from './components/Auth/login'
@@ -27,20 +31,12 @@ import Signup from './components/Auth/signup'
 import ResetPass from './components/Auth/resetpass'
 
 import RequireManager from './utils/RequireManager'
-import { isManagerRole } from './utils/roles'
-import { clearToken, getToken, setToken } from './hooks/api'
-
-const CURRENT_USER_KEY = 'hrCurrentUser'
+import { isManagerRole, isSuperAdmin } from './utils/roles'
+import { clearSession, getStoredUser, getToken, saveSession, saveStoredUser } from './hooks/useApi'
 
 function AppRoutes() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(getToken()))
-  const [currentUser, setCurrentUser] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem(CURRENT_USER_KEY) || 'null')
-    } catch {
-      return null
-    }
-  })
+  const [currentUser, setCurrentUser] = useState(getStoredUser)
   const navigate = useNavigate()
 
   const handleAuthSuccess = (user, token) => {
@@ -52,17 +48,16 @@ function AppRoutes() {
       return
     }
 
-    setToken(token)
+    saveSession(user, token)
     setCurrentUser(user)
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user))
     setIsLoggedIn(true)
-    navigate('/dashboard')
+    navigate(isSuperAdmin(user) ? '/superadmin' : '/dashboard')
   }
 
   const handleProfileUpdate = (updatedUser) => {
     setCurrentUser((prev) => {
       const merged = { ...prev, ...updatedUser, id: updatedUser._id || updatedUser.id || prev?.id }
-      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(merged))
+      saveStoredUser(merged)
       return merged
     })
   }
@@ -72,8 +67,7 @@ function AppRoutes() {
   }
 
   const handleLogout = () => {
-    clearToken()
-    localStorage.removeItem(CURRENT_USER_KEY)
+    clearSession()
     setCurrentUser(null)
     setIsLoggedIn(false)
     navigate('/')
@@ -91,12 +85,31 @@ function AppRoutes() {
       <Route path="/reset-password" element={<ResetPass onBack={() => navigate('/')} />} />
 
       <Route
+        path="/superadmin"
+        element={
+          !isLoggedIn ? (
+            <Navigate to="/" replace />
+          ) : isSuperAdmin(currentUser) ? (
+            <SuperAdminLayout currentUser={currentUser} onLogout={handleLogout} />
+          ) : (
+            <Navigate to="/dashboard" replace />
+          )
+        }
+      >
+        <Route index element={<SuperAdminDashboard />} />
+        <Route path="companies/:companyId" element={<SuperAdminCompanyDetail />} />
+        <Route path="companies/:companyId/employees/:userId" element={<SuperAdminEmployeeDetail />} />
+      </Route>
+
+      <Route
         path="/dashboard"
         element={
-          isLoggedIn ? (
-            <DashboardLayout currentUser={currentUser} onLogout={handleLogout} onProfileUpdate={handleProfileUpdate} />
-          ) : (
+          !isLoggedIn ? (
             <Navigate to="/" replace />
+          ) : isSuperAdmin(currentUser) ? (
+            <Navigate to="/superadmin" replace />
+          ) : (
+            <DashboardLayout currentUser={currentUser} onLogout={handleLogout} onProfileUpdate={handleProfileUpdate} />
           )
         }
       >

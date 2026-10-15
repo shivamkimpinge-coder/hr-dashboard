@@ -3,6 +3,7 @@ import { isManagerRole } from '../../../utils/roles'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
+import EmployeeSearchFilter from '../../../utils/EmployeeSearchFilter'
 import { IconAlertTriangle, IconClock, IconTarget, IconUserCheck } from '../../Layout/Sidebar/icons'
 import { PERFORMANCE_TABS } from '../../../utils/Performance/performanceTabs'
 import useApi from '../../../hooks/useApi'
@@ -297,17 +298,12 @@ function GoalsList({ currentUser }) {
 
       <div className="row g-3">
         {isManager ? (
-          <div className="form-field filter-field">
-            <label htmlFor="goal-employee-filter">Filter by employee</label>
-            <select id="goal-employee-filter" value={employeeFilter} onChange={(event) => setEmployeeFilter(event.target.value)}>
-              <option value="">All employees</option>
-              {employees.map((employee) => (
-                <option key={employee._id} value={employee.employeeId}>
-                  {employee.employeeId} — {employee.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <EmployeeSearchFilter
+            id="goal-employee-filter"
+            employees={employees}
+            value={employeeFilter}
+            onChange={setEmployeeFilter}
+          />
         ) : null}
 
         <div className="form-field filter-field">

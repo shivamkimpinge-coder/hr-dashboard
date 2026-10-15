@@ -3,9 +3,10 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import CommonForm from '../../../utils/Form/commonform'
-import useApi from '../../../hooks/useApi'
-import { getProfileImageUrl } from '../../../hooks/api'
+import useApi, { getProfileImageUrl } from '../../../hooks/useApi'
 import { isValidPhoneNumber } from 'react-phone-number-input'
+import { isManagerRole } from '../../../utils/roles'
+// import useApi from './useApi'
 
 const EMAIL_PATTERN = /\S+@\S+\.\S+/
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024
@@ -108,14 +109,33 @@ function ChangePasswordModal({ changePassword, onClose }) {
 }
 
 function Profile({ currentUser, onProfileUpdate, onLogout }) {
-  const { getProfile, updateProfile, uploadProfileImage, changePassword } = useApi()
+  const { getProfile, updateProfile, uploadProfileImage, changePassword, getMyCompany } = useApi()
 
   const [user, setUser] = useState(currentUser || null)
   const [loading, setLoading] = useState(true)
   const [imagePreview, setImagePreview] = useState(null)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [passwordModalOpen, setPasswordModalOpen] = useState(false)
+  const [company, setCompany] = useState(null)
   const fileInputRef = useRef(null)
+  const isManager = isManagerRole(currentUser)
+
+  useEffect(() => {
+    if (!isManager) return
+    getMyCompany()
+      .then((data) => setCompany(data.company || null))
+      .catch(() => setCompany(null))
+  }, [isManager, getMyCompany])
+
+  const copyCompanyCode = async () => {
+    if (!company?.code) return
+    try {
+      await navigator.clipboard.writeText(company.code)
+      toast.success('Company code copied.')
+    } catch {
+      toast.error('Could not copy the code — copy it manually.')
+    }
+  }
 
   const {
     register,
@@ -261,6 +281,18 @@ function Profile({ currentUser, onProfileUpdate, onLogout }) {
             <p className="profile-summary-email">{user?.email}</p>
             <span className={`pill ${rolePillClass}`}>{user?.role || 'User'}</span>
             {memberSince ? <p className="profile-summary-since">Member since {memberSince}</p> : null}
+
+            {isManager && company ? (
+              <div className="profile-company-code">
+                <p className="profile-company-code-label">Company Code</p>
+                <div className="profile-company-code-box">
+                  <span className="profile-company-code-value">{company.code}</span>
+                  <button type="button" className="profile-company-code-copy" onClick={copyCompanyCode}>
+                    ⧉ Copy
+                  </button>
+                </div>
+              </div>
+            ) : null}
 
             <Button
               type="button"

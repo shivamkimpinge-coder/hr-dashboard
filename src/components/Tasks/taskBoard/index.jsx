@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { isManagerRole } from '../../../utils/roles'
 import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
+import EmployeeSearchFilter from '../../../utils/EmployeeSearchFilter'
 import useApi from '../../../hooks/useApi'
 import TaskForm from '../taskForm'
 import TaskDetails from '../taskDetails'
@@ -95,21 +96,12 @@ function TaskBoard({ currentUser }) {
       </div>
 
       {isManager ? (
-        <div className="form-field filter-field">
-          <label htmlFor="task-employee-filter">Filter by employee</label>
-          <select
-            id="task-employee-filter"
-            value={assigneeFilter}
-            onChange={(event) => setAssigneeFilter(event.target.value)}
-          >
-            <option value="">All employees</option>
-            {employees.map((employee) => (
-              <option key={employee._id} value={employee.employeeId}>
-                {employee.employeeId} — {employee.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <EmployeeSearchFilter
+          id="task-employee-filter"
+          employees={employees}
+          value={assigneeFilter}
+          onChange={setAssigneeFilter}
+        />
       ) : null}
 
       {error ? <div className="feedback-banner feedback-banner-error">{error}</div> : null}

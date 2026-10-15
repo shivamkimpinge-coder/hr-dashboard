@@ -19,6 +19,26 @@ export const getAttendanceTabs = (isManager) =>
         { label: 'Reports', to: '/dashboard/attendance/reports' },
       ]
 
+export const CORRECTION_STATUS = {
+  PENDING: 'Pending',
+  APPROVED: 'Approved',
+  REJECTED: 'Rejected',
+  CANCELLED: 'Cancelled',
+}
+
+export const correctionStatusPillClass = (status) => {
+  switch (status) {
+    case CORRECTION_STATUS.APPROVED:
+      return 'pill-success'
+    case CORRECTION_STATUS.REJECTED:
+      return 'pill-danger'
+    case CORRECTION_STATUS.CANCELLED:
+      return 'pill-muted'
+    default:
+      return 'pill-warning'
+  }
+}
+
 const pad2 = (value) => String(value).padStart(2, '0')
 
 export const getDateKey = (date = new Date()) => {

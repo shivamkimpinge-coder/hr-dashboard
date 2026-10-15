@@ -72,6 +72,12 @@ function Payslip({ payroll, onClose }) {
               <p>
                 <strong>Deduction:</strong> {formatCurrency(payroll.deduction)}
               </p>
+              {payroll.lopDays > 0 ? (
+                <p>
+                  <strong>LOP ({payroll.lopDays} day{payroll.lopDays === 1 ? '' : 's'}):</strong>{' '}
+                  {formatCurrency(payroll.lopAmount)}
+                </p>
+              ) : null}
             </div>
           </div>
 

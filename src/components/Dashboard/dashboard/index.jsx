@@ -10,10 +10,14 @@ import { MAX_SESSIONS_PER_DAY, canStartNewSession, formatTimeDisplay, getDateKey
 import { TASK_STATUS, formatDateDisplay as taskFormatDate, priorityPillClass as taskPriorityPillClass } from '../../Tasks/taskStore'
 import PerfAvatar from '../../Performance/PerfAvatar'
 import useApi from '../../../hooks/useApi'
+import ImpersonationBanner from '../../SuperAdmin/ImpersonationBanner'
 import { isManagerRole } from '../../../utils/roles'
 import Pager from '../../../utils/Pagination/pager'
 import { usePagination } from '../../../utils/Pagination/usePagination'
 import { HeadcountChart } from './charts'
+
+// import useApi from './useApi'
+
 import {
   IconAlertTriangle,
   IconCalendar,
@@ -614,7 +618,7 @@ function OverviewContent({
       <section className="row g-3">
         <div className="col-lg-12">
           <div className="page-head">
-            <DashboardGreeting currentUser={currentUser} subtitle="Here's what's happening with your team today." />
+            <DashboardGreeting currentUser={currentUser} subtitle="Hee's what's happening with your team today." />
             <Button variant="secondary" to="/dashboard/employees">
               View all employees
             </Button>
@@ -657,6 +661,17 @@ function OverviewContent({
             </div>
             <HeadcountChart data={headcountSeries} />
           </div>
+        </div>
+      </section>
+
+      <section className="row g-3">
+        <div className="col-lg-12">
+          <PendingApprovals
+            leaves={pendingLeaves}
+            loading={pendingLoading}
+            onApprove={onApproveLeave}
+            onReject={onRejectLeave}
+          />
         </div>
       </section>
 
@@ -884,6 +899,7 @@ function DashboardLayout({ onLogout, currentUser, onProfileUpdate }) {
     setHeadcountRange,
     pendingLeaves,
     pendingLoading,
+    refreshPendingLeaves: fetchPendingLeaves,
     handleApproveLeave,
     handleRejectLeave,
     refreshEmployeeData,
@@ -909,6 +925,7 @@ function DashboardLayout({ onLogout, currentUser, onProfileUpdate }) {
 
       <main className="dashboard-main">
         <Header currentUser={currentUser} onLogout={onLogout} onToggleSidebar={toggleSidebar} />
+        <ImpersonationBanner currentUser={currentUser} />
         <Outlet context={outletContext} />
       </main>
     </div>
@@ -917,6 +934,20 @@ function DashboardLayout({ onLogout, currentUser, onProfileUpdate }) {
 
 export function DashboardHome() {
   const ctx = useOutletContext()
+  const { isManager, refreshPendingLeaves } = ctx
+
+  // The layout stays mounted while you move between dashboard pages, so its
+  // pending-leave list would still show a request that was already approved
+  // from the Leaves page. Refresh on every *return* visit, but not on the first
+  // one: the layout has just fetched it, and asking twice is wasted.
+  const firstVisit = useRef(true)
+  useEffect(() => {
+    if (firstVisit.current) {
+      firstVisit.current = false
+      return
+    }
+    if (isManager) refreshPendingLeaves()
+  }, [isManager, refreshPendingLeaves])
 
   if (!ctx.isManager) return <EmployeeOverview currentUser={ctx.currentUser} />
 

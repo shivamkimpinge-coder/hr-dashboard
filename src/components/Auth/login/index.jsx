@@ -2,16 +2,23 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useLocation } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { takeSessionEndedMessage } from '../../../hooks/api'
+import useApi, {
+  clearSession,
+  setToken,
+  takeSessionEndedMessage,
+} from '../../../hooks/useApi'
+
 import CommonForm from '../../../utils/Form/commonform'
-import useApi from '../../../hooks/useApi'
+// import useApi from '../../../hooks/useApi'
+
+// import useApi from './useApi'
 
 const EMAIL_PATTERN = /\S+@\S+\.\S+/
 
 function Login({ onLoginSuccess, onForgotPassword }) {
   const location = useLocation()
   const [token1,setToken1] = useState(null)
-  const { login, loading } = useApi()
+  const { login, getCurrentUser, loading } = useApi()
 
   const {
     register,
@@ -41,9 +48,21 @@ function Login({ onLoginSuccess, onForgotPassword }) {
   const onSubmit = async ({ email, password }) => {
     try {
       const data = await login({ email, password })
-      console.log('Login successful:', data)
+
+      // Login hands back only a token, so the token is stored first and the
+      // account's own details are then read from /auth/me. If that second call
+      // fails there is no usable session, so the token is thrown away again.
+      setToken(data.token)
+      let me
+      try {
+        me = await getCurrentUser()
+      } catch (err) {
+        clearSession()
+        throw err
+      }
+
       toast.success('Welcome back!')
-      onLoginSuccess?.(data.user, data.token)
+      onLoginSuccess?.(me.user, data.token)
       setToken1(data.token)
     } catch (err) {
       // A pending or deactivated account is a longer explanation than a simple

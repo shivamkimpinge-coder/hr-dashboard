@@ -12,16 +12,18 @@ function Signup({ onSignupSuccess }) {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm({
     mode: 'onTouched',
-    defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
+    defaultValues: { name: '', email: '', password: '', companyCode: '' },
   })
 
-  const onSubmit = async ({ name, email, password }) => {
+  // Only these four fields are ever sent — no companyId, no role, no status.
+  // The backend looks up the company from companyCode and always forces
+  // role: "Employee", status: "Pending" itself; nothing here can change that.
+  const onSubmit = async ({ name, email, password, companyCode }) => {
     try {
-      const data = await registerUser({ name, email, password })
+      const data = await registerUser({ name, email, password, companyCode })
       onSignupSuccess?.(data?.message)
     } catch (err) {
       toast.error(err.message || 'Registration failed.')
@@ -31,8 +33,9 @@ function Signup({ onSignupSuccess }) {
   return (
     <div className="auth-page auth-page--dark">
       <div className="auth-card">
-        <h1>Create Account</h1>
-        <p>Join HR Hub and manage your team.</p>
+        <p className="eyebrow">HR Office</p>
+        <h1>Create Your Account</h1>
+        <p>Join your company&apos;s workspace.</p>
 
         <CommonForm
           formClassName="auth-form"
@@ -50,7 +53,7 @@ function Signup({ onSignupSuccess }) {
             },
             {
               name: 'email',
-              label: 'Email',
+              label: 'Email Address',
               type: 'email',
               placeholder: 'you@company.com',
               className: 'auth-input',
@@ -72,29 +75,27 @@ function Signup({ onSignupSuccess }) {
               },
             },
             {
-              name: 'confirmPassword',
-              label: 'Confirm Password',
-              type: 'password',
-              showToggle: true,
-              placeholder: 'Re-enter your password',
+              name: 'companyCode',
+              label: 'Company Code',
+              type: 'text',
+              placeholder: 'e.g. A1B2C3',
               className: 'auth-input',
-              rules: {
-                required: 'Please confirm your password',
-                validate: (value) => value === watch('password') || 'Passwords do not match',
-              },
+              rules: { required: 'Company code is required' },
             },
           ]}
           onSubmit={handleSubmit(onSubmit)}
         >
+          <p className="form-hint">Please enter the company code provided by your company Admin or HR.</p>
+
           <button type="submit" className="auth-submit-btn" disabled={loading}>
-            {loading ? 'Creating Account...' : 'Create Account'}
+            {loading ? 'Submitting...' : 'Request to Join'}
           </button>
         </CommonForm>
 
         <p className="auth-footer">
           Already have an account?{' '}
           <Link to="/">
-            Sign In
+            Login
           </Link>
         </p>
       </div>

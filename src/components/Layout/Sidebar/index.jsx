@@ -11,6 +11,10 @@ import {
   IconUserCheck,
 } from './icons'
 
+function buildSuperAdminNavItems() {
+  return [{ key: 'companies', label: 'Companies', icon: IconGrid, to: '/superadmin', end: true }]
+}
+
 function buildNavItems(canManageEmployees) {
   return [
     { key: 'dashboard', label: 'Dashboard', icon: IconGrid, to: '/dashboard', end: true },
@@ -40,12 +44,13 @@ function buildNavItems(canManageEmployees) {
 function Sidebar({ currentUser, collapsed = false, mobileOpen = false, onNavigate }) {
   const isAdmin = currentUser?.role === 'Admin'
 const isHR = currentUser?.role === 'HR'
+const isSuperAdmin = currentUser?.role === 'SuperAdmin'
 
 const canManageEmployees = isAdmin || isHR
 
 const navItems = useMemo(
-  () => buildNavItems(canManageEmployees),
-  [canManageEmployees]
+  () => (isSuperAdmin ? buildSuperAdminNavItems() : buildNavItems(canManageEmployees)),
+  [isSuperAdmin, canManageEmployees]
 )
 
   return (

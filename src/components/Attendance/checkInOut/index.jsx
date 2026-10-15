@@ -3,6 +3,8 @@ import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import useApi from '../../../hooks/useApi'
+// import useApi from './useApi'
+import RequestCorrectionModal from '../corrections/RequestCorrectionModal'
 import { IconCalendar, IconClock, IconSparkle, IconTarget } from '../../Layout/Sidebar/icons'
 import {
   ATTENDANCE_STATUS,
@@ -197,7 +199,7 @@ export function SessionRows({ sessions }) {
   ))
 }
 
-function DayDetailModal({ record, onClose }) {
+function DayDetailModal({ record, onClose, onRequestCorrection }) {
   if (!record) return null
 
   const sessions = record.sessions?.length ? record.sessions : record.checkIn ? [{ checkIn: record.checkIn, checkOut: record.checkOut }] : []
@@ -226,6 +228,18 @@ function DayDetailModal({ record, onClose }) {
         <div className="attendance-sessions" style={{ marginTop: 14 }}>
           {sessions.length === 0 ? <p className="form-hint">No check-ins recorded for this day.</p> : <SessionRows sessions={sessions} />}
         </div>
+
+        {hoursStatus === 'in-progress' ? (
+          <p className="form-hint" style={{ marginTop: 10 }}>
+            This day still shows an open session with no check-out — it was never closed and won't resolve on its own.
+          </p>
+        ) : null}
+
+        <div className="action-row" style={{ marginTop: 14 }}>
+          <Button variant="secondary" onClick={() => onRequestCorrection(record)}>
+            Edit This Day
+          </Button>
+        </div>
       </div>
     </div>
   )
@@ -241,6 +255,9 @@ function CheckInOut() {
   const [selectedDate, setSelectedDate] = useState(() => getDateKey())
   const [historyFilter, setHistoryFilter] = useState('all')
   const [viewRecord, setViewRecord] = useState(null)
+  // null = closed; {} = open blank (the "Forgot to check in/out?" button);
+  // a filled object = open pre-filled with one day's info ("Edit This Day").
+  const [correctionModal, setCorrectionModal] = useState(null)
 
   const todayKey = getDateKey()
   const isViewingToday = selectedDate === todayKey
@@ -267,6 +284,22 @@ function CheckInOut() {
 
   useEffect(() => {
     refresh()
+
+    // HR/Admin can approve a correction from a different page/session at any
+    // time, which updates the real Attendance record directly — this tab has
+    // no way to be pushed that update, so poll and refetch on refocus to pick
+    // it up without the employee needing to manually reload.
+    const interval = setInterval(refresh, 60000)
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') refresh()
+    }
+    window.addEventListener('focus', refresh)
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('focus', refresh)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
   }, [refresh])
 
   const sessions = selectedRecord?.sessions || []
@@ -489,6 +522,12 @@ function CheckInOut() {
                   )}
                 </div>
               ) : null}
+
+              <div className="action-row">
+                <Button variant="secondary" onClick={() => setCorrectionModal({})}>
+                  Forgot to check in/out on another day?
+                </Button>
+              </div>
             </div>
 
             <div className="attendance-hero-gauge">
@@ -617,7 +656,22 @@ function CheckInOut() {
         </>
       )}
 
-      <DayDetailModal record={viewRecord} onClose={() => setViewRecord(null)} />
+      <DayDetailModal
+        record={viewRecord}
+        onClose={() => setViewRecord(null)}
+        onRequestCorrection={(record) => {
+          setViewRecord(null)
+          setCorrectionModal({
+            date: record.date,
+            requestedStatus: record.status,
+            requestedCheckIn: record.checkIn || '',
+            requestedCheckOut: '',
+          })
+        }}
+      />
+      {correctionModal ? (
+        <RequestCorrectionModal defaultValues={correctionModal} onClose={() => setCorrectionModal(null)} />
+      ) : null}
     </div>
   )
 }

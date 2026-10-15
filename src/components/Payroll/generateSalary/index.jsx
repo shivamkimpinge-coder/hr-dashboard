@@ -150,8 +150,12 @@ function GenerateSalary() {
         errors={errors}
         onSubmit={handleSubmit(onSubmit)}
       >
+        <p className="form-hint">
+          Loss of Pay for that employee's Approved leave in the selected month is added automatically when you
+          generate — it isn't part of this preview.
+        </p>
         <div className="payroll-net-preview">
-          <span>Net Salary</span>
+          <span>Net Salary (before LOP)</span>
           <strong>{formatCurrency(previewNet)}</strong>
         </div>
         <div className="action-row">

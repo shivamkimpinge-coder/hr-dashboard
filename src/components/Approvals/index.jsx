@@ -1,11 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import Button from '../../utils/Button/button'
 import useApi from '../../hooks/useApi'
-import { isAdminRole } from '../../utils/roles'
 import { IconUserCheck, IconUsers } from '../Layout/Sidebar/icons'
-
-const WORK_TYPES = ['Full Time', 'Part Time', 'Contract', 'Intern']
 
 const formatDate = (value) => {
   if (!value) return '--'
@@ -14,29 +11,15 @@ const formatDate = (value) => {
   return date.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
-const emptyForm = {
-  role: 'Employee',
-  department: '',
-  designation: '',
-  workType: 'Full Time',
-  reportingManager: '',
-  salary: '',
-  joiningDate: '',
-}
-
-function PendingApprovals({ currentUser }) {
+function PendingApprovals() {
   const { listPendingApprovals, approveSignup, rejectSignup } = useApi()
 
   const [pending, setPending] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [reviewUser, setReviewUser] = useState(null)
   const [rejectUser, setRejectUser] = useState(null)
   const [rejectReason, setRejectReason] = useState('')
-  const [form, setForm] = useState(emptyForm)
   const [busyId, setBusyId] = useState(null)
-
-  const canGrantPrivilegedRole = isAdminRole(currentUser)
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -55,30 +38,12 @@ function PendingApprovals({ currentUser }) {
     refresh()
   }, [refresh])
 
-  const roleOptions = useMemo(
-    () => (canGrantPrivilegedRole ? ['Employee', 'HR', 'Admin'] : ['Employee']),
-    [canGrantPrivilegedRole]
-  )
-
-  const openReview = (user) => {
-    setReviewUser(user)
-    setForm({ ...emptyForm, joiningDate: new Date().toISOString().slice(0, 10) })
-  }
-
-  const closeReview = useCallback(() => {
-    setReviewUser(null)
-    setForm(emptyForm)
-  }, [])
-
   const closeReject = useCallback(() => {
     setRejectUser(null)
     setRejectReason('')
   }, [])
 
-  // Rejecting from inside the review modal swaps to the confirm step rather than
-  // stacking two dialogs on top of each other.
   const openReject = (user) => {
-    setReviewUser(null)
     setRejectUser(user)
     setRejectReason('')
   }
@@ -86,42 +51,24 @@ function PendingApprovals({ currentUser }) {
   const isBusy = busyId !== null
 
   useEffect(() => {
-    if (!reviewUser && !rejectUser) return undefined
+    if (!rejectUser) return undefined
 
     const onKeyDown = (event) => {
-      if (event.key !== 'Escape' || isBusy) return
-      if (rejectUser) closeReject()
-      else closeReview()
+      if (event.key === 'Escape' && !isBusy) closeReject()
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [reviewUser, rejectUser, isBusy, closeReview, closeReject])
+  }, [rejectUser, isBusy, closeReject])
 
-  const setField = (key) => (event) => {
-    const { value } = event.target
-    setForm((previous) => ({ ...previous, [key]: value }))
-  }
-
-  const handleApprove = async (event) => {
-    event.preventDefault()
-    if (!reviewUser) return
-
-    setBusyId(reviewUser._id)
+  // Approving is a single click: the server activates the account and assigns
+  // the employee ID. Department, salary and the rest are filled in afterwards
+  // from the employee record, so there is nothing to collect here first.
+  const handleApprove = async (user) => {
+    setBusyId(user._id)
     try {
-      const payload = {
-        role: form.role,
-        department: form.department.trim(),
-        designation: form.designation.trim(),
-        workType: form.workType,
-        reportingManager: form.reportingManager.trim(),
-        joiningDate: form.joiningDate || undefined,
-      }
-      if (form.salary !== '') payload.salary = Number(form.salary)
-
-      const data = await approveSignup(reviewUser._id, payload)
-      toast.success(`${reviewUser.name} approved as ${data.user?.employeeId || 'staff'}.`)
-      setPending((previous) => previous.filter((item) => item._id !== reviewUser._id))
-      closeReview()
+      const data = await approveSignup(user._id, {})
+      toast.success(`${user.name} approved as ${data.user?.employeeId || 'staff'}.`)
+      setPending((previous) => previous.filter((item) => item._id !== user._id))
     } catch (err) {
       toast.error(err.message || 'Failed to approve this signup.')
     } finally {
@@ -212,8 +159,8 @@ function PendingApprovals({ currentUser }) {
                     <td>{formatDate(user.createdAt)}</td>
                     <td className="text-end">
                       <div className="action-row">
-                        <Button variant="approve" onClick={() => openReview(user)} disabled={rowBusy}>
-                          Approve
+                        <Button variant="approve" onClick={() => handleApprove(user)} disabled={rowBusy}>
+                          {rowBusy ? 'Approving...' : 'Approve'}
                         </Button>
                         <Button variant="reject" onClick={() => openReject(user)} disabled={rowBusy}>
                           Reject
@@ -227,113 +174,6 @@ function PendingApprovals({ currentUser }) {
           </table>
         </div>
       )}
-
-      {reviewUser ? (
-        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="approve-modal-title">
-          <div className="modal-card">
-            <div className="panel-heading">
-              <div>
-                <p className="eyebrow">Approve signup</p>
-                <h3 id="approve-modal-title">{reviewUser.name}</h3>
-                <p className="form-hint">{reviewUser.email}</p>
-              </div>
-              <Button variant="secondary" onClick={closeReview} disabled={isBusy}>
-                Cancel
-              </Button>
-            </div>
-
-            <form className="employee-form" onSubmit={handleApprove}>
-              <div className="form-grid">
-                <div className="form-field">
-                  <label htmlFor="approve-role">Role</label>
-                  <select id="approve-role" value={form.role} onChange={setField('role')}>
-                    {roleOptions.map((role) => (
-                      <option key={role} value={role}>
-                        {role}
-                      </option>
-                    ))}
-                  </select>
-                  {canGrantPrivilegedRole ? null : (
-                    <span className="form-hint">Only an Admin can grant Admin or HR.</span>
-                  )}
-                </div>
-
-                <div className="form-field">
-                  <label htmlFor="approve-department">Department</label>
-                  <input
-                    id="approve-department"
-                    value={form.department}
-                    onChange={setField('department')}
-                    placeholder="Engineering"
-                  />
-                </div>
-
-                <div className="form-field">
-                  <label htmlFor="approve-designation">Designation</label>
-                  <input
-                    id="approve-designation"
-                    value={form.designation}
-                    onChange={setField('designation')}
-                    placeholder="Software Engineer"
-                  />
-                </div>
-
-                <div className="form-field">
-                  <label htmlFor="approve-workType">Work Type</label>
-                  <select id="approve-workType" value={form.workType} onChange={setField('workType')}>
-                    {WORK_TYPES.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="form-field">
-                  <label htmlFor="approve-manager">Reporting Manager</label>
-                  <input
-                    id="approve-manager"
-                    value={form.reportingManager}
-                    onChange={setField('reportingManager')}
-                    placeholder="Optional"
-                  />
-                </div>
-
-                <div className="form-field">
-                  <label htmlFor="approve-salary">Monthly Salary</label>
-                  <input
-                    id="approve-salary"
-                    type="number"
-                    min="0"
-                    value={form.salary}
-                    onChange={setField('salary')}
-                    placeholder="0"
-                  />
-                </div>
-
-                <div className="form-field">
-                  <label htmlFor="approve-joining">Joining Date</label>
-                  <input
-                    id="approve-joining"
-                    type="date"
-                    value={form.joiningDate}
-                    onChange={setField('joiningDate')}
-                  />
-                </div>
-              </div>
-
-              <div className="action-row">
-                <Button type="submit" disabled={isBusy}>
-                  {isBusy ? 'Approving...' : 'Approve'}
-                </Button>
-                <Button type="reject" onClick={() => openReject(reviewUser)} disabled={isBusy}>
-                  Reject
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      ) : null}
 
       {rejectUser ? (
         <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="reject-modal-title">

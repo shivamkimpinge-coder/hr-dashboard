@@ -3,9 +3,16 @@ import toast from 'react-hot-toast'
 import Button from '../../../utils/Button/button'
 import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
 import useApi from '../../../hooks/useApi'
+import CorrectionDetails from '../corrections/correctionDetails'
+
+// import useApi from './useApi'
+
+
 import {
   ATTENDANCE_STATUS,
   ATTENDANCE_STATUSES,
+  correctionStatusPillClass,
+  formatDateDisplay,
   formatHours,
   formatTimeDisplay,
   getAttendanceTabs,
@@ -22,17 +29,48 @@ const emptyForm = {
 }
 
 function MarkAttendance() {
-  const { listEmployees, listAttendance, markAttendance } = useApi()
+  const {
+    listEmployees,
+    listAttendance,
+    markAttendance,
+    listAttendanceCorrections,
+    approveAttendanceCorrection,
+    rejectAttendanceCorrection,
+  } = useApi()
   const [employees, setEmployees] = useState([])
   const [form, setForm] = useState(emptyForm)
   const [dayRecords, setDayRecords] = useState([])
   const [error, setError] = useState('')
+  const [pendingCorrections, setPendingCorrections] = useState([])
+  const [selectedCorrection, setSelectedCorrection] = useState(null)
 
   useEffect(() => {
     listEmployees({ limit: 200 })
       .then((data) => setEmployees(data.employees || []))
       .catch(() => {})
   }, [listEmployees])
+
+  const refreshPendingCorrections = useCallback(() => {
+    listAttendanceCorrections({ status: 'Pending' })
+      .then((data) => setPendingCorrections(data.corrections || []))
+      .catch(() => {})
+  }, [listAttendanceCorrections])
+
+  useEffect(() => {
+    refreshPendingCorrections()
+  }, [refreshPendingCorrections])
+
+  const decideCorrection = async (correction, action, message) => {
+    try {
+      await action(correction._id)
+      toast.success(message)
+      refreshPendingCorrections()
+      refreshDay(form.date)
+      setSelectedCorrection(null)
+    } catch (err) {
+      toast.error(err.message)
+    }
+  }
 
   const refreshDay = useCallback(
     async (date) => {
@@ -225,6 +263,64 @@ function MarkAttendance() {
           </tbody>
         </table>
       </div>
+
+      <p className="eyebrow" style={{ marginTop: '1.5rem' }}>
+        Pending Correction Requests
+      </p>
+      <div className="table-responsive">
+        <table className="table table-dark table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Date</th>
+              <th>Requested Status</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pendingCorrections.length === 0 ? (
+              <tr>
+                <td colSpan={5}>No pending correction requests.</td>
+              </tr>
+            ) : (
+              pendingCorrections.map((correction) => (
+                <tr key={correction._id}>
+                  <td>
+                    {correction.employeeName} <span className="text-muted">({correction.employeeId})</span>
+                  </td>
+                  <td>{formatDateDisplay(correction.date)}</td>
+                  <td>{correction.requestedStatus}</td>
+                  <td>
+                    <span className={`pill ${correctionStatusPillClass(correction.status)}`}>{correction.status}</span>
+                  </td>
+                  <td>
+                    <div className="table-actions">
+                      <Button variant="view" onClick={() => setSelectedCorrection(correction)}>
+                        View
+                      </Button>
+                      <Button
+                        variant="approve"
+                        onClick={() => decideCorrection(correction, approveAttendanceCorrection, 'Correction approved.')}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        variant="reject"
+                        onClick={() => decideCorrection(correction, rejectAttendanceCorrection, 'Correction rejected.')}
+                      >
+                        Reject
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <CorrectionDetails correction={selectedCorrection} onClose={() => setSelectedCorrection(null)} />
     </div>
   )
 }

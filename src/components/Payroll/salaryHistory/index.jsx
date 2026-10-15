@@ -3,6 +3,7 @@ import { isManagerRole } from '../../../utils/roles'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Button from '../../../utils/Button/button'
 import SectionTabs from '../../../utils/SectionTabs/sectionTabs'
+import EmployeeSearchFilter from '../../../utils/EmployeeSearchFilter'
 import useApi from '../../../hooks/useApi'
 import Payslip from '../payslip'
 
@@ -72,21 +73,12 @@ function SalaryHistory({ currentUser }) {
       </div>
 
       {isManager ? (
-        <div className="form-field filter-field">
-          <label htmlFor="history-employee-filter">Filter by employee</label>
-          <select
-            id="history-employee-filter"
-            value={employeeFilter}
-            onChange={(event) => setEmployeeFilter(event.target.value)}
-          >
-            <option value="">All employees</option>
-            {employees.map((employee) => (
-              <option key={employee._id} value={employee.employeeId}>
-                {employee.employeeId} — {employee.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <EmployeeSearchFilter
+          id="history-employee-filter"
+          employees={employees}
+          value={employeeFilter}
+          onChange={setEmployeeFilter}
+        />
       ) : null}
 
       {error ? <div className="feedback-banner feedback-banner-error">{error}</div> : null}

@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import CommonForm from '../../../utils/Form/commonform'
 import useApi from '../../../hooks/useApi'
+// import useApi from './useApi'
 
 function ResetPass({ onBack }) {
   const [searchParams] = useSearchParams()
